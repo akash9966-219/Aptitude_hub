@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reading Comprehension & Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f0f2f5;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .passage-pane {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            line-height: 1.7;
+            font-size: 1.05rem;
+            border-left: 6px solid var(--accent);
+        }
+
+        .question-pane {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .q-text {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt {
+            padding: 14px;
+            border: 2px solid #edf2f7;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #f8fafc;
+        }
+
+        .opt:hover { border-color: var(--accent); }
+        .opt.selected { border-color: var(--accent); background: #ebf8ff; }
+        .opt.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer-nav {
+            margin-top: auto;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-weight: bold;">Verbal Logic: Reading Analysis</div>
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">Dashboard</a>
+</header>
+
+<div class="main-container">
+    <div class="passage-pane" id="passage-view"></div>
+    
+    <div class="question-pane">
+        <div id="progress-bar" style="font-size: 0.8rem; color: #666; margin-bottom: 5px;"></div>
+        <div class="q-text" id="question-view"></div>
+        <div class="options-list" id="options-view"></div>
+        
+        <div class="footer-nav">
+            <span id="score-tracker"></span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">Check Answer</button>
+                <button class="btn btn-next" id="nextBtn" onclick="loadNext()">Next →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const pool = [
+    { p: "One New York publisher has estimated that 50,000 to 60,000 people in the United States want an anthology that includes the complete works of William Shakespeare. And what accounts for this renewed interest? As scholars point out, his psychological insights into both male and female characters are amazing even today.", q: "This paragraph best supports the statement that:", opts: ["Shakespeare's characters are more interesting than fictional characters today.", "People even today are interested in Shakespeare's work because of the characters.", "Academic scholars are putting together an anthology.", "New Yorkers have a renewed interested.", "Shakespeare was a psychiatrist."], ans: 1 },
+    { p: "One of the warmest winters on record has put consumers in the mood to spend money. Spending is likely to be the strongest in thirteen years. During the month of February, sales of existing single-family homes hit an annual record rate of 4.75 million.", q: "This paragraph best supports the statement that:", opts: ["Spending will be higher 13 years from now.", "More people buy houses in February than any other month.", "In winter, prices of single-family homes are lowest.", "There were 4 million homes for sale in February.", "Warm winter weather is likely to affect the rate of home sales."], ans: 4 },
+    { p: "Generation Xers (born 1965-1981) tend to be more challenged when they can carry out tasks independently. This makes them the most entrepreneurial generation in history.", q: "This supports the statement that Gen Xers:", opts: ["Work harder than others.", "Have a tendency to be self-directed workers.", "Have an interest in making history.", "Require risk-taking behavior.", "Like to challenge their bosses."], ans: 1 },
+    { p: "If you're a fitness walker, there's no need for a health club. Your neighborhood is your club. All you need is a well-designed pair of athletic shoes.", q: "This paragraph best supports the statement that:", opts: ["Walking is better than weight lifting.", "Health club memberships are poor investments.", "Outdoor workouts are better than indoors.", "Fitness walking is a convenient and valuable exercise.", "Poorly designed shoes cause major injuries."], ans: 3 },
+    { p: "Miranda v. Arizona (1966) held that before police obtain statements, a person must be given a warning of the right to remain silent. Violation means statements are not admissible.", q: "This supports the statement that:", opts: ["Police without warnings commit a crime.", "A Miranda warning must be given before interrogation begins.", "Lawyers must always be present.", "The decision should be reversed.", "Persons should always remain silent."], ans: 1 },
+    { p: "Today's high school students spend too much time on trivial matters like fashion. We should make school uniforms mandatory to increase harmony and discipline, freeing administrators from being 'clothing police'.", q: "This supports the statement that:", opts: ["Inappropriate clothing leads to failing grades.", "Uniforms help students get into better colleges.", "Administrators spend 25% of time on dress code.", "Students aren't interested in community.", "School uniforms should be compulsory for high schoolers."], ans: 4 },
+    { p: "Critical reading is a demanding process. You must slow down, pencil in hand, and mark the text with reactions and questions to become an active participant.", q: "This supports the statement that:", opts: ["Critical reading is slow and dull.", "Reading happens best at critical times.", "Readers should question the truth of everything.", "Critical reading requires thoughtful and careful attention.", "Reading should happen at the same time each day."], ans: 3 },
+    { p: "Surveys find that fewer than half of all adults adequately protect themselves from the sun, despite frequent health campaigns and a massive supply of sunscreen products.", q: "This supports the statement that:", opts: ["Children are better protected than adults.", "Sun protection sales are at an all-time high.", "Adults are not heeding sun warnings seriously enough.", "More adults have skin cancer now.", "There is not enough information about sun danger."], ans: 2 }
+];
+
+let idx = 0;
+let selected = null;
+
+function loadQ() {
+    const item = pool[idx];
+    document.getElementById('progress-bar').innerText = `PASSAGE ${idx + 1} OF ${pool.length}`;
+    document.getElementById('passage-view').innerText = item.p;
+    document.getElementById('question-view').innerText = item.q;
+    
+    const optBox = document.getElementById('options-view');
+    optBox.innerHTML = '';
+    item.opts.forEach((o, i) => {
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.innerText = o;
+        div.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt').forEach(el => el.classList.remove('selected'));
+            div.classList.add('selected');
+        };
+        optBox.appendChild(div);
+    });
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function checkAnswer() {
+    if (selected === null) return alert("Please select an option.");
+    const correct = pool[idx].ans;
+    const opts = document.querySelectorAll('.opt');
+    opts.forEach((el, i) => {
+        if (i === correct) el.classList.add('correct');
+        if (i === selected && i !== correct) el.classList.add('wrong');
+        el.style.pointerEvents = 'none';
+    });
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function loadNext() {
+    selected = null;
+    if (idx < pool.length - 1) {
+        idx++;
+        loadQ();
+    } else {
+        alert("Reading Analysis complete!");
+    }
+}
+
+loadQ();
+</script>
+</body>
+</html>

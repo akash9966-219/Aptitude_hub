@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Java Progrraming Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Java Programming Test 4</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 4</button>
+        <a href="test6.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+    const questions = [
+  {
+    q: `Which two cause a compiler error?
+1. float[ ] f = new float(3);
+2. float f2[ ] = new float[ ];
+3. float[ ]f1 = new float[3];
+4. float f3[ ] = new float[3];
+5. float f5[ ] = {1.0f, 2.0f, 2.0f};`,
+    options: ["2, 4", "3, 5", "4, 5", "1, 2"],
+    ans: 3,
+    logic: `Explanation: Line 1 uses parentheses instead of square brackets for array size. Line 2 fails because an array must either be initialized with a size or an initializer list.`
+  },
+  {
+    q: `public class Test { }
+What is the prototype of the default constructor for this class?`,
+    options: ["Test( )", "Test(void)", "public Test( )", "public Test(void)"],
+    ans: 2,
+    logic: `Explanation: The default constructor provided by the compiler always has the same access modifier as the class and takes no arguments.`
+  },
+  {
+    q: `What is the widest valid returnType for methodA in line 3?
+
+public class ReturnIt { 
+    returnType methodA(byte x, double y) /* Line 3 */
+    { 
+        return (long)x / y * 2; 
+    } 
+}`,
+    options: ["int", "byte", "long", "double"],
+    ans: 3,
+    logic: `Explanation: In the expression (long)x / y * 2, the division by a double (y) results in a double. Therefore, the return type must be double.`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class Test {  
+    public static void main(String args[]) { 
+        class Foo {
+            public int i = 3;
+        } 
+        Object o = (Object)new Foo();
+        Foo foo = (Foo)o;
+        System.out.println("i = " + foo.i);
+    }
+}`,
+    options: ["i = 3", "Compilation fails.", "i = 5", "A ClassCastException will occur."],
+    ans: 0,
+    logic: `Explanation: This is a valid use of a local inner class. The object is cast to Object and then safely cast back to Foo to access variable 'i'.`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class A { 
+    void A() /* Line 3 */
+    {
+        System.out.println("Class A"); 
+    } 
+    public static void main(String[] args) 
+    { 
+        new A(); 
+    } 
+}`,
+    options: ["Class A", "Compilation fails.", "An exception is thrown at line 3.", "The code executes with no output."],
+    ans: 3,
+    logic: `Explanation: 'void A()' is a method, not a constructor (constructors have no return type). When 'new A()' is called, the default constructor runs, which does nothing.`
+  },
+  {
+    q: `What will be the output of the program?
+
+class Test {
+    public static void main(String [] args) {
+        int x= 0;
+        int y= 0;
+        for (int z = 0; z < 5; z++) {
+            if (( ++x > 2 ) || (++y > 2)) {
+                x++;
+            }
+        }
+    System.out.println(x + " " + y);
+    }
+}`,
+    options: ["5 3", "8 2", "8 3", "8 5"],
+    ans: 1,
+    logic: `Explanation: Due to short-circuit OR (||), once ++x > 2 is true, ++y is no longer evaluated. This happens for the last 3 iterations, leaving y at 2.`
+  },
+  {
+    q: `import java.awt.Button;
+class CompareReference {
+    public static void main(String [] args) {
+        float f = 42.0f;
+        float [] f1 = new float[2];
+        float [] f2 = new float[2];
+        float [] f3 = f1;
+        long x = 42;
+        f1[0] = 42.0f;
+    }
+}
+
+Which three statements are true?
+1. f1 == f2
+2. f1 == f3
+3. f2 == f1[1]
+4. x == f1[0]
+5. f == f1[0]`,
+    options: ["1, 2 and 3", "2, 4 and 5", "3, 4 and 5", "1, 4 and 5"],
+    ans: 1,
+    logic: `Explanation: 2 is true because f3 points to f1. 4 and 5 are true because numerical comparisons between float, long, and double values of 42.0 are equal.`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class MyProgram {
+    public static void main(String args[]) {
+        try {
+            System.out.print("Hello world ");
+        }
+        finally {
+            System.out.println("Finally executing ");
+        }
+    }
+}`,
+    options: ["No compile (needs exception)", "No compile (needs catch)", "Hello world.", "Hello world Finally executing"],
+    ans: 3,
+    logic: `Explanation: A try block can be followed by either a catch block or a finally block (or both). It does not strictly require a catch clause.`
+  },
+  {
+    q: `System.out.print("Start ");
+try {
+    System.out.print("Hello world");
+    throw new FileNotFoundException();
+}
+System.out.print(" Catch Here "); /* Line 7 */
+catch(EOFException e) {
+    System.out.print("End of file exception");
+}
+catch(FileNotFoundException e) {
+    System.out.print("File not found");
+}
+
+Which statement is true concerning this code?`,
+    options: ["The code will not compile.", "Output: Start Hello world File Not Found.", "Output: Start Hello world End of file exception.", "Output: Start Hello world Catch Here File not found."],
+    ans: 0,
+    logic: `Explanation: Line 7 contains code between the try and catch blocks, which is illegal in Java and causes a compilation error.`
+  },
+  {
+    q: `Which class does not override the equals() and hashCode() methods, inheriting them directly from class Object?`,
+    options: ["java.lang.String", "java.lang.Double", "java.lang.StringBuffer", "java.lang.Character"],
+    ans: 2,
+    logic: `Explanation: StringBuffer and StringBuilder do not override equals() or hashCode() from Object. Two StringBuffers with the same content are not "equal" via .equals().`
+  },
+  {
+    q: `You need to store elements in a collection that guarantees that no duplicates are stored and all elements can be accessed in natural order. Which interface provides that capability?`,
+    options: ["java.util.Map", "java.util.Set", "java.util.List", "java.util.Collection"],
+    ans: 1,
+    logic: `Explanation: Specifically, the SortedSet interface (which extends Set) provides natural ordering while preventing duplicates.`
+  },
+  {
+    q: `/* Missing Statement ? */
+public class foo {
+    public static void main(String[]args) throws Exception {
+        java.io.PrintWriter out = new java.io.PrintWriter(); 
+        new java.io.OutputStreamWriter(System.out,true); 
+        out.println("Hello"); 
+    } 
+}
+
+What line of code allows this program to compile?`,
+    options: ["No statement required.", "import java.io.*;", "include java.io.*;", "import java.io.PrintWriter;"],
+    ans: 0,
+    logic: `Explanation: Since the code uses fully qualified names (java.io.PrintWriter), no import statements are required for compilation.`
+  },
+  {
+    q: `public class MyOuter {
+    public static class MyInner {
+        public static void foo() { }
+    }
+}
+
+Which statement instantiates the nested class from an external class?`,
+    options: ["MyOuter.MyInner m = new MyOuter.MyInner();", "MyOuter.MyInner mi = new MyInner();", "MyOuter m = new MyOuter(); MyOuter.MyInner mi = m.new MyOuter.MyInner();", "MyInner mi = new MyOuter.MyInner();"],
+    ans: 0,
+    logic: `Explanation: For a static nested class, you use the Outer.Inner syntax for both the type and the constructor call.`
+  },
+  {
+    q: `Which is true about an anonymous inner class?`,
+    options: ["Extends one class and implements one interface.", "Extends one class and implements many interfaces.", "Extends one class OR implements one interface.", "Implements multiple interfaces regardless."],
+    ans: 2,
+    logic: `Explanation: An anonymous inner class can either extend a single class or implement a single interface, but not both or multiples.`
+  },
+  {
+    q: `Under which conditions will a currently executing thread stop?
+1. Interrupted exception occurs.
+2. Higher priority thread is ready.
+3. Thread creates a new thread.
+4. The stop() method is called.`,
+    options: ["1 and 3", "2 and 4", "1 and 4", "2 and 3"],
+    ans: 2,
+    logic: `Explanation: An unhandled exception or the (deprecated) stop() method will terminate a thread. Priority only affects scheduling, not termination.`
+  },
+  {
+    q: `Which two are valid constructors for the Thread class?
+1. Thread(Runnable r, String name)
+2. Thread()
+3. Thread(int priority)
+4. Thread(Runnable r, ThreadGroup g)
+5. Thread(Runnable r, int priority)`,
+    options: ["1 and 3", "2 and 4", "1 and 2", "2 and 5"],
+    ans: 2,
+    logic: `Explanation: Thread() and Thread(Runnable, String) are standard constructors. Thread does not have a constructor that accepts an integer for priority.`
+  },
+  {
+    q: `Which two of the following methods are defined in class Thread?
+1. start()
+2. wait()
+3. notify()
+4. run()
+5. terminate()`,
+    options: ["1 and 4", "2 and 3", "3 and 4", "2 and 4"],
+    ans: 0,
+    logic: `Explanation: start() and run() are core methods of the Thread class. wait() and notify() are defined in the Object class.`
+  },
+  {
+    q: `Which statement is true regarding thread synchronization?`,
+    options: ["notifyAll() must be called from synchronized context.", "wait() requires a lock on the thread.", "notify() is in the Thread class.", "notify() immediately releases locks."],
+    ans: 0,
+    logic: `Explanation: Methods like wait(), notify(), and notifyAll() must be called from within a synchronized block or method to avoid an IllegalMonitorStateException.`
+  },
+  {
+    q: `public Object m() {  
+    Object o = new Float(3.14F); 
+    Object [] oa = new Object[l];
+    oa[0] = o; /* Line 5 */
+    o = null;  /* Line 6 */
+    oa[0] = null; /* Line 7 */
+    return o; /* Line 8 */
+}
+
+When is the Float object eligible for garbage collection?`,
+    options: ["just after line 5", "just after line 6", "just after line 7", "just after line 8"],
+    ans: 2,
+    logic: `Explanation: On line 6, the direct reference 'o' is null. On line 7, the only remaining reference inside the array 'oa' is removed. At that point, the object is eligible for GC.`
+  },
+  {
+    q: `What will be the output of the program?
+
+String a = "ABCD"; 
+String b = a.toLowerCase(); 
+b.replace('a','d'); 
+b.replace('b','c'); 
+System.out.println(b);`,
+    options: ["abcd", "ABCD", "dccd", "dcba"],
+    ans: 0,
+    logic: `Explanation: String objects are immutable. The .replace() method returns a NEW string, but the original reference 'b' remains "abcd" because the results of the replacements were not reassigned.`
+  }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

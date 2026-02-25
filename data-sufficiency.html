@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Data Sufficiency Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #1e293b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --accent: #6366f1;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #334155;
+            --ans-bg: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .legend {
+            background: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .question-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .statement-box {
+            background: var(--ans-bg);
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opt-btn {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover:not(:disabled) { background: #fdf2f2; border-color: var(--accent); }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .logic-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ecfdf5;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            display: none;
+        }
+
+        .nav-btns {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:disabled { background: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="counter">Question 1 of 49</span>
+</div>
+
+<div class="container">
+    <div class="legend">
+        <div><strong>(A)</strong> I alone sufficient</div>
+        <div><strong>(B)</strong> II alone sufficient</div>
+        <div><strong>(C)</strong> Either I or II sufficient</div>
+        <div><strong>(D)</strong> Neither/Both not sufficient</div>
+        <div><strong>(E)</strong> Both together necessary</div>
+    </div>
+
+    <div class="quiz-card">
+        <div id="question" class="question-header"></div>
+        <div id="statements" class="statement-box"></div>
+        
+        <div id="options" class="options-list">
+            <button class="opt-btn" onclick="check(0)">Option (A)</button>
+            <button class="opt-btn" onclick="check(1)">Option (B)</button>
+            <button class="opt-btn" onclick="check(2)">Option (C)</button>
+            <button class="opt-btn" onclick="check(3)">Option (D)</button>
+            <button class="opt-btn" onclick="check(4)">Option (E)</button>
+        </div>
+
+        <div id="logic" class="logic-box">
+            <strong>Explanatory Logic:</strong><br>
+            <span id="logicText"></span>
+        </div>
+
+        <div class="nav-btns">
+            <button class="btn" id="prevBtn" onclick="prev()">Previous</button>
+            <button class="btn" id="nextBtn" onclick="next()" style="display:none">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "In which year was Rahul born?", s: "I. Rahul is 25 yrs younger to mother.\nII. Brother (born 1964) is 35 yrs younger to mother.", ans: 4, logic: "From II, Mother was born in 1964 - 35 = 1929. From I, Rahul was born 25 years after 1929 = 1954. Both are needed." },
+    { q: "Total weight of 10 poles (same weight)?", s: "I. 1/4th weight is 5 kg.\nII. Weight of 3 poles is 20 kg more than 2 poles.", ans: 2, logic: "I gives 1 pole = 20kg. II gives 3x - 2x = 20, so x = 20kg. Either statement works." },
+    { q: "How many children does M have?", s: "I. H is only daughter of X (wife of M).\nII. K and J are brothers of M.", ans: 3, logic: "I only says H is the only daughter; we don't know if there are sons. II is irrelevant." },
+    { q: "Total sale of the company?", s: "I. Sold 8000 units at 25 each.\nII. No other product line.", ans: 4, logic: "I gives revenue of A. II confirms no other revenue. Together they give total sale (200,000)." },
+    { q: "Last Sunday of March 2006 date?", s: "I. 1st Sunday was 5th.\nII. Last day was Friday.", ans: 2, logic: "I gives Sundays as 5, 12, 19, 26. II says March 31 (last day) is Friday, which also helps find Sundays. Either works." },
+    { q: "Code for 'sky'?", s: "I. 'sky is clear' = 'de ra fa'.\nII. 'make it clear' = 'de ga jo'.", ans: 3, logic: "Only 'clear' = 'de' can be deduced. 'sky' could be 'ra' or 'fa'. Not sufficient even together." },
+    { q: "Children between P and Q?", s: "I. P is 15th from left.\nII. Q is middle, 10 to his right.", ans: 4, logic: "II says Q is 11th from right and 11th from left (Total 21). P is 15th. We can calculate children between 11 and 15." },
+    { q: "How is T related to K?", s: "I. R's sister J married T's brother L (only son).\nII. K is daughter of L and J.", ans: 4, logic: "L is T's brother. K is L's daughter. So T is K's Aunt/Uncle. Since L is the only son, T must be a female (Aunt)." },
+    { q: "How is J related to P?", s: "I. M is brother, T is sister of P.\nII. P's mother married J's husband (1 son, 2 daughters).", ans: 4, logic: "J's husband is P's father. So J is P's mother. Both together clarify the family tree." },
+    { q: "How is X related to Y?", s: "I. Y, Z children of D (wife of X).\nII. R's sister X married to Y's father.", ans: 2, logic: "I shows X is D's husband, so X is Y's father. Either alone works (II also defines the relationship)." },
+    { q: "Immediate right of P (P,Q,R,S,T)?", s: "I. R is 3rd left of Q, P is 2nd right of R.\nII. Q is left of T, who is 2nd right of P.", ans: 2, logic: "I gives R _ P Q _. II gives _ P Q T. Either provides the arrangement R S P Q T." },
+    { q: "Date of Anjali's birth (Feb 2004)?", s: "I. Even date.\nII. Prime date.", ans: 4, logic: "The only even prime number is 2. Both together pinpoint Feb 2." },
+    { q: "How is X related to Y?", s: "I. Y has 1 brother.\nII. X has 1 sister.", ans: 3, logic: "We don't know if X and Y are even in the same family. Not sufficient." },
+    { q: "How is F related to P?", s: "I. P has sisters M, N.\nII. F's mother is sister of M's father.", ans: 4, logic: "M's father is P's father. F's mother is P's aunt. F is P's cousin." },
+    { q: "How is A related to B?", s: "I. A is sister of C.\nII. E is husband of A.", ans: 0, logic: "Question states B is brother of A. I confirms A is female (sister of C). So A is B's sister." },
+    { q: "Children in row (North)?", s: "I. Vishakha (5th L) is 8th left of Ashish (12th R).\nII. Rohit 5th left of Nisha (7th R, 18th L).", ans: 2, logic: "I gives 5 + 8 + 11 = 24. II gives 18 + 7 - 1 = 24. Either works." },
+    { q: "Doctors in town?", s: "I. 1 doctor per 700 residents.\nII. 16 wards, each has 16 doctors.", ans: 1, logic: "II gives 16 x 16 = 256 doctors. I is insufficient without total population." },
+    { q: "Sahil's birthday weekday?", s: "I. Day after Arun's.\nII. Sister born 3rd day (Wed), 2 days after Sahil.", ans: 1, logic: "II says Sister = Wed, Sahil = Mon (2 days before). I is irrelevant." },
+    { q: "Pages Robert read on Sunday?", s: "I. Book 300 pgs, 2/3 read before Sunday.\nII. Last 40 read on Monday.", ans: 4, logic: "Before Sunday: 200 read. Remainder: 100. Monday: 40 read. So Sunday = 100 - 40 = 60." },
+    { q: "Tanya related to man?", s: "I. Man is only son of Tanya's grandfather.\nII. Man has no siblings, father is Tanya's grandfather.", ans: 2, logic: "In both cases, the man is Tanya's father." },
+    { q: "3rd heaviest (T, V, B, E, C)?", s: "I. V > B > (T,C), V not heaviest.\nII. C > only T.", ans: 4, logic: "Order: E > V > B > C > T. Both needed to fix E and the bottom two." },
+    { q: "Code for 'flower'?", s: "I. 'de fu la pane' = rose flower is beautiful; 'la quiz' = beautiful tree.\nII. 'de la chin' = red rose flower; 'pa chin' = red tea.", ans: 3, logic: "Together: 'rose flower' = 'de' or 'chin'. Cannot isolate 'flower'." },
+    { q: "How many play football?", s: "I. Only boys play.\nII. 40 boys, 30 girls.", ans: 3, logic: "We know only boys play, but we don't know *how many* of the 40 boys play." },
+    { q: "C's partner in cards?", s: "I. D opposite A.\nII. B right of A.", ans: 0, logic: "If D is opposite A, then B must be opposite C. B is the partner." },
+    { q: "When was serial C screened?", s: "I. 23rd Tue was followed by D.\nII. A not 25th, one between A and B.", ans: 4, logic: "Tue 23: ?, Wed 24: D. From II, A-?-B or B-?-A. C must fit in the gaps. Both needed." },
+    { q: "Sulekha related to Nandini?", s: "I. Sulekha's husband is only son of Nandini's mother.\nII. Brother/husband are cousins.", ans: 0, logic: "I implies Sulekha's husband is Nandini's brother. So Sulekha is Nandini's sister-in-law." },
+    { q: "Can Ritesh retire in Jan 2006?", s: "I. Completes 30 yrs in April 2000.\nII. Needs 30 yrs + age 60. Age 60 in Jan 2006 (3 yrs after Jan 2003).", ans: 4, logic: "Both define the rules and current status. He meets both in Jan 2006." },
+    { q: "Code for 'or'?", s: "I. 'nik sa te' = right or wrong; 'ro da nik' = right; 'fe te ro' = wrong.\nII. 'pa nik la' = right; 'sa ne pa' = or; 'ne ka re' = this.", ans: 2, logic: "Either set of sentences allows isolation of 'or' (sa)." },
+    { q: "Who is youngest (M, K, S, A)?", s: "I. S < M.\nII. A < K. (Given M > K).", ans: 4, logic: "M > K > A > S or M > S. Wait, M > K and A < K and S < M. Cannot determine between A and S without both." },
+    { q: "Date Kapil born?", s: "I. 16, 17, 18.\nII. 13, 14, 15, 16.", ans: 4, logic: "The only common date is 16th." },
+    { q: "Gagan's age?", s: "I. G=V=K.\nII. V+K+Anil=32, Anil=V+K.", ans: 4, logic: "II gives 2(V+K)=32 -> V+K=16. Since V=K, V=8. So G=8." },
+    { q: "Code for 9 and 5?", s: "I. 157 = stop bad habit.\nII. 839 = smoking is injurious.", ans: 4, logic: "59 = injurious habit. From I, 5=habit. From II, 9=injurious. Both needed." },
+    { q: "Money Vivek and Suman together?", s: "I. S = T - 20.\nII. V = T + 30.", ans: 3, logic: "V+S = 2T + 10. Unknown without T's value." },
+    { q: "Who came last?", s: "I. A > M > T.\nII. T > R > S.", ans: 4, logic: "A > M > T > R > S. S is last. Both needed." },
+    { q: "Who is lightest (P,Q,R,S,T)?", s: "I. S > R > (Q,T).\nII. S not heaviest.", ans: 3, logic: "Still don't know if Q or T is lighter, or where P fits." },
+    { q: "T related to K?", s: "I. K's sons include A.\nII. Mother of T has sons A, B.", ans: 4, logic: "A is son of K. A is son of T's mother. So K is T's parent. Both needed." },
+    { q: "Distance Devipur to Durgapur?", s: "I. Dur to Ram = 20.\nII. Dev to Ram = 15.", ans: 3, logic: "Don't know the angle/direction between the towns." },
+    { q: "A related to D?", s: "I. B is brother of A.\nII. B is D's son.", ans: 4, logic: "A is child of D. Both needed to link B to both A and D." },
+    { q: "Who is heaviest (M, P, A, K)?", s: "I. A > P > (M,K).\nII. P > M > K.", ans: 0, logic: "I alone shows Akash (A) is heavier than the others." },
+    { q: "Vinod's salary?", s: "I. Ratio 4:3.\nII. Javed = 4500.", ans: 4, logic: "Both together allow us to use the ratio: (4/3)*4500 = 6000." },
+    { q: "Nitin's rank?", s: "I. 10 between N and D.\nII. D is 20th.", ans: 3, logic: "N could be 9th or 31st." },
+    { q: "Sunny facing direction?", s: "I. R+R = North -> Currently South.\nII. Face left of Dinesh (South) = East.", ans: 2, logic: "Either gives a definite direction." },
+    { q: "T's school?", s: "I. T not R or J.\nII. R=D, J=F.", ans: 3, logic: "T could be in B, C, or E." },
+    { q: "Divya related to Shaloo?", s: "I. Mother sister of Father (Cousins).\nII. Shaloo daughter of only child (Divya herself or sister).", ans: 2, logic: "Either provides a specific relationship path." },
+    { q: "Cards sold this year?", s: "I. Last year 2935.\nII. 1.2 times last year.", ans: 4, logic: "Calculation: 2935 * 1.2. Both needed." },
+    { q: "Gautam's birthday date?", s: "I. 28 yrs after mother.\nII. Mother's age on Aug 18.", ans: 4, logic: "Both allow calculation of birth dates." },
+    { q: "Code for 'is'?", s: "I. 'shi tu ke' = pen is blue.\nII. 'ke si re' = this is wonderful.", ans: 4, logic: "Common word 'is', common code 'ke'. Both needed." },
+    { q: "Middle person?", s: "I. A C _ _ D with E placement.\nII. A _ C E D.", ans: 2, logic: "Either allows complete row arrangement." },
+    { q: "Who is heaviest (A-F)?", s: "I. A, D > others; C > A.\nII. C > A > D.", ans: 0, logic: "I shows C is heavier than A and D, who are heavier than the rest. C is heaviest." }
+];
+
+let idx = 0;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('question').innerText = item.q;
+    document.getElementById('statements').innerText = item.s;
+    document.getElementById('counter').innerText = `Question ${idx + 1} of ${data.length}`;
+    
+    document.querySelectorAll('.opt-btn').forEach(b => {
+        b.classList.remove('correct', 'wrong');
+        b.disabled = false;
+    });
+    document.getElementById('logic').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('prevBtn').disabled = (idx === 0);
+}
+
+function check(choice) {
+    const correctAns = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if (choice === correctAns) {
+        btns[choice].classList.add('correct');
+    } else {
+        btns[choice].classList.add('wrong');
+        btns[correctAns].classList.add('correct');
+    }
+    
+    document.getElementById('logicText').innerText = data[idx].logic;
+    document.getElementById('logic').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    if (idx < data.length - 1) { idx++; render(); }
+    else alert("You have finished all 49 questions!");
+}
+
+function prev() {
+    if (idx > 0) { idx--; render(); }
+}
+
+render();
+</script>
+</body>
+</html>

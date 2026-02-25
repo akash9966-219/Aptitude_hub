@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Course of Action</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --accent: #2980b9;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .guide-panel {
+            flex: 1;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .quiz-panel {
+            flex: 2;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .statement-header {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .statement-text {
+            font-size: 1.15rem;
+            color: var(--primary);
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .action-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .action-label {
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .options-list {
+            margin-top: 25px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #f0f7ff; }
+        .opt-btn.selected { border-color: var(--accent); background: #ebf8ff; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .footer-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        /* Responsive Fixes */
+        @media (max-width: 900px) {
+            .container { flex-direction: column; }
+            .guide-panel { position: static; margin-bottom: 20px; }
+        }
+
+        @media (max-width: 600px) {
+            .header { padding: 1rem; font-size: 0.9rem; }
+            .quiz-panel { padding: 20px; }
+            .footer-actions { flex-direction: column; gap: 15px; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="q-counter">Question 1 / 50</span>
+</div>
+
+<div class="container">
+    <div class="guide-panel">
+        <h3 style="margin-top:0;">Decision Framework</h3>
+        <p style="font-size: 0.9rem; color: #555;">Follow these rules for "Course of Action":</p>
+        <ul style="font-size: 0.85rem; padding-left: 20px; line-height: 1.6;">
+            <li><strong>Practicality:</strong> Is the solution realistic?</li>
+            <li><strong>Relevance:</strong> Does it directly solve the problem?</li>
+            <li><strong>Balance:</strong> Avoid harsh, extreme, or disproportionate reactions.</li>
+            <li><strong>Grammar:</strong> Action I and II must be independent possibilities.</li>
+        </ul>
+    </div>
+
+    <div class="quiz-panel">
+        <div class="statement-header">The Situation</div>
+        <div id="statement" class="statement-text"></div>
+        
+        <div id="actions-container">
+            <div class="action-box"><span class="action-label">I.</span> <span id="action1"></span></div>
+            <div class="action-box"><span class="action-label">II.</span> <span id="action2"></span></div>
+        </div>
+
+        <div class="options-list">
+            <button class="opt-btn" onclick="setSelection(0)">Only I follows</button>
+            <button class="opt-btn" onclick="setSelection(1)">Only II follows</button>
+            <button class="opt-btn" onclick="setSelection(2)">Either I or II follows</button>
+            <button class="opt-btn" onclick="setSelection(3)">Neither I nor II follows</button>
+            <button class="opt-btn" onclick="setSelection(4)">Both I and II follow</button>
+        </div>
+
+        <div class="footer-actions">
+            <div id="status-msg" style="font-weight: 600;"></div>
+            <div>
+                <button class="btn btn-check" id="submitBtn" onclick="evaluateAnswer()">Submit Decision</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">Next Case →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { s: "A large number of people in ward X of the city are diagnosed to be suffering from a fatal malaria type.", a1: "The city municipal authority should take immediate steps to carry out extensive fumigation in ward X.", a2: "The people in the area should be advised to take steps to avoid mosquito bites.", ans: 4 },
+    { s: "Severe drought is reported to have set in several parts of the country.", a1: "Government should immediately make arrangement for providing financial assistance to those affected.", a2: "Food, water and fodder should immediately be sent to all these areas to save the people and cattle.", ans: 4 },
+    { s: "Since its launching in 1981, Vayudoot has so far accumulated losses amounting to 153 crore.", a1: "Vayudoot should be directed to reduce wasteful expenditure and to increase passenger fare.", a2: "An amount of about 300 crore should be provided to Vayudoot to make the airliner economically viable.", ans: 0 },
+    { s: "Exporters allege commercial banks are violating RBI directives on foreign currency credit at international rates.", a1: "The officers concerned in the commercial banks are to be suspended.", a2: "The RBI should be asked to stop giving such directives to commercial banks.", ans: 3 },
+    { s: "A large number of people die every year due to drinking polluted water during the summer.", a1: "The government should make adequate arrangements to provide safe drinking water to all its citizens.", a2: "The people should be educated about the dangers of drinking polluted water.", ans: 4 },
+    { s: "Most students in premier engineering colleges migrate to developed nations for better prospects.", a1: "Students should sign a bond to stay in India for 10 years after graduation.", a2: "Those desiring to settle abroad should pay the entire unsubsidised cost of education.", ans: 1 },
+    { s: "Villagers are migrating to urban areas due to repeated crop failures and financial precariosity.", a1: "Villagers should be provided with alternate sources of income in their villages.", a2: "Migrated villagers should be provided with jobs in urban areas to help them survive.", ans: 0 },
+    { s: "The recent census report shows the female to male ratio is alarmingly low.", a1: "The government should conduct another census to verify the results.", a2: "The government should issue orders to departments to encourage people to improve the ratio.", ans: 1 },
+    { s: "Four districts in State A have experienced severe drought for three years, leading to an exodus.", a1: "The government should start food for work programmes to halt the exodus.", a2: "The government should make efforts to provide potable water to these districts.", ans: 4 },
+    { s: "Inviting retired Professors to deliberate on restructuring the organization may be beneficial.", a1: "Management may seek employee opinion before calling retired professors.", a2: "Management should involve experienced people for systematic restructuring.", ans: 1 },
+    { s: "The sale of a particular product has gone down considerably, causing concern to the company.", a1: "The company should make a proper study of rival products in the market.", a2: "The price of the product should be reduced and quality improved.", ans: 0 },
+    { s: "The ADB approved a 285 million loan to construct coal ports by Paradip and Madras Port Trusts.", a1: "India should use financial assistance from other international organizations to develop ports elsewhere.", a2: "India should not seek such financial assistance from international agencies.", ans: 0 },
+    { s: "Doordarshan is concerned about quality due to competition from satellite channels and needs talent.", a1: "Doordarshan decided to revise its fee structure for artists to attract talent.", a2: "Fee structure should not be revised until other media also revise it.", ans: 0 },
+    { s: "Teachers are not familiar with the need or role of population education in higher education.", a1: "Population education should be included in college curriculum.", a2: "Orientation programmes should be conducted for teachers on population education.", ans: 1 },
+    { s: "Children below five die in developing cities mainly from diarrhoea and parasitic worms.", a1: "Governments should take measures to improve hygienic conditions in cities.", a2: "Children below five need to be kept under periodic medical check-up.", ans: 4 },
+    { s: "Kharif crops affected by insects for 3 years; farmers harvested less than 50% produce.", a1: "Farmers should seek measures to control insect attacks for next year.", a2: "Government should increase support price considerably to protect farmers.", ans: 0 },
+    { s: "Huge response for new XYZ car booking; people complaining about business hours and queues.", a1: "People should bring snacks and be ready to spend several hours in queue.", a2: "More booking desks and increased business hours should be arranged.", ans: 1 },
+    { s: "State Govt declared 'Kala Azar' a notifiable disease; neighbors must inform authorities.", a1: "Efforts should be made to effectively implement the Act.", a2: "Punishments should be propagated through mass media for awareness.", ans: 4 },
+    { s: "Curriculum has not been revised in keeping with the pace of changes; system needs flexibility.", a1: "Curriculum should be reviewed and revised periodically.", a2: "System of education should be made more flexible.", ans: 4 },
+    { s: "CBI receives complaint of an officer taking a bribe to perform his duty.", a1: "CBI should try to catch the officer red-handed and take strict action.", a2: "CBI should wait for more complaints to be sure.", ans: 0 },
+    { s: "Electronic component industry faces tough competition from Japan in W. European markets.", a1: "India should search for other international markets.", a2: "India should improve quality to compete with Japanese components.", ans: 1 },
+    { s: "Orissa and Andhra Pradesh agreed to set up a joint board for multipurpose project management.", a1: "Other neighbouring states should set up such control boards.", a2: "The proposed board should not be allowed as joint boards are ineffective.", ans: 3 },
+    { s: "Govt decided not to provide financial support to voluntary organizations from next Plan.", a1: "Voluntary organizations should collaborate with foreign agencies.", a2: "They should explore other sources of financial support.", ans: 1 },
+    { s: "Imported fruit availability increased; demand for indigenous fruits has decreased.", a1: "Govt should impose high import duty even if indigenous fruits are lower quality.", a2: "Fruit vendors should stop selling imported fruits.", ans: 3 },
+    { s: "Unprecedented increase in successful candidates in this year's SLC Examination.", a1: "Govt should increase seats of intermediate courses in existing colleges.", a2: "Govt should take active steps to open new colleges.", ans: 4 },
+    { s: "About 20 people die daily crossing railway tracks through level crossings.", a1: "Railway authorities should close all level crossings.", a2: "Those crossing tracks when gates are closed should be fined heavily.", ans: 1 },
+    { s: "Majority of students in many schools do not pass the final examination.", a1: "These schools should be closed down as unproductive.", a2: "The teachers of these schools should immediately be retrenched.", ans: 3 },
+    { s: "Despite Principal's warnings, a child was caught exploding crackers secretly.", a1: "Crackers should be taken and child threatened not to do it again.", a2: "The child should be severely punished for his wrong act.", ans: 1 },
+    { s: "Necessary to adopt measures to prevent bad debts based on NPA experiences of banks.", a1: "Customer eligibility should be evaluated strictly before granting loans.", a2: "Loan-funded work should be supervised minutely on a regular basis.", ans: 4 },
+    { s: "A very large number of students failed the exam due to faulty questions in one subject.", a1: "Failed students should be allowed to take a supplementary exam.", a2: "Those responsible for the error should be suspended and an enquiry initiated.", ans: 4 },
+    { s: "Engineering graduates are lacking gainful employment; numbers likely to grow.", a1: "Govt should launch employment schemes using their expertise.", a2: "Colleges not equipped to impart quality education should be closed down.", ans: 0 },
+    { s: "Conjunctivitis epidemic witnessed after four years during monsoon.", a1: "Precautionary measures should be taken every four years.", a2: "People should be advised to drink boiled water during rainy season.", ans: 3 },
+    { s: "Devotees die every year due to severe cold on the way to the mountain shrine.", a1: "Devotees should be discouraged from visiting without warm clothes.", a2: "Govt should provide warm clothes and shelter to all devotees.", ans: 0 },
+    { s: "Unprecedented increase in requests for berths in long distance trains during holidays.", a1: "Railway authority should increase capacity by attaching additional coaches.", a2: "People should be advised to plan travel after the holiday season.", ans: 0 },
+    { s: "Finance Minister submits resignation a month before the new budget presentation.", a1: "Resignation should be accepted and a new Minister appointed.", a2: "Resignation should not be accepted.", ans: 2 },
+    { s: "People visiting from country X tested positive for viruses of a killer disease.", a1: "India should put a complete ban on people coming from country X.", a2: "Detection centers should be set up at airports/seaports to quarantine positives.", ans: 1 },
+    { s: "Less than 40% voter turnout in the recent assembly elections.", a1: "Election Commission should cancel the process as votes aren't representative.", a2: "Voting rights of those who did not exercise them should be taken away.", ans: 3 },
+    { s: "Most development plans develop on paper only.", a1: "In-charges should be instructed to supervise field-work regularly.", a2: "Supply of paper to such departments should be cut short.", ans: 0 },
+    { s: "Vegetable traders feel onion prices will go up shortly in State 'P'.", a1: "State 'P' should purchase and store sufficient onion in advance.", a2: "Fair price shop networks should be made available during shortage.", ans: 4 },
+    { s: "Vitamin E in fresh food is beneficial, but capsule Vitamin E doesn't have same effect.", a1: "The sale of capsule Vitamin E should be banned.", a2: "People should be encouraged to eat fresh fruits and vegetables.", ans: 1 },
+    { s: "Youngsters are often found staring at obscene posters.", a1: "Children should be punished and penalized for doing so.", a2: "Any display of such material should be banned.", ans: 1 },
+    { s: "Food processing industry faces irregular supply; producers aren't getting fair prices.", a1: "Govt should regulate supply to other industries also.", a2: "Govt should announce attractive package to ensure regular supply.", ans: 1 },
+    { s: "Committee criticized Institute for failure to implement programmes despite more staff.", a1: "Broad objectives should be redefined to implement practical action plan.", a2: "Institute should report reasons for not implementing planned programmes.", ans: 1 },
+    { s: "India experiencing continuous military threats from neighbouring countries.", a1: "India should engage in an all out war to stop nagging threats.", a2: "India should get neighbours into serious dialogue to reduce tension.", ans: 1 },
+    { s: "Ten coaches of passenger train derailed and blocked both tracks.", a1: "Authorities should send men and equipment immediately to clear tracks.", a2: "All trains in both directions should be diverted to other routes.", ans: 4 },
+    { s: "Significant drop in water level of all lakes supplying the city.", a1: "Water authority should impose a partial cut in supply.", a2: "Govt should appeal to residents for minimal use of water.", ans: 4 },
+    { s: "Senior police officials suspected in illegal sale of arms from police armoury.", a1: "Thorough investigation should be ordered to find all involved.", a2: "State armoury should be kept under Central Govt control.", ans: 0 },
+    { s: "Financial stringency prevented State Govt from paying salaries since April.", a1: "Govt should immediately curtail staff strength by 30%.", a2: "Govt should reduce wasteful expenditure and arrange to pay salaries.", ans: 1 },
+    { s: "Cinema halls incurring heavy losses as people prefer watching at home on TV.", a1: "Cinema halls should be demolished for multi-storey buildings.", a2: "Cinema halls should be converted into shopping malls.", ans: 3 },
+    { s: "Duty free technology parks for hardware components proposed for various places.", a1: "Govt should immediately implement proposal to augment foreign reserves.", a2: "Govt should not implement it as it hinders indigenous production.", ans: 0 }
+];
+
+let cur = 0;
+let selection = null;
+
+function render() {
+    const q = data[cur];
+    document.getElementById('q-counter').innerText = `Case ${cur + 1} / ${data.length}`;
+    document.getElementById('statement').innerText = q.s;
+    document.getElementById('action1').innerText = q.a1;
+    document.getElementById('action2').innerText = q.a2;
+    
+    document.querySelectorAll('.opt-btn').forEach(b => {
+        b.classList.remove('selected', 'correct', 'wrong');
+        b.disabled = false;
+    });
+    document.getElementById('submitBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('status-msg').innerText = "";
+    selection = null;
+}
+
+function setSelection(i) {
+    selection = i;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach((b, idx) => b.classList.toggle('selected', idx === i));
+}
+
+function evaluateAnswer() {
+    if (selection === null) return alert("Please select a course of action!");
+    const correct = data[cur].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns[correct].classList.add('correct');
+    if (selection !== correct) {
+        btns[selection].classList.add('wrong');
+        document.getElementById('status-msg').innerHTML = "<span style='color:var(--wrong)'>Sub-optimal Choice</span>";
+    } else {
+        document.getElementById('status-msg').innerHTML = "<span style='color:var(--correct)'>Correct Decision!</span>";
+    }
+    
+    btns.forEach(b => b.disabled = true);
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQuestion() {
+    if (cur < data.length - 1) {
+        cur++;
+        render();
+        window.scrollTo(0,0);
+    } else {
+        alert("Well done! You have reviewed all 50 administrative cases.");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

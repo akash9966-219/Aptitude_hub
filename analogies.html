@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analogies - Logical Reasoning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #9b59b6;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #fdfefe;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .instruction {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .analogy-pair {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: #fdfaff;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid #f0e6f5;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fdfaff; }
+        .opt-btn.selected { border-color: var(--accent); background: #f5eeff; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress { font-weight: bold; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <span class="instruction">Choose the pair that represents the same relationship:</span>
+        <div id="q-pair" class="analogy-pair"></div>
+        <div id="options" class="options-grid"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress">Question 1 of 61</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="validate()">Verify</button>
+                <button class="btn btn-next" id="nextBtn" onclick="next()">Next →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    // SET 1
+    { q: "Odometer : Mileage :: Compass : ?", opts: ["speed", "hiking", "needle", "direction"], ans: "direction" },
+    { q: "Marathon : Race :: Hibernation : ?", opts: ["winter", "bear", "dream", "sleep"], ans: "sleep" },
+    { q: "Window : Pane :: Book : ?", opts: ["novel", "glass", "cover", "page"], ans: "page" },
+    { q: "Cup : Coffee :: Bowl : ?", opts: ["dish", "soup", "spoon", "food"], ans: "soup" },
+    { q: "Yard : Inch :: Quart : ?", opts: ["gallon", "ounce", "milk", "liquid"], ans: "ounce" },
+    { q: "Elated : Despondent :: Enlightened : ?", opts: ["aware", "ignorant", "miserable", "tolerant"], ans: "ignorant" },
+    { q: "Optimist : Cheerful :: Pessimist : ?", opts: ["gloomy", "mean", "petty", "helpful"], ans: "gloomy" },
+    { q: "Reptile : Lizard :: Flower : ?", opts: ["petal", "stem", "daisy", "alligator"], ans: "daisy" },
+    { q: "Play : Actor :: Concert : ?", opts: ["symphony", "musician", "piano", "percussion"], ans: "musician" },
+    { q: "Sponge : Porous :: Rubber : ?", opts: ["massive", "solid", "elastic", "inflexible"], ans: "elastic" },
+    { q: "Careful : Cautious :: Boastful : ?", opts: ["arrogant", "humble", "joyful", "suspicious"], ans: "arrogant" },
+    { q: "Pen : Poet :: Needle : ?", opts: ["thread", "button", "sewing", "tailor"], ans: "tailor" },
+    { q: "Secretly : Openly :: Silently : ?", opts: ["scarcely", "impolitely", "noisily", "quietly"], ans: "noisily" },
+    { q: "Embarrassed : Humiliated :: Frightened : ?", opts: ["terrified", "agitated", "courageous", "reckless"], ans: "terrified" },
+    { q: "Pride : Lion :: Shoal : ?", opts: ["teacher", "student", "self-respect", "fish"], ans: "fish" },
+    { q: "Artist : Painting :: Senator : ?", opts: ["attorney", "law", "politician", "constituents"], ans: "law" },
+    { q: "Exercise : Gym :: Eating : ?", opts: ["food", "dieting", "fitness", "restaurant"], ans: "restaurant" },
+    { q: "Candid : Indirect :: Honest : ?", opts: ["frank", "wicked", "truthful", "untruthful"], ans: "untruthful" },
+    { q: "Guide : Direct :: Reduce : ?", opts: ["decrease", "maintain", "increase", "preserve"], ans: "decrease" },
+    { q: "Oar : Rowboat :: Foot : ?", opts: ["running", "sneaker", "skateboard", "jumping"], ans: "skateboard" },
+    
+    // SET 2
+    { q: "MONK : DEVOTION", opts: ["maniac : pacifism", "explorer : contentment", "visionary : complacency", "rover : wanderlust"], ans: "rover : wanderlust" },
+    { q: "SLAPSTICK : LAUGHTER", opts: ["fallacy : dismay", "genre : mystery", "satire : anger", "horror : fear"], ans: "horror : fear" },
+    { q: "VERVE : ENTHUSIASM", opts: ["loyalty : duplicity", "devotion : reverence", "intensity : color", "eminence : anonymity"], ans: "devotion : reverence" },
+    { q: "SPY : CLANDESTINE", opts: ["accountant : meticulous", "furrier : rambunctious", "lawyer : ironic", "astronaut : opulent"], ans: "accountant : meticulous" },
+    { q: "COBBLER : SHOE", opts: ["jockey : horse", "contractor : building", "mason : stone", "potter : paint"], ans: "contractor : building" },
+    { q: "UMBRAGE : OFFENSE", opts: ["confusion : penance", "infinity : meaning", "decorum : decoration", "elation : jubilance"], ans: "elation : jubilance" },
+    { q: "DIRGE : FUNERAL", opts: ["chain : letter", "bell : church", "telephone : call", "jingle : commercial"], ans: "jingle : commercial" },
+    { q: "DOMINANCE : HEGEMONY", opts: ["romance : sympathy", "furtherance : melancholy", "independence : autonomy", "tolerance : philanthropy"], ans: "independence : autonomy" },
+    { q: "PHOBIC : FEARFUL", opts: ["finicky : thoughtful", "cautious : emotional", "envious : desiring", "asinine : silly"], ans: "asinine : silly" },
+    { q: "FERAL : TAME", opts: ["rancid : rational", "repetitive : recurrent", "nettlesome : annoying", "ephemeral : immortal"], ans: "ephemeral : immortal" },
+    { q: "METAPHOR : SYMBOL", opts: ["pentameter : poem", "rhythm : melody", "nuance : song", "analogy : comparison"], ans: "analogy : comparison" },
+    { q: "INTEREST : OBSESSION", opts: ["mood : feeling", "weeping : sadness", "dream : fantasy", "plan : negation"], ans: "dream : fantasy" },
+    { q: "CONDUCTOR : ORCHESTRA", opts: ["jockey : mount", "thrasher : hay", "driver : tractor", "skipper : crew"], ans: "skipper : crew" },
+    { q: "FROND : PALM", opts: ["quill : porcupine", "blade : evergreen", "scale : wallaby", "blade : fern"], ans: "blade : fern" },
+    { q: "SOUND : CACOPHONY", opts: ["taste : style", "touch : massage", "smell : stench", "sight : panorama"], ans: "smell : stench" },
+    { q: "AERIE : EAGLE", opts: ["capital : government", "bridge : architect", "unit : apartment", "house : person"], ans: "house : person" },
+    { q: "PROFESSOR : ERUDITE", opts: ["aviator : licensed", "inventor : imaginative", "procrastinator : conscientious", "overseer : wealthy"], ans: "inventor : imaginative" },
+    { q: "DELTOID : MUSCLE", opts: ["radius : bone", "brain : nerve", "tissue : organ", "blood : vein"], ans: "radius : bone" },
+    { q: "JAUNDICE : LIVER", opts: ["rash : skin", "dialysis : kidney", "smog : lung", "valentine : heart"], ans: "rash : skin" },
+    { q: "CONVICTION : INCARCERATION", opts: ["reduction : diminution", "induction : amelioration", "radicalization : estimation", "marginalization : intimidation"], ans: "reduction : diminution" },
+    { q: "DEPENDABLE : CAPRICIOUS", opts: ["fallible : cantankerous", "erasable : obtuse", "malleable : limpid", "capable : inept"], ans: "capable : inept" },
+
+    // SET 3
+    { q: "BINDING : BOOK", opts: ["criminal : gang", "display : museum", "artist : carpenter", "frame : picture"], ans: "frame : picture" },
+    { q: "EXPLORE : DISCOVER", opts: ["read : skim", "research : learn", "write : print", "think : relate"], ans: "research : learn" },
+    { q: "SIAMESE : CAT", opts: ["type : breed", "dog : puppy", "mark : spot", "romaine : lettuce"], ans: "romaine : lettuce" },
+    { q: "FINCH : BIRD", opts: ["frog : toad", "elephant : reptile", "Dalmatian : dog", "collie : marsupial"], ans: "Dalmatian : dog" },
+    { q: "PETAL : FLOWER", opts: ["salt : pepper", "tire : bicycle", "base : ball", "sandals : shoes"], ans: "tire : bicycle" },
+    { q: "COTTON : BALE", opts: ["butter : churn", "wine : ferment", "grain : shock", "curd : cheese"], ans: "grain : shock" },
+    { q: "ELEPHANT : PACHYDERM", opts: ["mantis : rodent", "poodle : feline", "kangaroo : marsupial", "zebra : horse"], ans: "kangaroo : marsupial" },
+    { q: "PSYCHOLOGIST : NEUROSIS", opts: ["ophthalmologist : cataract", "dermatologist : fracture", "infant : pediatrician", "oncologist : measles"], ans: "ophthalmologist : cataract" },
+    { q: "PASTORAL : RURAL", opts: ["metropolitan : urban", "harvest : autumn", "agrarian : benevolent", "sleepy : nocturnal"], ans: "metropolitan : urban" },
+    { q: "TAILOR : SUIT", opts: ["scheme : agent", "edit : manuscript", "revise : writer", "implode : building"], ans: "edit : manuscript" },
+    { q: "PEDAL : BICYCLE", opts: ["inch : yardstick", "walk : skip", "tire : automobile", "oar : canoe"], ans: "oar : canoe" },
+    { q: "DIVISION : SECTION", opts: ["layer : tier", "tether : bundle", "chapter : verse", "riser : stage"], ans: "layer : tier" },
+    { q: "DEPRESSED : SAD", opts: ["neat : considerate", "towering : cringing", "rapid : plodding", "exhausted : tired"], ans: "exhausted : tired" },
+    { q: "BRISTLE : BRUSH", opts: ["arm : leg", "stage : curtain", "recline : chair", "key : piano"], ans: "key : piano" },
+    { q: "RAIN : DRIZZLE", opts: ["swim : dive", "hop : shuffle", "walk : run", "run : jog"], ans: "run : jog" },
+    { q: "PULSATE : THROB", opts: ["walk : run", "tired : sleep", "examine : scrutinize", "find : lose"], ans: "examine : scrutinize" },
+    { q: "FISH : SHOAL", opts: ["wolf : pack", "elephant : jungle", "beagle : clan", "herd : peacock"], ans: "wolf : pack" },
+    { q: "ODOMETER : DISTANCE", opts: ["scale : weight", "length : width", "inch : foot", "area : size"], ans: "scale : weight" },
+    { q: "WAITRESS : RESTAURANT", opts: ["doctor : diagnosis", "actor : role", "driver : truck", "teacher : school"], ans: "teacher : school" },
+    { q: "SKEIN : YARN", opts: ["squeeze : lemon", "fire : coal", "ream : paper", "tree : lumber"], ans: "ream : paper" }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `Question ${idx + 1} of ${data.length}`;
+    document.getElementById('q-pair').innerText = item.q;
+    
+    const container = document.getElementById('options');
+    container.innerHTML = '';
+    item.opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+            selected = opt;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        container.appendChild(btn);
+    });
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function validate() {
+    if (!selected) return alert("Choose an answer first!");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach(btn => {
+        if (btn.innerText === correct) btn.classList.add('correct');
+        if (btn.innerText === selected && selected !== correct) btn.classList.add('wrong');
+        btn.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Analogy practice complete!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

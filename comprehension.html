@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability - Full Comprehension</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); }
+        .nav { background: #fff; padding: 15px 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; }
+        .main { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 25px; padding: 0 20px; }
+        @media (max-width: 950px) { .main { grid-template-columns: 1fr; } .p-box { position: relative !important; top: 0 !important; } }
+        .p-box { background: white; padding: 30px; border-radius: 12px; height: fit-content; position: sticky; top: 80px; line-height: 1.8; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .p-text { font-size: 1.1rem; text-align: justify; white-space: pre-line; color: #444; }
+        .q-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-height: 400px; }
+        .opt { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt:hover { background: #f0f7ff; border-color: var(--accent); }
+        .opt.selected { border-color: var(--accent); background: #e1f5fe; font-weight: bold; }
+        .opt.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <span style="font-weight:bold; color:var(--primary)">Reading Comprehension Series</span>
+    <a href="index.html" style="text-decoration:none; color:var(--accent)">Home</a>
+</div>
+
+<div class="main">
+    <div class="p-box">
+        <h2 id="p-title" style="margin-top:0; color:var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px;"></h2>
+        <div id="p-text" class="p-text"></div>
+    </div>
+
+    <div class="q-box">
+        <div id="progress" style="font-weight: bold; color: var(--accent); margin-bottom: 15px;"></div>
+        <div id="q-text" style="font-weight: bold; font-size: 1.2rem; margin-bottom: 20px; line-height: 1.4;"></div>
+        <div id="options"></div>
+        <div class="footer">
+            <button class="btn btn-check" onclick="check()">Check Answer</button>
+            <button id="nextBtn" class="btn btn-next" onclick="next()">Next →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    {
+        title: "Space Mission & Re-entry",
+        text: "I felt the wall of the tunnel shiver. The master alarm squealed through my earphones. Almost simultaneously, Jack yelled down to me that there was a warning light on. Fleeting but spectacular sights snapped into and out of view, the snow, the shower of debris, the moon, looming close and big, the dazzling sunshine for once unfiltered by layers of air. \n\nThe last twelve hours before re-entry were particular bone-chilling. During this period, I had to go up in to command module. Even after the fiery re-entry splashing down in 81° water in south pacific, we could still see our frosty breath inside the command module.",
+        qs: [
+            { q: "The word 'Command Module' used twice in the given passage indicates perhaps that it deals with", opts: ["an alarming journey", "a commanding situation", "a journey into outer space", "a frightful battle"], ans: 2 },
+            { q: "Which one of the following reasons would one consider as more as possible for the warning lights to be on?", opts: ["There was a shower of debris.", "Jack was yelling.", "A catastrophe was imminent.", "The moon was looming close and big."], ans: 2 },
+            { q: "The statement that the dazzling sunshine was 'for once unfiltered by layers of air' means", opts: ["that the sun was very hot", "that there was no strong wind", "that the air was unpolluted", "none of above"], ans: 2 }
+        ]
+    },
+    {
+        title: "The Elephant Shot",
+        text: "But I did not want to shoot the elephant. I watched him beating his bunch of grass against his knees, with the preoccupied grandmotherly air that elephants have. It seemed to me that it would be murder to shoot him. I had never shot an elephant and never wanted to. (Somehow it always seems worse to kill large animal.) \n\nBesides, there was the beast's owner to be considered. But I had got to act quickly. I turned to some experienced-looking Burmans who had been there when we arrived, and asked them how the elephants had been behaving. They all said the same thing; he took no notice of you if you left him alone, but he might charge if you went too close to him.",
+        qs: [
+            { q: "The phrase 'Preoccupied grandmotherly air' signifies", opts: ["being totally unconcerned", "pretending to be very busy", "a very superior attitude", "calm, dignified and affectionate disposition"], ans: 3 },
+            { q: "From the passage it appears that the author was", opts: ["an inexperienced hunter", "kind and considerate", "possessed with fear", "a worried man"], ans: 1 },
+            { q: "The author did not want to shoot the elephant because he", opts: ["was afraid of it", "did not have the experience of shooting big animals", "did not wish to kill animal which was not doing anybody any harm", "did not find the elephant to be ferocious"], ans: 2 }
+        ]
+    },
+    {
+        title: "Harold's Dream",
+        text: "Harold a professional man who had worked in an office for many years had a fearful dream. In it, he found himself in a land where small slug-like animals with slimy tentacles lived on people's bodies. The people tolerated the loathsome creatures because after many years they grew into elephants which then became the nation's system of transport, carrying everyone wherever he wanted to go. \n\nHarold suddenly realised that he himself was covered with these things, and he woke up screaming. In a vivid sequence of pictures this dream dramatised for Harold what he had never been able to put in to words; he saw himself as letting society feed on his body in his early years so that it would carry him when he retired. He later threw off the 'security bug' and took up freelance work.",
+        qs: [
+            { q: "In his dream Harold found the loathsome creatures", opts: ["in his village", "in his own house", "in a different land", "in his office"], ans: 2 },
+            { q: "Which one of the following phrases best helps to bring out the precise meaning of 'loathsome creatures'?", opts: ["Security bug and slimy tentacles", "Fearful dream and slug-like animals", "Slimy tentacles and slug-like animals", "slug-like animals and security bug"], ans: 2 },
+            { q: "The statement that 'he later threw off the security bug' means that", opts: ["Harold succeeded in overcoming the need for security", "Harold stopped giving much importance to dreams", "Harold started tolerating social victimisation", "Harold killed all the bugs troubled him"], ans: 0 }
+        ]
+    },
+    {
+        title: "Laws of Nature",
+        text: "Laws of nature are not commands but statements of acts. The use of the word 'law' in this context is rather unfortunate. It would be better to speak of uniformities in nature. This would do away with the elementary fallacy that a law implies a law giver. \n\nIf a piece of matter does not obey a law of nature it is punished. On the contrary, we say that the law has been incorrectly started.",
+        qs: [
+            { q: "If a piece of matter violates nature's law, it is not punished because", opts: ["it is not binding to obey it", "there is no superior being to enforce the law of nature", "it cannot be punished", "it simply means that the facts have not been correctly stated"], ans: 3 },
+            { q: "Laws of nature differ from man-made laws because", opts: ["the former state facts of Nature", "they must be obeyed", "they are natural", "unlike human laws, they are systematic"], ans: 0 }
+        ]
+    },
+    {
+        title: "The Male Lions",
+        text: "Male lions are rather reticent about expanding their energy in hunting more than three quarters of kills are made by lionesses are in front, tensely scanning ahead, the cubs lag playfully behind and the males bring up the rear, walking slowly, their massive heads nodding with each step as if they were bored with the whole matter. \n\nBut slothfulness may have survival value. With lionesses busy hunting, the males function as guard for the cubs, protecting them particularly from hyenas.",
+        qs: [
+            { q: "According to the passage male lions generally do not go for huntings because", opts: ["they don not like it.", "they want lioness to get training", "they wish to save their vigour for other things", "they are very lazy"], ans: 2 },
+            { q: "Male lions protect their cubs", opts: ["from members of their own species", "from hyenas only", "from hyenas as much as from other enemies", "more from hyenas than from other animals"], ans: 3 }
+        ]
+    },
+    {
+        title: "Civilisation & Mentality",
+        text: "At this stage of civilisation, when many nations are brought in to close and vital contact for good and evil, it is essential, as never before, that their gross ignorance of one another should be diminished, that they should begin to understand a little of one another's historical experience and resulting mentality. \n\nIt is the fault of the English to expect the people of other countries to react as they do, to political and international situations. Our genuine goodwill and good intentions are often brought to nothing, because we expect other people to be like us.",
+        qs: [
+            { q: "According to the author of 'Mentality' of a nation is mainly product of its", opts: ["history", "international position", "politics", "present character"], ans: 0 },
+            { q: "The need for a greater understanding between nations", opts: ["was always there", "is no longer there", "is more today than ever before", "will always be there"], ans: 2 }
+        ]
+    },
+    {
+        title: "Approach to Work",
+        text: "What needs to be set right is our approach to work. It is a common sight in our country of employees reporting for duty on time and at the same time doing little work. If an assessment is made of time they spent in gossiping, drinking tea, eating 'pan' and smoking cigarettes, it will be shocking to know that the time devoted to actual work is negligible. \n\nThe problem is the standard which the leadership in administration sets for the staff. The administration set up remains week mainly because the employees do not have the right example to follow and they are more concerned about being in the good books of the bosses than doing work.",
+        qs: [
+            { q: "The employees in our country", opts: ["are quite punctual but not duty conscious", "are not punctual", "are somewhat lazy but good natured", "are not very highly qualified"], ans: 0 },
+            { q: "The word 'assessment' means", opts: ["enquiry", "report", "evaluation", "summary"], ans: 2 }
+        ]
+    },
+    {
+        title: "Speech: Great Blessing or Curse",
+        text: "Speech is great blessings but it can also be great curse, for while it helps us to make our intentions and desires known to our fellows, it can also if we use it carelessly, make our attitude completely misunderstood. \n\nA slip of the tongue, the use of unusual word, or of an ambiguous word, and so on, may create an enemy where we had hoped to win a friend. Again, different classes of people use different vocabularies, and the ordinary speech of an educated may strike an uneducated listener as pompous. Thus speech is not a gift to use lightly without thought, but one which demands careful handling.",
+        qs: [
+            { q: "The best way to win a friend is to avoid", opts: ["irony in speech", "pomposity in speech", "verbosity in speech", "ambiguity in speech"], ans: 3 },
+            { q: "A 'slip of the tongue' means something said", opts: ["wrongly by choice", "unintentionally", "without giving proper thought", "to hurt another person"], ans: 1 }
+        ]
+    },
+    {
+        title: "Mahatma Gandhi's Rural Vision",
+        text: "Mahatma Gandhi believed that industrialisation was no answer to the problems that plague the mass of India's poor and that villagers should be taught to be self-sufficient in food, weave their own cloth from cotton and eschew the glittering prizes that the 20th century so temptingly offers. \n\nSuch an idyllic and rural paradise did not appear to those who inherited the reins of political power.",
+        qs: [
+            { q: "The meaning of 'glittering prizes that the 20th century so temptingly offers' is", opts: ["pursuit of a commercialised material culture", "replacement of rural by urban interests", "complete removal of poverty", "absence of violence and corruption"], ans: 0 },
+            { q: "The basis of 'an idyllic and rural paradise' is", opts: ["rapid industrialisation of villages", "self sufficiency in food clothes and simplicity", "glittering prizes of the 20th century", "holding powerful political positions"], ans: 1 }
+        ]
+    },
+    {
+        title: "Organizations & Organic Systems",
+        text: "Organisations are institutions in which members compete for status and power. They compete for resource of the organisation, for example finance to expand their own departments, for career advancement and for power to control the activities of others. \n\nAs a result, policy decisions may serve the ends of political and career systems rather than those of the concern. These preoccupations sometimes prevent the emergence of organic systems. Many senior managers had little knowledge of technicality and possibilities of new developments. Some felt that close cooperation with the experts would reveal their ignorance and show their experience was now redundant.",
+        qs: [
+            { q: "The theme of the passage is", opts: ["groupism in organizations", "individual ambitions in organizations", "frustration of senior managers", "sectional interests in organizations"], ans: 3 },
+            { q: "Organic system' as related to the organization implies its", opts: ["growth with expert knowledge", "growth with science and technology", "steady all around development", "natural and unimpeded growth"], ans: 3 }
+        ]
+    }
+];
+
+let pIdx = 0, qIdx = 0, selected = null;
+
+function render() {
+    const p = data[pIdx], q = p.qs[qIdx];
+    document.getElementById('p-title').innerText = p.title;
+    document.getElementById('p-text').innerText = p.text;
+    document.getElementById('q-text').innerText = q.q;
+    document.getElementById('progress').innerText = `Passage ${pIdx+1}/${data.length} | Question ${qIdx+1}/${p.qs.length}`;
+    
+    const optBox = document.getElementById('options');
+    optBox.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt';
+        b.innerText = o;
+        b.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt').forEach(x => x.classList.remove('selected'));
+            b.classList.add('selected');
+        };
+        optBox.appendChild(b);
+    });
+    document.getElementById('nextBtn').style.display = 'none';
+}
+
+function check() {
+    if(selected === null) return alert("Select an option!");
+    const ans = data[pIdx].qs[qIdx].ans;
+    const btns = document.querySelectorAll('.opt');
+    btns.forEach((b, i) => {
+        if(i === ans) b.classList.add('correct');
+        if(i === selected && i !== ans) b.classList.add('wrong');
+        b.disabled = true;
+    });
+    document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function next() {
+    selected = null;
+    if(qIdx < data[pIdx].qs.length - 1) qIdx++;
+    else if(pIdx < data.length - 1) { pIdx++; qIdx = 0; }
+    else return alert("Great job! You've finished all 10 major passages.");
+    render();
+}
+render();
+</script>
+</body>
+</html>

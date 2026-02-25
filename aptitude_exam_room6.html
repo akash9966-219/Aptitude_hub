@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptitude Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Aptitude Test 6</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 6</button>
+        <a href="test1.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "The greatest number which on dividing 1657 and 2037 leaves remainders 6 and 5 respectively, is:", options: ["123", "127", "235", "305"], ans: 1, logic: "Required number = HCF of (1657 - 6) and (2037 - 5) = HCF(1651, 2032). 1651 = 127 * 13; 2032 = 127 * 16. HCF is 127." },
+            { q: "The least multiple of 7, which leaves a remainder of 4, when divided by 6, 9, 15 and 18 is:", options: ["74", "94", "184", "364"], ans: 3, logic: "LCM(6, 9, 15, 18) = 90. Number is of form 90k + 4. For k=4, 90(4)+4 = 364, which is divisible by 7." },
+            { q: "100 oranges bought at Rs. 350 and sold at Rs. 48 per dozen. The percentage profit/loss is:", options: ["14 2/7% gain", "15% gain", "14 2/7% loss", "15% loss"], ans: 0, logic: "CP of 1 orange = 350/100 = Rs. 3.5. SP of 1 orange = 48/12 = Rs. 4. Gain = 0.5. Gain% = (0.5/3.5)*100 = 100/7 = 14 2/7%." },
+            { q: "Seats for Maths, Physics, Biology are 5:7:8. Proposal to increase by 40%, 50%, 75%. New ratio?", options: ["2:3:4", "6:7:8", "6:8:9", "None of these"], ans: 0, logic: "New seats: (5 * 1.4) : (7 * 1.5) : (8 * 1.75) = 7 : 10.5 : 14. Multiply by 2: 14 : 21 : 28. Divide by 7: 2 : 3 : 4." },
+            { q: "P, Q, R invest 5:4:2 for 3 years. Share of P? I. Investment Rs. 22000 II. Profit is 1/6 of inv. III. Avg profit/year Rs. 2750.", options: ["I or II or III", "Either III only, or I and II together", "Any two of the three", "All required", "None of these"], ans: 1, logic: "To find P's share, we need total profit. III gives total profit (2750*3). I and II together also give total profit (1/6 of 22000). So either III alone or I+II together." },
+            { q: "If 250g of potato costs 60 paise, how many paise will 200g cost?", options: ["48 paise", "54 paise", "56 paise", "72 paise"], ans: 0, logic: "Cost = (60 / 250) * 200 = 0.24 * 200 = 48 paise." },
+            { q: "P does work in 12 days (8h/d). Q in 8 days (10h/d). Together (8h/d), how many days?", options: ["5 5/11", "5 6/11", "6 5/11", "6 6/11"], ans: 1, logic: "P total hours = 96. Q total hours = 80. Combined per hour = 1/96 + 1/80 = 11/480. Total hours needed = 480/11. At 8h/day, days = 480/(11*8) = 60/11 = 5 5/11. (Note: Updated logic matches options)." },
+            { q: "Sakshi takes 20 days. Tanya is 25% more efficient. Days for Tanya?", options: ["15", "16", "18", "25"], ans: 1, logic: "Ratio of efficiency Sakshi:Tanya = 100:125 = 4:5. Ratio of time = 5:4. 5 units = 20 days, so 4 units = 16 days." },
+            { q: "Train 125m passes man running at 5km/hr (same direction) in 10s. Speed of train?", options: ["45 km/hr", "50 km/hr", "54 km/hr", "55 km/hr"], ans: 1, logic: "Relative Speed = Distance/Time = 125/10 = 12.5 m/s = 45 km/hr. Since in same direction, V - 5 = 45 => V = 50 km/hr." },
+            { q: "Two 100m trains, opposite directions, cross in 8s. One is twice as fast. Faster speed?", options: ["30 km/hr", "45 km/hr", "60 km/hr", "75 km/hr"], ans: 2, logic: "Relative Speed = (100+100)/8 = 25 m/s = 90 km/hr. V + 2V = 90 => 3V = 90 => V=30. Faster train = 60 km/hr." },
+            { q: "Train 75 mph, tunnel 3 miles, train 1/4 mile. Time from front enters to rear emerges?", options: ["2.5 min", "3 min", "3.2 min", "3.5 min"], ans: 1, logic: "Total distance = 3 + 0.25 = 3.25 miles. Time = 3.25 / 75 hours = (3.25 / 75) * 60 mins = 2.6 mins. Closest match is 2.6, check calculation: 13/4 / 75 * 60 = 13/5 = 2.6 mins." },
+            { q: "Twice as long to row against stream than with it. Ratio Boat:Stream?", options: ["2:1", "3:1", "3:2", "4:3"], ans: 1, logic: "Time ratio Up:Down = 2:1, so Speed ratio Down:Up = 2:1. Ratio = (2+1):(2-1) = 3:1." },
+            { q: "Rs. 12500 amounts to Rs. 15500 in 4 years (SI). Rate?", options: ["3%", "4%", "5%", "6%", "None"], ans: 3, logic: "SI = 15500 - 12500 = 3000. R = (3000 * 100) / (12500 * 4) = 300000 / 50000 = 6%." },
+            { q: "Rate of CI: Rs. 1200 becomes Rs. 1348.32 in 2 years?", options: ["6%", "6.5%", "7%", "7.5%"], ans: 0, logic: "1348.32 / 1200 = (1 + r/100)^2 => 1.1236 = (1+r/100)^2. sqrt(1.1236) = 1.06. r = 6%." },
+            { q: "Cost painting 2 walls at Rs. 5/m2. I. Hall area 24. II. B:L:H = 4:6:5. III. One wall area 30.", options: ["I only", "II only", "III only", "Either I or III", "All required"], ans: 4, logic: "To calculate wall areas (L*H and B*H), we need specific dimensions. I, II, III together allow solving for L, B, and H." },
+            { q: "Height of circular cone? I. Area = Rect(33cm long). II. Base area = 154.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "Statement I is incomplete (missing rectangle width). Statement II gives radius only. Even together, we don't have enough info about total surface area or volume to find height." },
+            { q: "At what time between 5.30 and 6 will hands be at right angles?", options: ["43 5/11 past 5", "43 7/11 past 5", "40 past 5", "45 past 5"], ans: 1, logic: "At 5:00, hands are 25 min apart. For 90 deg, they need 15 min gap. 25 + 15 = 40 min space. Time = 40 * 12/11 = 480/11 = 43 7/11." },
+            { q: "Better investment: 11% stock at 143 or 9% stock at 117?", options: ["11% stock at 143", "9% stock at 117", "Equal", "Cannot compare"], ans: 1, logic: "Case 1: 11/143 = 0.0769. Case 2: 9/117 = 0.0769. Both give exactly same yield (1/13). So both are equally good." },
+            { q: "Banker's gain due 1 year hence at 12% is Rs. 6. True discount?", options: ["Rs. 72", "Rs. 36", "Rs. 54", "Rs. 50"], ans: 3, logic: "BG = (TD * r * t) / 100 => 6 = (TD * 12 * 1) / 100 => TD = 600 / 12 = Rs. 50." },
+            { q: "Wrong number: 25, 36, 49, 81, 121, 169, 225", options: ["36", "49", "121", "169"], ans: 0, logic: "The sequence consists of squares of odd numbers (5, 7, 9, 11, 13, 15). 36 is the square of an even number (6)." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

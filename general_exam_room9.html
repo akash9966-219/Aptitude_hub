@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 9</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 9</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+   const questions = [
+    { q: "To which king belongs the Lion Capital at Sarnath?", options: ["Chandragupta", "Ashoka", "Kanishka", "Harsha"], ans: 1, logic: "The Lion Capital was originally placed atop the Ashoka Pillar at Sarnath by Emperor Ashoka in 250 BCE; it is now the National Emblem of India." },
+    { q: "The Objectives Resolution of the Constituent Assembly was moved by?", options: ["Sardar Patel", "Jawaharlal Nehru", "K.M. Munshi", "B.R. Ambedkar"], ans: 1, logic: "Jawaharlal Nehru moved the Objectives Resolution on December 13, 1946, which later became the Preamble of the Indian Constitution." },
+    { q: "Which instrument is used in a submarine to see objects on the water's surface?", options: ["kaleidoscope", "periscope", "spectroscope", "telescope"], ans: 1, logic: "A periscope uses a system of prisms or mirrors to allow a viewer to see objects that are not in their direct line of sight." },
+    { q: "GATT (General Agreement on Tariffs and Trade) is defined as?", options: ["international agreement signed in 1947", "encourages bargaining with trade concessions", "Both option A and B", "None of the above"], ans: 2, logic: "GATT was a legal agreement between many countries, whose overall purpose was to promote international trade by reducing or eliminating trade barriers." },
+    { q: "India's first Technicolor film produced in the early 1950s was?", options: ["'Jhansi Ki Rani', Sohrab Modi", "'Jhansi Ki Rani', Sir Syed Ahmed", "'Mirza Ghalib', Sohrab Modi", "'Mirza Ghalib', Munshi Premchand"], ans: 0, logic: "Produced and directed by Sohrab Modi in 1953, 'Jhansi Ki Rani' was India's first high-budget Technicolor historical drama." },
+    { q: "Penicillin is widely used as an?", options: ["antiseptic", "disinfectant", "an antibiotic", "an insecticide"], ans: 2, logic: "Discovered by Alexander Fleming, Penicillin was the world's first 'miracle drug' or antibiotic used to treat bacterial infections." },
+    { q: "On a stationary sailboat, if a fan attached to the boat blows air into the sail, the boat?", options: ["moves in opposite direction", "does not move", "moves in same direction", "spins around"], ans: 1, logic: "This is due to the conservation of momentum within a closed system; the force of the fan and the force on the sail cancel each other out." },
+    { q: "Which two English counties did Anil Kumble play for?", options: ["Nottinghamshire & Lancashire", "Nottinghamshire & Leicestershire", "Northamptonshire & Leicestershire", "Northamptonshire & Lancashire"], ans: 2, logic: "Anil Kumble had successful stints with Northamptonshire (1995) and Leicestershire (2000) during his career." },
+    { q: "Which country signed Rahul Dravid as their overseas player for their 2003 debut?", options: ["Holland", "Ireland", "Wales", "Scotland"], ans: 3, logic: "Scotland signed Rahul Dravid in 2003 for their debut season in the English domestic one-day league." },
+    { q: "The average power (in watts) used by a 20 to 25 inch home color television is?", options: ["70-100", "25-50", "500-800", "Over 1000"], ans: 0, logic: "Standard CRT color televisions of that size typically consume between 70 to 100 watts during operation." },
+    { q: "In networking and computing, what is a MAC?", options: ["A Computer made by Apple", "Memory Address Corruption", "Mediocre Apple Computer", "Media Access Control"], ans: 3, logic: "A MAC address is a unique identifier assigned to a network interface controller (NIC) for communications at the data link layer." },
+    { q: "The mass number of a nucleus is?", options: ["always less than atomic number", "sum of protons and neutrons", "always more than atomic weight", "a fraction"], ans: 1, logic: "The mass number (A) is the total number of nucleons (protons + neutrons) present in an atom's nucleus." },
+    { q: "The official language of the Government of India is?", options: ["English", "Malayalam", "Hindi", "Marathi"], ans: 2, logic: "According to Article 343 of the Indian Constitution, the official language of the Union is Hindi in Devanagari script." },
+    { q: "When and where was women's hockey introduced in the Olympics?", options: ["1908 at London", "1980 at Moscow", "1936 at Berlin", "1924 at Paris"], ans: 1, logic: "Women's field hockey was first included in the Olympic program at the 1980 Moscow Games, where Zimbabwe won the gold." },
+    { q: "The main producers of free gas in India are?", options: ["western offshore (Bassein/Tapti)", "Tripura and KG Basin", "both (a) and (b)", "None of the above"], ans: 2, logic: "India's free gas production is concentrated in both the offshore fields of the west coast and the onshore/offshore fields of the east coast and northeast." },
+    { q: "Ali Sher, an Arjuna Award winner, is associated with which sport?", options: ["Golf", "Football", "Yachting", "Hockey"], ans: 0, logic: "Ali Sher is a famous Indian professional golfer who won the Indian Open twice and received the Arjuna Award in 1991." },
+    { q: "The National Institute of Nutrition (NIN) is located in?", options: ["Bangalore", "Kerala", "Gandhinagar", "Hyderabad"], ans: 3, logic: "NIN is an Indian public health, nutrition, and biology research center located in Hyderabad." },
+    { q: "The 'Char Minar' is located in which city?", options: ["Ahmedabad", "Hyderabad", "Delhi", "Sikri"], ans: 1, logic: "The Charminar was built in 1591 by Muhammad Quli Qutb Shah to mark the end of a plague in the city of Hyderabad." },
+    { q: "The headquarters of UNESCO is located in?", options: ["Rome", "Geneva", "New York", "Paris"], ans: 3, logic: "UNESCO (United Nations Educational, Scientific and Cultural Organization) is headquartered at Place de Fontenoy in Paris, France." },
+    { q: "Amalgams are defined as?", options: ["highly coloured alloys", "alloys which contain mercury", "alloys resistant to abrasion", "alloys which contain carbon"], ans: 1, logic: "An amalgam is an alloy of mercury with another metal. It can be liquid, soft paste, or solid, depending on the proportion of mercury." }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

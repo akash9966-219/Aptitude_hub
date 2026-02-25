@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Antonyms Quiz - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #e74a3b;
+            --secondary: #be2617;
+            --dark: #2e3759;
+            --bg: #f8f9fc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .instructions {
+            background: #fff5f5;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta { color: #888; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; }
+        
+        .word-display {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .option:hover { border-color: var(--primary); background: #fff5f5; }
+        .option.selected { border-color: var(--primary); background: #ffebeb; }
+
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Antonyms Practice</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='verbal-ability.html'">⬅ Back to Topics</button>
+
+    <div class="instructions">
+        <strong>Direction:</strong> Choose the word which is most nearly the <strong>OPPOSITE</strong> in meaning to the given word.
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="q-count" class="question-meta">Question 1 of 60</div>
+        
+        <div class="word-display" id="main-word">WORD</div>
+        
+        <div id="options-container" class="options-list">
+            </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div id="explanation-content" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Word ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { w: "ENORMOUS", opts: ["Soft", "Average", "Tiny", "Weak"], correct: 2, ex: "Enormous means huge; Tiny means very small." },
+        { w: "COMMISSIONED", opts: ["Started", "Closed", "Finished", "Terminated"], correct: 3, ex: "Commissioned means started or brought into service; Terminated means ended." },
+        { w: "ARTIFICIAL", opts: ["Red", "Natural", "Truthful", "Solid"], correct: 1, ex: "Artificial is man-made; Natural exists in nature." },
+        { w: "EXODUS", opts: ["Influx", "Home-coming", "Return", "Restoration"], correct: 0, ex: "Exodus is a mass departure; Influx is a mass arrival." },
+        { w: "RELINQUISH", opts: ["Abdicate", "Renounce", "Possess", "Deny"], correct: 2, ex: "Relinquish means to give up; Possess means to keep or own." },
+        { w: "EXPAND", opts: ["Convert", "Condense", "Congest", "Conclude"], correct: 1, ex: "Expand means to grow larger; Condense means to make smaller." },
+        { w: "MORTAL", opts: ["Divine", "Immortal", "Spiritual", "Eternal"], correct: 1, ex: "Mortal means subject to death; Immortal means living forever." },
+        { w: "QUIESCENT", opts: ["Active", "Dormant", "Weak", "Unconcerned"], correct: 0, ex: "Quiescent means inactive or at rest; Active means moving or working." },
+        { w: "OBEYING", opts: ["Ordering", "Following", "Refusing", "Contradicting"], correct: 2, ex: "Obeying is following rules; Refusing is declining to follow them." },
+        { w: "FRAUDULENT", opts: ["Candid", "Direct", "Forthright", "Genuine"], correct: 3, ex: "Fraudulent is fake/dishonest; Genuine is real/honest." },
+        { w: "FLAGITIOUS", opts: ["Innocent", "Vapid", "Ignorant", "Frivolous"], correct: 0, ex: "Flagitious means criminal or wicked; Innocent means free from guilt." },
+        { w: "BELITTLE", opts: ["Criticize", "Flatter", "Exaggerate", "Adore"], correct: 2, ex: "Belittle means to make seem small; Exaggerate means to make seem larger." },
+        { w: "STARTLED", opts: ["Amused", "Relaxed", "Endless", "Astonished"], correct: 1, ex: "Startled is shocked/surprised; Relaxed is calm." },
+        { w: "BUSY", opts: ["Occupied", "Engrossed", "Relaxed", "Engaged"], correct: 2, ex: "Busy means working; Relaxed means at ease." },
+        { w: "FRESH", opts: ["Faulty", "Sluggish", "Disgraceful", "Stale"], correct: 3, ex: "Fresh is new/clean; Stale is old/decayed (especially food)." },
+        { w: "CULPABLE", opts: ["Defendable", "Blameless", "Careless", "Irresponsible"], correct: 1, ex: "Culpable means deserving blame; Blameless means innocent." },
+        { w: "EVASIVE", opts: ["Free", "Honest", "Liberal", "Frank"], correct: 3, ex: "Evasive is avoiding the truth; Frank is open and direct." },
+        { w: "GREGARIOUS", opts: ["Antisocial", "Glorious", "Horrendous", "Similar"], correct: 0, ex: "Gregarious is sociable; Antisocial avoids others." },
+        { w: "AWARE", opts: ["Uncertain", "Ignorant", "Sure", "Doubtful"], correct: 1, ex: "Aware is having knowledge; Ignorant is lacking knowledge." },
+        { w: "HIRSUTE", opts: ["Scaly", "Bald", "Erudite", "Quiet"], correct: 1, ex: "Hirsute means hairy; Bald means hairless." },
+        { w: "SHRINK", opts: ["Contract", "Spoil", "Expand", "Stretch"], correct: 2, ex: "Shrink is to get smaller; Expand is to get larger." },
+        { w: "COMMON", opts: ["Rare", "Small", "Petty", "Poor"], correct: 0, ex: "Common is found everywhere; Rare is hard to find." },
+        { w: "COMFORT", opts: ["Uncomfort", "Miscomfort", "Discomfort", "None Of These"], correct: 2, ex: "Discomfort is the direct antonym of Comfort." },
+        { w: "DEAR", opts: ["Priceless", "Free", "Worthless", "Cheap"], correct: 3, ex: "Dear (in this context) means expensive; Cheap means low cost." },
+        { w: "ARROGANT", opts: ["Humble", "Cowardly", "Egotistic", "Gentlemanly"], correct: 0, ex: "Arrogant is proud/conceited; Humble is modest." },
+        { w: "VICTORIOUS", opts: ["Defeated", "Annexed", "Destroyed", "Vanquished"], correct: 0, ex: "Victorious is winning; Defeated is losing." },
+        { w: "GRACEFUL", opts: ["Rough", "Expert", "Miserable", "Awkward"], correct: 3, ex: "Graceful is elegant; Awkward is clumsy." },
+        { w: "NADIR", opts: ["Modernity", "Zenith", "Liberty", "Progress"], correct: 1, ex: "Nadir is the lowest point; Zenith is the highest point." },
+        { w: "EXTRAVAGANCE", opts: ["Luxury", "Poverty", "Economical", "Cheapness"], correct: 2, ex: "Extravagance is wasteful spending; Economical is careful saving." },
+        { w: "PERTINENT", opts: ["Irrational", "Irregular", "Insistent", "Irrelevant"], correct: 3, ex: "Pertinent is relevant; Irrelevant is not related." },
+        { w: "OBSCURE", opts: ["Implicit", "Obnoxious", "Explicit", "Pedantic"], correct: 2, ex: "Obscure is unclear; Explicit is stated clearly." },
+        { w: "URBANE", opts: ["Illiterate", "Backward", "Discourteous", "Orthodox"], correct: 2, ex: "Urbane is polite/refined; Discourteous is rude." },
+        { w: "VANITY", opts: ["Pride", "Humility", "Conceit", "Ostentatious"], correct: 1, ex: "Vanity is excessive pride; Humility is being humble." },
+        { w: "RARELY", opts: ["Hardly", "Definately", "Frequently", "Periodically"], correct: 2, ex: "Rarely is not often; Frequently is very often." },
+        { w: "MALICIOUS", opts: ["Kind", "Boastful", "Generous", "Indifferent"], correct: 0, ex: "Malicious is intending harm; Kind is helpful." },
+        { w: "EPILOGUE", opts: ["Dialogue", "Prelude", "Post script", "Epigram"], correct: 1, ex: "Epilogue is the end of a book/play; Prelude is the introduction." },
+        { w: "CAPACIOUS", opts: ["Limited", "Caring", "Foolish", "Changeable"], correct: 0, ex: "Capacious is roomy/spacious; Limited is restricted in space." },
+        { w: "CONDENSE", opts: ["Expand", "Distribute", "Interpret", "Lengthen"], correct: 0, ex: "Condense is to shorten; Expand is to lengthen/enlarge." },
+        { w: "ADAPTABLE", opts: ["Adoptable", "Flexible", "Yielding", "Rigid"], correct: 3, ex: "Adaptable is flexible; Rigid is stiff and unchanging." },
+        { w: "SACROSANCT", opts: ["Irreligious", "Unethical", "Irreverent", "Unholy"], correct: 3, ex: "Sacrosanct is extremely holy/sacred; Unholy is not sacred." },
+        { w: "INDISCREET", opts: ["Reliable", "Honest", "Prudent", "Stupid"], correct: 2, ex: "Indiscreet is careless; Prudent is wise and careful." },
+        { w: "FAMILIAR", opts: ["Unpleasant", "Dangerous", "Friendly", "Strange"], correct: 3, ex: "Familiar is well-known; Strange is unknown." },
+        { w: "TANGIBLE", opts: ["Ethereal", "Concrete", "Actual", "Solid"], correct: 0, ex: "Tangible is touchable/physical; Ethereal is light/airy/non-physical." },
+        { w: "LOVE", opts: ["Villainy", "Hatred", "Compulsion", "Force"], correct: 1, ex: "The opposite of Love is Hatred." },
+        { w: "FAMOUS", opts: ["Disgraced", "Unknown", "Evil", "Popular"], correct: 1, ex: "Famous is widely known; Unknown is not known." },
+        { w: "ABSOLUTE", opts: ["Deficient", "Faulty", "Limited", "Scarce"], correct: 2, ex: "Absolute is total/unlimited; Limited is restricted." },
+        { w: "FRUGAL", opts: ["Copious", "Extravagant", "Generous", "Ostentatious"], correct: 1, ex: "Frugal is saving money; Extravagant is wasting it." },
+        { w: "INSIPID", opts: ["Tasty", "Stupid", "Discreet", "Feast"], correct: 0, ex: "Insipid is tasteless; Tasty is full of flavor." },
+        { w: "ABLE", opts: ["Disable", "Inable", "Unable", "Misable"], correct: 2, ex: "The opposite of Able is Unable." },
+        { w: "HOSTILITY", opts: ["Courtesy", "Hospitality", "Relationship", "Friendliness"], correct: 3, ex: "Hostility is being an enemy; Friendliness is being a friend." },
+        { w: "CROWDED", opts: ["Busy", "Congested", "Quiet", "Deserted"], correct: 3, ex: "Crowded is full of people; Deserted is empty." },
+        { w: "COMIC", opts: ["Emotional", "Tragic", "Fearful", "Painful"], correct: 1, ex: "Comic is funny; Tragic is very sad." },
+        { w: "HAPLESS", opts: ["Cheerful", "Consistent", "Fortunate", "Shapely"], correct: 2, ex: "Hapless is unlucky; Fortunate is lucky." },
+        { w: "FLIMSY", opts: ["Frail", "Filthy", "Firm", "Flippant"], correct: 2, ex: "Flimsy is weak/easily broken; Firm is strong/solid." },
+        { w: "EQUANIMITY", opts: ["Resentment", "Dubiousness", "Duplicity", "Excitement"], correct: 3, ex: "Equanimity is calmness; Excitement is an agitated state." },
+        { w: "ADDITION", opts: ["Division", "Enumeration", "Subtraction", "Multiplication"], correct: 2, ex: "The mathematical opposite of Addition is Subtraction." },
+        { w: "ZENITH", opts: ["Acme", "Top", "Nadir", "Pinnacle"], correct: 2, ex: "Zenith is highest point; Nadir is lowest point." },
+        { w: "DOUBTFUL", opts: ["Famous", "Certain", "Fixed", "Important"], correct: 1, ex: "Doubtful is unsure; Certain is sure." },
+        { w: "PERENNIAL", opts: ["Frequent", "Regular", "Lasting", "Rare"], correct: 3, ex: "Perennial is constant/everlasting; Rare occurs very seldom." },
+        { w: "BENIGN", opts: ["Malevolent", "Soft", "Friendly", "Unwise"], correct: 0, ex: "Benign is kind/gentle; Malevolent is wanting to do evil." }
+    ];
+
+    let currentIdx = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Word ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('main-word').innerText = q.w;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.opts.forEach((opt, i) => {
+            const btn = document.createElement('div');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                btn.classList.add('selected');
+            };
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        selectedIdx = null;
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        feedback.style.display = 'block';
+
+        if (selectedIdx === q.correct) {
+            document.getElementById('result-title').innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            document.getElementById('result-title').innerText = `Incorrect. The opposite of ${q.w} is ${q.opts[q.correct]}.`;
+            feedback.className = "feedback wrong";
+        }
+
+        document.getElementById('explanation-content').innerHTML = `<strong>Explanation:</strong> ${q.ex}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `<h2>Antonyms Complete!</h2><p>Excellent work on your vocabulary.</p><button class="btn btn-check" onclick="location.reload()">Restart Quiz</button>`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

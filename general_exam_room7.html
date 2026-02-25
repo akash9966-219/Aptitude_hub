@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 7</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 7</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+    const questions = [
+    { q: "Who was the fastest shorthand writer?", options: ["Dr. G. D. Bist", "J.R.D. Tata", "J.M. Tagore", "Khudada Khan"], ans: 0, logic: "Dr. Gopal Dutt Bist is a world record holder for shorthand speed, reaching 250 words per minute in Hindi shorthand." },
+    { q: "A Fathometer is used to measure which of the following?", options: ["Earthquakes", "Rainfall", "Ocean depth", "Sound intensity"], ans: 2, logic: "A fathometer is an instrument used to determine the depth of water by transmitting sound waves into the water and measuring the time for the echo to return." },
+    { q: "The Film and TV Institute of India (FTII) is located in which city?", options: ["Pune (Maharashtra)", "Rajkot (Gujarat)", "Pimpri (Maharashtra)", "Perambur (Tamilnadu)"], ans: 0, logic: "FTII is an autonomous institute under the Ministry of Information and Broadcasting, located on the premises of the former Prabhat Studio in Pune." },
+    { q: "What does the abbreviation 'FRS' stand for?", options: ["Fellow Research System", "Federation of Regulation Society", "Fellow of Royal Society", "None of the above"], ans: 2, logic: "FRS is an award and fellowship granted by the Royal Society of London to individuals who have made a substantial contribution to the improvement of natural knowledge." },
+    { q: "Which of the following food grain crops occupies the largest part of the cropped area in India?", options: ["Barley and maize", "Jowar and bajra", "Rice", "Wheat"], ans: 2, logic: "Rice is the dominant crop in India, occupying roughly 25% of the total cropped area and serving as the primary staple for most of the population." },
+    { q: "Oil rises up the wick in a lamp due to which physical principle?", options: ["diffusion of oil", "liquid state of oil", "capillary action phenomenon", "volatility of oil"], ans: 2, logic: "Capillary action occurs due to the intermolecular forces between the liquid and the surrounding solid surfaces of the wick's fibers." },
+    { q: "Radiocarbon ($^{14}C$) is produced in the atmosphere as a result of?", options: ["collision between fast neutrons and nitrogen nuclei", "action of UV light on oxygen", "action of cosmic rays on carbon dioxide", "lightning discharge"], ans: 0, logic: "Cosmic rays produce neutrons that collide with Nitrogen-14 nuclei in the atmosphere, converting them into radioactive Carbon-14." },
+    { q: "Superconductors are substances which?", options: ["conduct electricity at low temperature", "offer high resistance", "offer no resistance to the flow of electricity", "conduct electricity at high temperatures"], ans: 2, logic: "Superconductivity is a phenomenon where a material exhibits exactly zero electrical resistance and expels magnetic fields when cooled below a characteristic critical temperature." },
+    { q: "Which English county did Indian pacer Javagal Srinath sign for in 2003?", options: ["Surrey", "Durham", "Sussex", "Essex"], ans: 1, logic: "Javagal Srinath had a successful stint in English County Cricket, notably signing with Durham in 2003." },
+    { q: "Which component, often made of carbon, is used to inhibit the flow of electric current?", options: ["Choke", "Inductor", "Resistor", "Capacitor"], ans: 2, logic: "Resistors are fundamental electronic components used to create resistance in the flow of electric current, often made from carbon composition or metal films." },
+    { q: "What is the main item of equipment contained in a medium voltage electricity substation?", options: ["Transformer", "Transponder", "Transducer", "Converter"], ans: 0, logic: "Substations use transformers to step down high or medium voltage to a lower level suitable for distribution to buildings." },
+    { q: "Which chemical constituent is responsible for the characteristic flavour of cardamom oil?", options: ["cineole", "engenol", "geraniol", "limonene"], ans: 0, logic: "1,8-cineole (also known as eucalyptol) is the primary component that gives cardamom its distinct spicy and cooling aroma." },
+    { q: "Myopia is a medical condition connected with the?", options: ["ears", "eyes", "lungs", "None of these"], ans: 1, logic: "Myopia, or nearsightedness, is a common vision condition in which you can see objects near to you clearly, but objects farther away are blurry." },
+    { q: "A potato is a modified form of which plant part?", options: ["root", "stem", "fruit", "leaf"], ans: 1, logic: "Potatoes are edible tubers, which are thickened underground stems that the plant uses to store nutrients." },
+    { q: "The Treaty of Versailles, which ended World War I, was signed in which year?", options: ["1917", "1918", "1919", "1920"], ans: 2, logic: "The treaty was signed on June 28, 1919, exactly five years after the assassination of Archduke Franz Ferdinand." },
+    { q: "To which country does the current UN Secretary-General belong?", options: ["Ghana", "South Korea", "Spain", "Portugal"], ans: 3, logic: "António Guterres, the current UN Secretary-General (as of 2026), is the former Prime Minister of Portugal." },
+    { q: "In which year did Christopher Columbus reach the West Indies?", options: ["1455 AD", "1492 AD", "1139 AD", "1556 AD"], ans: 1, logic: "Columbus landed in the Bahamas on October 12, 1492, marking the beginning of European exploration of the Americas." },
+    { q: "Where did Roosevelt, Churchill, and Stalin meet in 1943 to discuss international peace?", options: ["Moscow", "San Francisco", "Teheran", "Washington D.C."], ans: 2, logic: "The Tehran Conference was a strategy meeting between the 'Big Three' leaders to coordinate military strategy and postwar peace." },
+    { q: "Which region in India typically features a dispersed rural settlement pattern?", options: ["Kerala coastal plain", "western Ganga plain", "eastern Rajasthan", "Telengana plateau"], ans: 3, logic: "Dispersed settlements are often found in plateau regions like Telangana or hilly areas where houses are scattered over a wide area." },
+    { q: "The headquarters of the Food and Agriculture Organisation (FAO) is located in?", options: ["Washington", "Paris", "Madrid", "Rome"], ans: 3, logic: "The FAO is a specialized agency of the United Nations that leads international efforts to defeat hunger, headquartered in Rome, Italy." }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

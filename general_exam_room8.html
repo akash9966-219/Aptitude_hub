@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 8</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 8</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+    const questions = [
+    { q: "In Mughal India, the 'Zamindari' right was NOT considered which of the following?", options: ["a saleable right", "hereditary", "ownership of land", "morgageable"], ans: 2, logic: "Zamindars were intermediaries who had the hereditary right to collect revenue, but they were not the absolute owners of the land; the land technically belonged to the state or the tiller." },
+    { q: "The 'benefits received' principle of taxation to achieve optimality is based on?", options: ["Marginal benefit received", "Total benefit received", "Average benefit received", "Ability to pay for the benefit"], ans: 0, logic: "This principle suggests that individuals should be taxed in proportion to the marginal benefits they receive from public spending, mirroring a market price." },
+    { q: "Paper currency first started in India in which year?", options: ["1861", "1542", "1601", "1880"], ans: 0, logic: "The Paper Currency Act of 1861 gave the Government of India the monopoly on issuing notes, ending the era of private bank notes." },
+    { q: "Heavy clay soils that show significant expansion (wet) and contraction (dry) are called?", options: ["aridsols", "vertisols", "histosols", "andisols"], ans: 1, logic: "Vertisols are clay-rich soils that shrink and swell dramatically with moisture changes, often creating deep cracks during dry seasons." },
+    { q: "Lance Armstrong, a sportsperson of international repute, belongs to which country?", options: ["USA", "Ukraine", "Spain", "Brazil"], ans: 0, logic: "Lance Armstrong is an American former professional road racing cyclist, famous for his Seven Tour de France titles (later stripped)." },
+    { q: "Why is sugar production growing faster in South India than in North India?", options: ["I and II", "I, II and III", "I, III and IV", "I, II and IV"], ans: 3, logic: "The South offers higher yield per acre, higher sucrose content due to the tropical climate, and a longer crushing period compared to the North." },
+    { q: "When was the first passenger elevator built?", options: ["1743", "1739", "1760", "1785"], ans: 0, logic: "The 'Flying Chair' was built for King Louis XV at the Palace of Versailles in 1743 so he could visit his mistress on the floor above." },
+    { q: "Who has scored the most Test hundreds in cricket history?", options: ["Steve Waugh", "Sachin Tendulkar", "Shane Warne", "Sunil Gavaskar"], ans: 1, logic: "Sachin Tendulkar holds the record for the most Test centuries, with 51 hundreds in 200 matches." },
+    { q: "When did Sourav Ganguly make his ODI debut?", options: ["20 March 1993", "11 January 1992", "1 December 1987", "1 June 1998"], ans: 1, logic: "Sourav Ganguly made his One Day International debut against the West Indies on January 11, 1992, at the Gabba." },
+    { q: "The first metal used by man was?", options: ["iron", "copper", "gold", "bronze"], ans: 1, logic: "Copper was the first metal used by humans (around 8000 BC) because it could be found in a relatively pure state in nature." },
+    { q: "If tuning fork A is higher frequency than B, and B is loaded with wax, the beat frequency will?", options: ["increase", "decrease", "remain same", "become zero"], ans: 0, logic: "Loading B with wax decreases its frequency. Since B was already lower than A, the gap between them increases, thus increasing the number of beats." },
+    { q: "The highest national award in India for art, literature, and science is?", options: ["Bharat Ratna", "Padma Awards", "Gallantry Awards", "None of the above"], ans: 0, logic: "Instituted in 1954, the Bharat Ratna is India's highest civilian award, recognizing exceptional service of the highest order." },
+    { q: "The plants typically grown in equatorial regions include?", options: ["wheat, barley, maize", "evergreen dense forests, rubber trees, groundnuts", "groundnuts, soyabeans, potatoes", "evergreen coniferous forests, oats, cocoa"], ans: 1, logic: "Equatorial regions are characterized by high heat and rainfall, supporting dense rainforests and commercial crops like rubber." },
+    { q: "Short-term variations of the atmosphere (minutes to months) are called?", options: ["climate", "weather", "temperature", "humidity"], ans: 1, logic: "Weather describes the short-term state of the atmosphere, whereas climate refers to the long-term average (usually 30 years)." },
+    { q: "The 'Global 500' awards are given for outstanding achievement in which field?", options: ["Campaign against AIDS", "Population control", "Protection of environment", "Elimination of illiteracy"], ans: 2, logic: "Launched by the UNEP in 1987, these awards recognize individuals and organizations for environmental protection." },
+    { q: "Who famously said 'God helps those who help themselves'?", options: ["Andre Maurois", "Andre Gide", "Algernon Sidney", "Swami Vivekananda"], ans: 2, logic: "While often attributed to Benjamin Franklin, the phrase originated in its modern English form in the work of Algernon Sidney in 1698." },
+    { q: "Who is the author of: 'That Government is the best which governs least'?", options: ["Herbert Spencer", "Harold Laski", "Alexis De Tocqueville", "Henry David Thoreau"], ans: 3, logic: "This famous quote appears in Henry David Thoreau's influential 1849 essay, 'Civil Disobedience'." },
+    { q: "Kandla, situated on the Gulf of Kachh, is well known for being an?", options: ["Export Processing Zone", "Centre for Marine Food products", "Cutting and Polishing of diamonds", "Ship breaking industry"], ans: 0, logic: "Kandla (now Deendayal Port) was the first Special Economic Zone / Export Processing Zone established in India (1965)." },
+    { q: "The Indian Cancer Research Institute is located in?", options: ["New Delhi", "Calcutta", "Chennai", "Mumbai"], ans: 3, logic: "The Advanced Centre for Treatment, Research and Education in Cancer (ACTREC) is located in Navi Mumbai." },
+    { q: "Sodium metal is safely stored under which liquid?", options: ["petrol", "alcohol", "water", "kerosene"], ans: 3, logic: "Sodium is highly reactive and catches fire when in contact with air or water; kerosene acts as a barrier because it does not react with the metal." }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

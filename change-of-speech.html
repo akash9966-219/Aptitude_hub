@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Change of Speech - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #fdfefe;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .instruction {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .speech-box {
+            background: #fff8f2;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 6px solid var(--accent);
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .opt-btn:hover { background: #fffaf0; border-color: var(--accent); }
+        .opt-btn.selected { border-color: var(--accent); background: #fff5e6; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress-indicator { color: #7f8c8d; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="verbal-ability.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <span class="instruction">Select the correct Direct/Indirect Narration:</span>
+        <div id="q-text" class="speech-box"></div>
+        <div id="options" class="options-container"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress-indicator">Question 1 of 17</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="validate()">Check Answer</button>
+                <button class="btn btn-next" id="nextBtn" onclick="next()">Next Question →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "\"If you don't keep quiet I shall shoot you\", he said to her in a calm voice.", opts: ["He warned her to shoot if she didn't keep quiet calmly.", "He said calmly that I shall shoot you if you don't be quiet.", "He warned her calmly that he would shoot her if she didn't keep quiet.", "Calmly he warned her that be quiet or else he will have to shoot her."], ans: 2 },
+    { q: "I told him that he was not working hard.", opts: ["I said to him, \"You are not working hard.\"", "I told to him, \"You are not working hard.\"", "I said, \"You are not working hard.\"", "I said to him, \"He is not working hard.\""], ans: 0 },
+    { q: "His father ordered him to go to his room and study.", opts: ["His father said, \"Go to your room and study.\"", "His father said to him, \"Go and study in your room.\"", "His father shouted, \"Go right now to your study room\"", "His father said firmly, \"Go and study in your room.\""], ans: 0 },
+    { q: "He said to his father, \"Please increase my pocket-money.\"", opts: ["He told his father, \"Please increase the pocket-money\"", "He pleaded his father to please increase my pocket money.", "He requested his father to increase his pocket-money.", "He asked his father to increase his pocket-money."], ans: 2 },
+    { q: "She said that her brother was getting married.", opts: ["She said, \"Her brother is getting married.\"", "She told, \"Her brother is getting married.\"", "She said, \"My brother is getting married.\"", "She said, \"My brother was getting married.\""], ans: 2 },
+    { q: "The boy said, \"Who dare call you a thief?\"", opts: ["The boy enquired who dared call him a thief.", "The boy asked who called him a thief.", "The boy told that who dared call him a thief.", "The boy wondered who dared call a thief."], ans: 0 },
+    { q: "She exclaimed with sorrow that was a very miserable plight.", opts: ["She said with sorrow, \"What a pity it is.\"", "She said, \"What a mystery it is.\"", "She said, \"What a miserable sight it is.\"", "She said, \"What a miserable plight it is.\""], ans: 3 },
+    { q: "Dhruv said that he was sick and tired of working for that company.", opts: ["Dhruv said, \"I am sick and tired of working for this company.\"", "Dhruv said, \"He was tired of that company.\"", "Dhruv said to me, \"I am sick and tired of working for this company.\"", "Dhruv said, \"I will be tired of working for that company.\""], ans: 0 },
+    { q: "\"Are you alone, my son?\" asked a soft voice close behind me.", opts: ["A soft voice asked that what I was doing there alone.", "A soft voice said to me are you alone son.", "A soft voice from my back asked If I was alone.", "A soft voice behind me asked If I was alone."], ans: 3 },
+    { q: "She said to him, \"Why don't you go today?\"", opts: ["She asked him why he did not go that day.", "She said to him why he don't go that day.", "She asked him not to go that day.", "She asked him why he did not go today."], ans: 0 },
+    { q: "He exclaimed with joy that India had won the Sahara Cup.", opts: ["He said, \"India has won the Sahara Cup\"", "He said, \"India won the Sahara Cup\"", "He said, \"How! India will win the Sahara Cup\"", "He said, \"Hurrah! India has won the Sahara Cup\""], ans: 3 },
+    { q: "The little girl said to her mother, \"Did the sun rise in the East?\"", opts: ["The little girl said to her mother that the sun rose in the East.", "The little girl asked her mother if the sun rose in the East.", "The little girl said to her mother if the sun rises in the East.", "The little girl asked her mother if the sun is in the East."], ans: 1 },
+    { q: "The man said, \"No, I refused to confers guilt.\"", opts: ["The man emphatically refused to confers guilt.", "The man refused to confers his guilt.", "The man told that he did not confers guilt.", "The man was stubborn enough to confers guilt."], ans: 0 },
+    { q: "Nita ordered her servant to bring her cup of tea.", opts: ["Nita told her servant, \"Bring a cup of tea.\"", "Nita said, \"Bring me a cup of tea.\"", "Nita said to her servant, \"Bring me a cup of tea.\"", "Nita told her servant, \"Bring her that cup of tea.\""], ans: 2 },
+    { q: "My cousin said, \"My room-mate had snored throughout the night.\"", opts: ["my cousin said that her room-mate snored throughout the night.", "my cousin told me that her room-mate snored throughout the night.", "my cousin complained to me that her room-mate is snoring.", "my cousin felt that her room-mate may be snoring."], ans: 0 },
+    { q: "\"Please don't go away\", she said.", opts: ["She said to please her and not go away.", "She told me to go away.", "She begged me not to go away.", "She begged that I not go away."], ans: 2 },
+    { q: "She said to her friend, \"I know where is everyone\"", opts: ["She told that she knew where was everyone.", "She told her friend that she knew where was everyone.", "She told her friend that she knew where is everyone.", "She told her friend that she knows where was everyone."], ans: 1 }
+];
+
+let currentIdx = 0;
+let selectedOpt = null;
+
+function render() {
+    const item = data[currentIdx];
+    document.getElementById('progress').innerText = `Question ${currentIdx + 1} of ${data.length}`;
+    document.getElementById('q-text').innerText = item.q;
+    
+    const container = document.getElementById('options');
+    container.innerHTML = '';
+    item.opts.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+            selectedOpt = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        container.appendChild(btn);
+    });
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function validate() {
+    if (selectedOpt === null) return alert("Please select an option!");
+    const correct = data[currentIdx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((btn, i) => {
+        if (i === correct) btn.classList.add('correct');
+        if (i === selectedOpt && i !== correct) btn.classList.add('wrong');
+        btn.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    selectedOpt = null;
+    if (currentIdx < data.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        alert("Narration Practice Completed!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

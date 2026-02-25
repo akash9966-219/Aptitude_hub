@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 4</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 4</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Which state emerged as the largest wool-producing state in India in FY24 with a 47.5% share?", options: ["Jammu & Kashmir", "Rajasthan", "Karnataka", "Gujarat"], ans: 1, logic: "Rajasthan maintained its lead, producing 16,013.50 thousand kg of wool in FY24." },
+            { q: "Who has been appointed as the new Chairman of HSBC, succeeding Mark Tucker?", options: ["Mark Carney", "Brendan Nelson", "Andrew Bailey", "Noel Quinn"], ans: 1, logic: "Brendan Nelson was named as the successor to Sir Mark Tucker." },
+            { q: "Which bank launched the ‘Safety Centre’ on its mobile banking app to enhance security?", options: ["Axis Bank", "HDFC Bank", "ICICI Bank", "State Bank of India"], ans: 0, logic: "Axis Bank launched the 'Safety Centre' on its 'open' app in January 2026." },
+            { q: "Which Indian company was recognised in the 2025 Global Top 100 Corporate Startup Stars list?", options: ["Indian Oil Corporation", "Hindustan Petroleum Corporation Ltd", "ONGC", "Bharat Petroleum Corporation Ltd"], ans: 3, logic: "BPCL was the only Indian organization featured in the prestigious ICC and Mind the Bridge list." },
+            { q: "What is the revised FDI limit in insurance companies under the Insurance Amendment Bill, 2025?", options: ["100%", "74%", "51%", "49%"], ans: 0, logic: "The Sabka Bima Sabki Raksha Bill, 2025, passed in Dec 2025, allows up to 100% FDI in insurance." },
+            { q: "On which specific calendar date is UNICEF Foundation Day observed annually?", options: ["December 10", "December 12", "December 15", "December 11"], ans: 3, logic: "UNICEF was established on December 11, 1946." },
+            { q: "On which date is National Startup Day 2026 observed in India?", options: ["January 16", "January 15", "January 14", "January 17"], ans: 0, logic: "National Startup Day is celebrated on January 16 to mark the launch of the Startup India initiative." },
+            { q: "On which date is the International Day of Epidemic Preparedness observed every year?", options: ["December 1", "December 10", "December 27", "December 31"], ans: 2, logic: "The UN General Assembly designated December 27 for this day to promote global preparedness." },
+            { q: "On which date is National Geographic Day observed each year?", options: ["January 25", "January 27", "January 26", "January 28"], ans: 1, logic: "Observed annually on January 27 to honor the founding of the National Geographic Society." },
+            { q: "Which country became the first in the world to receive UNESCO recognition for its entire national cuisine?", options: ["France", "Japan", "Mexico", "Italy"], ans: 3, logic: "Italian cuisine was awarded UNESCO Intangible Cultural Heritage status for its entire gastronomic style." },
+            { q: "Which country hosted the G7 Critical Minerals Ministerial Meeting attended by Ashwini Vaishnaw?", options: ["Canada", "United States", "Germany", "Japan"], ans: 1, logic: "Union Minister Ashwini Vaishnaw attended the meeting in Washington D.C., USA, in early 2026." },
+            { q: "Who was Bangladesh’s first woman Prime Minister who passed away at the age of 80 in late 2025?", options: ["Khaleda Zia", "Sheikh Hasina", "Begum Rokeya", "Benazir Bhutto"], ans: 0, logic: "Former PM and BNP leader Khaleda Zia passed away on December 30, 2025." },
+            { q: "Where will India host the 20th session of the UNESCO Intangible Cultural Heritage committee in Dec 2025?", options: ["Red Fort", "India Gate", "Qutub Minar", "Rashtrapati Bhavan"], ans: 0, logic: "The session was hosted at the historic Red Fort complex in New Delhi." },
+            { q: "Where is the 39th Surajkund International Atmanirbhar Crafts Mela being held?", options: ["Faridabad", "Gurugram", "Noida", "Jaipur"], ans: 0, logic: "The 39th edition was inaugurated in Faridabad, Haryana, on January 31, 2026." },
+            { q: "Which country will host the Asian Rifle/Pistol Championships 2027?", options: ["China", "South Korea", "Japan", "India"], ans: 3, logic: "India will host this historic championship in New Delhi, offering Olympic quota places." },
+            { q: "Which country will host the Squash World Cup 2025 for the third consecutive time in Chennai?", options: ["India", "Egypt", "Malaysia", "Australia"], ans: 0, logic: "The SDAT Squash World Cup returned to Chennai, India, in December 2025." },
+            { q: "In which Indian state was the new reed snake species Calamaria mizoramensis discovered?", options: ["Mizoram", "Manipur", "Nagaland", "Assam"], ans: 0, logic: "The 'Mizoram Reed Snake' was discovered in Mizoram at elevations up to 1,295 meters." },
+            { q: "Which state hosted the Regional AI Impact Conference 2026?", options: ["Gujarat", "Madhya Pradesh", "Rajasthan", "Maharashtra"], ans: 2, logic: "Jaipur, Rajasthan, hosted the regional conference on January 6, 2026." },
+            { q: "In which state were MoUs worth 13,000 crore signed for pumped storage power projects?", options: ["Jharkhand", "Bihar", "Odisha", "West Bengal"], ans: 1, logic: "Bihar signed these MoUs for projects in the Nawada district under its 2025 policy." },
+            { q: "By which year does Google plan to deploy prototype satellites for its Project Suncatcher?", options: ["2027", "2025", "2030", "2024"], ans: 0, logic: "Google’s Project Suncatcher aims for prototype satellite launches by 2027." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

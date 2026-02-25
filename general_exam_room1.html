@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 1</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 1</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+       const questions = [
+    { q: "The Battle of Plassey was fought in which year?", options: ["1757", "1782", "1748", "1764"], ans: 0, logic: "The Battle of Plassey took place on June 23, 1757, where the British East India Company defeated the Nawab of Bengal, Siraj-ud-Daulah." },
+    { q: "Resurgent India Bonds were issued in US dollar, Pound Sterling and which other currency?", options: ["Japanese Yen", "Deutsche Mark", "Euro", "French Franc"], ans: 1, logic: "Issued in 1998 by SBI to attract NRI investment, these bonds were denominated in USD, GBP, and Deutsche Mark." },
+    { q: "The iron and steel industries of which country are almost fully dependent on imported raw materials?", options: ["Britain", "Japan", "Poland", "Germany"], ans: 1, logic: "Japan lacks significant domestic iron ore and coking coal deposits, making its massive steel industry reliant on imports." },
+    { q: "Federation Cup, World Cup, Allywyn International Trophy and Challenge Cup are awarded to winners of?", options: ["Tennis", "Volleyball", "Basketball", "Cricket"], ans: 1, logic: "These are prominent trophies and tournaments associated with the sport of Volleyball at national and international levels." },
+    { q: "If force is expressed in Newton and the distance in metre, then the work done is expressed in?", options: ["Joule", "Kg wt", "Kg wt m", "Watt"], ans: 0, logic: "Work is defined as Force × Distance. In the SI system, 1 Newton × 1 Metre equals 1 Joule." },
+    { q: "CORN FLAKES - Who made them first?", options: ["Nabisco", "Kellogg", "Quaker", "Archers"], ans: 1, logic: "John Harvey Kellogg originally developed corn flakes in the late 19th century as a healthy food for patients at the Battle Creek Sanitarium." },
+    { q: "Which African-American physical therapist invented a feeding device for disabled WWII soldiers?", options: ["Bessie Blount", "Marjorie Joyner", "Mae Jamison", "Beulah Henry"], ans: 0, logic: "Bessie Blount Griffin invented an electronic feeding device in the late 1940s to help amputees eat independently." },
+    { q: "The Indian football team made its first appearance at the Olympics in which year?", options: ["1936", "1948", "1952", "1956"], ans: 1, logic: "India's national football team debuted at the 1948 London Olympics, famously playing barefoot against France." },
+    { q: "What do you call a computer on a network that requests files from another computer?", options: ["A client", "A host", "A router", "A web server"], ans: 0, logic: "In a network architecture, the 'client' requests services or resources, and the 'server' provides them." },
+    { q: "The main use of salt in the diet is to?", options: ["make the taste of food better", "produce small amounts of hydrochloric acid for digestion", "ease the process of cooking", "increase the solubility of food"], ans: 1, logic: "Chloride from salt is essential for the stomach to produce hydrochloric acid (HCl), which is vital for breaking down food." },
+    { q: "The material which can be deformed permanently by heat and pressure is called a?", options: ["thermoplastic", "thermoset", "chemical compound", "polymer"], ans: 1, logic: "Thermosetting plastics (thermosets) undergo a chemical change when heated and cannot be remoulded once set." },
+    { q: "Plants growing on sand are called as?", options: ["chasmophytes", "oxylophytes", "lithophytes", "psammophytes"], ans: 3, logic: "Psammophytes are plants specifically adapted to grow in sandy soils, such as those found in deserts or dunes." },
+    { q: "The headquarters of several UN agencies are located in Vienna, which is in which country?", options: ["Austria", "Belgium", "Denmark", "Sweden"], ans: 0, logic: "Vienna, the capital of Austria, hosts UN agencies like the IAEA and UNIDO." },
+    { q: "The reaction which converts sugar solution into alcohol is an example of?", options: ["saponification", "hydrogenation", "fermentation", "hydrolysis"], ans: 2, logic: "Fermentation is the biochemical process where yeast or bacteria convert sugars into ethanol and carbon dioxide." },
+    { q: "The UN Flag is composed of which design?", options: ["white emblem on light blue background", "red emblem on white background", "light blue emblem on white background", "None of the above"], ans: 0, logic: "The UN flag features a white map of the world surrounded by olive branches (symbolizing peace) on a light blue field." },
+    { q: "The term of office of a Judge of the International Court of Justice is how many years?", options: ["five years", "six years", "nine years", "ten years"], ans: 2, logic: "Judges of the ICJ are elected for a nine-year term by the UN General Assembly and Security Council." },
+    { q: "The planets with no natural satellites (reported so far) are?", options: ["Mercury and Venus", "Earth and Pluto", "Mars and Neptune", "Jupiter and Saturn"], ans: 0, logic: "Mercury and Venus are the only two planets in our solar system that do not have any moons." },
+    { q: "The name of Pierre Cardin is associated with which of the following fields?", options: ["Painting", "Films", "Pop Music", "Fashion Designing"], ans: 3, logic: "Pierre Cardin was a legendary French fashion designer known for his avant-garde 'Space Age' designs." },
+    { q: "Sanchi Stupa is located near which city?", options: ["Gaya", "Bhopal", "Varanasi", "Bijapur"], ans: 1, logic: "The Great Stupa at Sanchi is a famous Buddhist complex located in the Raisen District, near Bhopal, Madhya Pradesh." },
+    { q: "The largest Indian State by area is?", options: ["Rajasthan", "Maharashtra", "Uttar Pradesh", "Madhya Pradesh"], ans: 0, logic: "Rajasthan is India's largest state, covering approximately 10.4% of the country's total land area." }
+];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

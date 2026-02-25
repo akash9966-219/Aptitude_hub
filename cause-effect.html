@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Cause & Effect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --accent: #16a085;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .main-content {
+            flex: 2;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .statement-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .stmt-num {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #f0fff4; }
+        .opt-btn.selected { border-color: var(--accent); background: #e6fffa; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        @media (max-width: 900px) {
+            .container { flex-direction: column; }
+            .sidebar { position: static; order: 2; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="q-counter">Question 1 / 30</span>
+</div>
+
+<div class="container">
+    <div class="sidebar">
+        <h3 style="color: var(--accent); margin-top: 0;">Logic Key</h3>
+        <p style="font-size: 0.85rem; line-height: 1.5;">
+            <strong>Cause:</strong> The event that makes something happen.<br><br>
+            <strong>Effect:</strong> The result or outcome.<br><br>
+            <strong>Independent:</strong> No direct link between the two events.<br><br>
+            <strong>Common Cause:</strong> Both result from the same third event (e.g., Heavy Rain).
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="statement-box">
+            <span class="stmt-num">Statement I</span>
+            <div id="stmt1" style="font-weight: 600; font-size: 1.1rem; margin-top: 5px;"></div>
+        </div>
+        <div class="statement-box">
+            <span class="stmt-num">Statement II</span>
+            <div id="stmt2" style="font-weight: 600; font-size: 1.1rem; margin-top: 5px;"></div>
+        </div>
+
+        <div class="options-container">
+            <button class="opt-btn" onclick="setSelection(0)">Statement I is the cause and statement II is its effect</button>
+            <button class="opt-btn" onclick="setSelection(1)">Statement II is the cause and statement I is its effect</button>
+            <button class="opt-btn" onclick="setSelection(2)">Both statements I and II are independent causes</button>
+            <button class="opt-btn" onclick="setSelection(3)">Both statements I and II are effects of independent causes</button>
+            <button class="opt-btn" onclick="setSelection(4)">Both statements I and II are effects of some common cause</button>
+        </div>
+
+        <div class="footer">
+            <div id="feedback" style="font-weight: bold;"></div>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="verify()">Check Relationship</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next Pair →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const dataset = [
+    { s1: "Domestic petrol/diesel prices remained unchanged for months.", s2: "International crude oil prices have gone up substantially.", ans: 3 },
+    { s1: "Govt fixed lower fees for professional courses compared to last year.", s2: "Parents launched a severe agitation last year against high fees.", ans: 1 },
+    { s1: "RBI put restrictions on a few small banks in the country.", s2: "Small private/co-op banks cannot withstand competition from bigger public banks.", ans: 1 },
+    { s1: "All schools in the area were closed for most of the week.", s2: "Many parents have withdrawn children from local schools.", ans: 4 },
+    { s1: "India surpassed tea export values due to European demand.", s2: "Domestic coffee demand increased over the last two years.", ans: 3 },
+    { s1: "Unprecedented increase in young unemployed vs previous year.", s2: "Large number of candidates applied for a bank manager post.", ans: 0 },
+    { s1: "Police caught a group of house breakers.", s2: "Citizen groups started night vigils in the area.", ans: 4 },
+    { s1: "Students opposed the college decision to become autonomous.", s2: "University expressed inability to provide grants to colleges.", ans: 1 },
+    { s1: "Literacy rate in the district has been increasing for four years.", s2: "District admin conducted extensive training for literacy workers.", ans: 1 },
+    { s1: "School asked Std X students to attend Sunday special classes.", s2: "Parents withdrew wards from Sunday private tuitions.", ans: 0 },
+    { s1: "Govt imported large quantities of sugar per trade agreements.", s2: "Domestic sugar prices have fallen sharply recently.", ans: 0 },
+    { s1: "Sharp decline in oil seed production this year.", s2: "Govt decided to increase edible oil import quantum.", ans: 0 },
+    { s1: "Private medical colleges increased fees by 200% to meet expenses.", s2: "Govt colleges did not increase fees despite price escalation.", ans: 3 },
+    { s1: "People in low-lying areas were evacuated to safer places.", s2: "Govt rushed relief supplies to the affected areas.", ans: 4 },
+    { s1: "Civic authority aims to reduce air pollution by 20%.", s2: "Number of asthma cases is constantly increasing.", ans: 1 },
+    { s1: "Co-op society stopped giving loans to farmers.", s2: "Members withdrew major part of their deposits from the society.", ans: 1 },
+    { s1: "Biggest bank employees gave an indefinite strike call.", s2: "Central Govt employees withdrew their week-long demonstrations.", ans: 3 },
+    { s1: "Police resorted to lathi-charge to disperse an unlawful gathering.", s2: "Citizens' forum called a strike to protest police atrocities.", ans: 0 },
+    { s1: "Majority of citizens in the locality belong to high income groups.", s2: "Local super market sales are much higher than other areas.", ans: 0 },
+    { s1: "Life today is fast, demanding and leads to stressful situations.", s2: "Number of suicide cases among teenagers is on the increase.", ans: 0 },
+    { s1: "Govt decided to make primary education info public.", s2: "In the past, the public did not have access to this information.", ans: 1 },
+    { s1: "Farmers decided against selling kharif crops to Govt agencies.", s2: "Govt reduced procurement price of kharif crops recently.", ans: 1 },
+    { s1: "Govt school Std X performance was excellent.", s2: "Many Govt school teachers left to join private schools.", ans: 3 },
+    { s1: "Reduction in water-borne diseases in City A this rainy season.", s2: "Govt opened four new civil hospitals in the beginning of the year.", ans: 3 },
+    { s1: "Vegetable prices increased considerably this summer.", s2: "Temperature increase damaged crops greatly this summer.", ans: 1 },
+    { s1: "High increase in incidents of atrocities against women.", s2: "Police unable to nab culprits committing crimes against women.", ans: 4 },
+    { s1: "Rural areas have been suffering from load shedding.", s2: "If crisis isn't overcome, load shedding will extend to urban areas.", ans: 3 },
+    { s1: "University instructed colleges to ban cell phones.", s2: "Teachers signed a petition complaining about ring-tone disturbances.", ans: 1 },
+    { s1: "Steel companies made considerable profit last year.", s2: "Many Asian countries have been importing huge quantities of steel.", ans: 1 },
+    { s1: "Water level in city tanks increased during the last fortnight.", s2: "Most trains were cancelled last week due to water-logging.", ans: 4 }
+];
+
+let cur = 0;
+let selected = null;
+
+function render() {
+    const item = dataset[cur];
+    document.getElementById('q-counter').innerText = `Pair ${cur + 1} / ${dataset.length}`;
+    document.getElementById('stmt1').innerText = item.s1;
+    document.getElementById('stmt2').innerText = item.s2;
+    
+    document.querySelectorAll('.opt-btn').forEach(b => {
+        b.classList.remove('selected', 'correct', 'wrong');
+        b.disabled = false;
+    });
+    document.getElementById('checkBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerText = "";
+    selected = null;
+}
+
+function setSelection(idx) {
+    selected = idx;
+    document.querySelectorAll('.opt-btn').forEach((b, i) => b.classList.toggle('selected', i === idx));
+}
+
+function verify() {
+    if (selected === null) return alert("Select a relationship type!");
+    const correct = dataset[cur].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns[correct].classList.add('correct');
+    if (selected !== correct) {
+        btns[selected].classList.add('wrong');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--wrong)'>Incorrect Logic</span>";
+    } else {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--correct)'>Correct!</span>";
+    }
+    
+    btns.forEach(b => b.disabled = true);
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    if (cur < dataset.length - 1) {
+        cur++;
+        render();
+        window.scrollTo(0,0);
+    } else {
+        alert("Completed all Cause and Effect pairs!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

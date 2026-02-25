@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs - Agriculture 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #065f46;
+            --bg: #f0fdf4;
+            --card: #ffffff;
+            --accent: #10b981;
+            --correct: #059669;
+            --wrong: #dc2626;
+            --text: #064e3b;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--primary); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #d1fae5; padding-bottom: 10px; }
+        .q-text { font-size: 1.25rem; font-weight: 600; line-height: 1.5; margin-bottom: 25px; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt-btn { padding: 16px; border: 2px solid #d1fae5; border-radius: 10px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s; }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #f0fdf4; }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+
+        .explanation { margin-top: 25px; padding: 20px; background: #ecfdf5; border-radius: 10px; border-left: 5px solid var(--correct); display: none; }
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; }
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; }
+        .btn:disabled { opacity: 0.4; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+
+    <div class="quiz-card">
+        <div class="q-header">
+            <span style="font-weight:bold; color:var(--primary)">Topic: Agriculture</span>
+            <span id="q-count">Question 1 / 35</span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent)">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const agriQuestions = [
+    { q: "Which state emerged as the largest wool-producing state in India in FY24 with a 47.5% share?", opts: ["Jammu & Kashmir", "Rajasthan", "Karnataka", "Gujarat"], ans: 1, exp: "Rajasthan continues to dominate Indian wool production, contributing nearly half of the national output." },
+    { q: "Which state has Balaghat selected as the pilot district for the World's Largest Grain Storage Plan?", opts: ["Maharashtra", "Chhattisgarh", "Madhya Pradesh", "Uttar Pradesh"], ans: 2, exp: "The pilot project in Balaghat, MP, focuses on strengthening cooperative sector storage via PACS." },
+    { q: "Which Indian state has declared 2026 as the 'Year of Agriculture'?", opts: ["Chhattisgarh", "Uttar Pradesh", "Rajasthan", "Madhya Pradesh"], ans: 3, exp: "Madhya Pradesh Governor declared 2026 as the 'Year of Agriculture' to focus on farmer prosperity and animal husbandry." },
+    { q: "Which organization launched the 'Reimagining Agriculture' roadmap for tech transformation?", opts: ["NITI Aayog", "Min. of Agriculture", "ICAR", "NABARD"], ans: 0, exp: "NITI Aayog, in collaboration with partners, launched this to modernize farming using AI and IoT." },
+    { q: "Which agricultural sector is the focus of India's Mission for Aatmanirbharta (2025-31)?", opts: ["Wheat", "Pulses", "Rice", "Maize"], ans: 1, exp: "Launched in Oct 2025, the mission aims for self-sufficiency in pulses (Tur, Urad, Masoor) by 2027-2030." },
+    { q: "By which year does Niti Aayog aim to double India's pulses production?", opts: ["2047", "2035", "2050", "2030"], ans: 3, exp: "The target is to reach 35 million tonnes by 2030 to ensure national nutritional security." },
+    { q: "Which state became the leading producer of processed potatoes in 2024-25?", opts: ["Punjab", "Gujarat", "Uttar Pradesh", "Haryana"], ans: 1, exp: "Gujarat's focus on contract farming and processing units has made it the hub for processed potato products." },
+    { q: "Which state recorded a 20% increase in cotton cultivation in 2025?", opts: ["Gujarat", "Maharashtra", "Haryana", "Punjab"], ans: 3, exp: "Punjab saw a 20% surge in cotton area as part of its crop diversification away from paddy." },
+    { q: "How many Kharif crops received an MSP hike for the 2025-26 season?", opts: ["10", "12", "14", "16"], ans: 2, exp: "The Union Cabinet approved MSP hikes for 14 primary Kharif crops to ensure remunerative prices." },
+    { q: "For which crop has Dhanuka Agritech launched the herbicide DINKAR?", opts: ["Wheat", "Maize", "Paddy", "Sugarcane"], ans: 2, exp: "Dinkar is a specialized pre-emergence herbicide designed specifically for transplanted rice/paddy." },
+    { q: "Which system ensures accurate data collection for crop production using Agri Stack?", opts: ["Agri Stack system", "Digital Crop Survey System", "Krishi Sakhis Program", "CSC Initiative"], ans: 1, exp: "The Digital Crop Survey (DCS) is the single source of truth for farmer and crop data under Agri Stack." },
+    { q: "Which system introduced by NIFTEM-K helps reduce post-harvest losses using solar power?", opts: ["PRADHAN system", "PARIVARTAN system", "SURAKSHA system", "SARTHI system"], ans: 3, exp: "SARTHI (Solar Assisted Refrigerated Transportation with Hybrid Innovation) helps transport perishables efficiently." },
+    { q: "How many new wheat varieties has the IIWBR started distributing?", opts: ["10", "15", "12", "13"], ans: 3, exp: "The institute released 13 new climate-resilient and high-yielding varieties to farmers." },
+    { q: "Which rice variety is promoted as an alternative to Pusa-44 to prevent farm fires?", opts: ["Pusa-44 Plus", "Pusa-2090", "Pusa-1500", "Pusa-2100"], ans: 1, exp: "Pusa-2090 matures faster (120 days), providing farmers time to clear fields without burning stubble." },
+    { q: "What is the primary purpose of the Krishi Nivesh Portal?", opts: ["Investments & support", "Increasing yield", "Weather updates", "Intl. trade"], ans: 0, exp: "It is a centralized portal for agri-investors to avail benefits from various government schemes." },
+    { q: "Which state government plans to emulate the Nilgiris cooperative farming model?", opts: ["Sikkim", "Kerala", "Assam", "Mizoram"], ans: 1, exp: "Kerala's cooperative department is looking at the Nilgiris model to improve farmer collective bargaining." },
+    { q: "From which state were 38 farmers invited to the Red Fort flag hoisting in 2025?", opts: ["Uttar Pradesh", "Maharashtra", "Punjab", "Gujarat"], ans: 1, exp: "Farmers from Maharashtra were invited as Special Guests to witness the Independence Day ceremony." },
+    { q: "What is the primary objective of the 'AgriSURE' fund?", opts: ["Infrastructure", "Healthcare", "Boost Agri Start-Ups", "Education"], ans: 2, exp: "AgriSURE is a blended capital fund specifically designed to fuel the agri-start-up ecosystem." },
+    { q: "Which state's program (APCNF) won the Gulbenkian Prize for Humanity 2024?", opts: ["Maharashtra", "Karnataka", "Andhra Pradesh", "Telangana"], ans: 2, exp: "Andhra Pradesh's Community Managed Natural Farming won for its impact on sustainable agriculture." },
+    { q: "Which country is working with MSDE on a pilot project for agriculture skills?", opts: ["Australia", "New Zealand", "United States", "Indonesia"], ans: 0, exp: "The Australia-India Critical Agriculture Skills Pilot Project focuses on emerging roles like Carbon Farming." },
+    { q: "Which UT elevated its agricultural partnership with New Zealand to a strategic agreement?", opts: ["Ladakh", "Jammu & Kashmir", "Puducherry", "Delhi"], ans: 1, exp: "J&K and New Zealand have a strategic focus on high-value crops and horticulture." },
+    { q: "Which country's court revoked permits for GM Golden Rice and Bt Eggplant?", opts: ["India", "Brazil", "Indonesia", "Philippines"], ans: 3, exp: "The Philippines court halted commercial propagation due to environmental and health biosafety concerns." },
+    { q: "Which organization launched the 'Millets: Seeds of Change' digital exhibition?", opts: ["Google", "Microsoft", "Apple", "Facebook"], ans: 0, exp: "Google Arts & Culture collaborated with the Ministry of Agriculture for this global digital exhibit." },
+    { q: "Which organization highlighted a $260 billion need to halve agrifood emissions?", opts: ["IMF", "United Nations", "ADB", "World Bank"], ans: 3, exp: "The World Bank report emphasized the massive investment required for climate-smart agriculture." },
+    { q: "Which organization is set to begin production of Nano Urea Plus?", opts: ["Bayer", "Monsanto", "Syngenta", "IFFCO"], ans: 3, exp: "IFFCO launched Nano Urea Plus with 16% nitrogen content to replace conventional urea." },
+    { q: "What is the focus of the CDP-SURAKSHA initiative?", opts: ["Livestock", "Horticulture", "Poultry", "Fisheries"], ans: 1, exp: "SURAKSHA is a digital platform for subsidy disbursal to horticulture farmers." },
+    { q: "By what year does India aim to end urea imports?", opts: ["2022", "2025", "2030", "2040"], ans: 1, exp: "Union Minister Mansukh Mandaviya stated India will be self-reliant in urea by the end of 2025." },
+    { q: "Where was the Krishi Integrated Command and Control Centre (ICCC) launched?", opts: ["New Delhi", "Mumbai", "Kolkata", "Chennai"], ans: 0, exp: "The ICCC at Krishi Bhawan, New Delhi, uses digital tech to monitor crop health and weather." },
+    { q: "Where is the Pusa Krishi Vigyan Mela being hosted for the first time outside Delhi?", opts: ["Ranchi", "Dhanbad", "Jamshedpur", "Simdega"], ans: 0, exp: "The famous mela was expanded to Jharkhand (Ranchi) to benefit eastern region farmers." },
+    { q: "Which state government announced free seed kits to boost millet production?", opts: ["Punjab", "Rajasthan", "Uttar Pradesh", "Maharashtra"], ans: 1, exp: "Rajasthan is distributing free kits for Pearl Millet (Bajra) to maintain its lead in production." },
+    { q: "Which company partnered with Shivalik Bank for commodity financing?", opts: ["Shivakami Agro", "Arya.ag", "NABARD", "MFDA"], ans: 1, exp: "Arya.ag acts as a Business Correspondent to extend warehouse receipt financing to farmers." },
+    { q: "Where was the 'National Speed Breeding Crop Facility' inaugurated?", opts: ["Hyderabad", "Bangalore", "Pune", "Mohali"], ans: 3, exp: "Located at NABI-Mohali, it helps develop better crop varieties in a shorter timeframe." },
+    { q: "What is the approved MSP for Raw Jute for the 2024-25 season?", opts: ["Rs.4,575/-", "Rs.4,800/-", "Rs.5,105/-", "Rs.5,335/-"], ans: 3, exp: "The MSP for Raw Jute was fixed at Rs.5,335 per quintal for 2024-25." },
+    { q: "Where was the Agriculture Integrated Command and Control Center inaugurated?", opts: ["Mumbai", "New Delhi", "Kolkata", "Bangalore"], ans: 1, exp: "The digital center at Krishi Bhawan, New Delhi, provides real-time data analysis for the ministry." },
+    { q: "Where is the National Horticultural Fair 2024 being held?", opts: ["Madurai", "Bengaluru", "Pune", "Kolkata"], ans: 1, exp: "The fair in Bengaluru showcases the latest innovations in fruit, vegetable, and flower farming." }
+];
+
+let currentQ = 0;
+
+function loadQuestion() {
+    const q = agriQuestions[currentQ];
+    document.getElementById('q-count').innerText = `Question ${currentQ + 1} / 35`;
+    document.getElementById('q-text').innerText = q.q;
+    
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    
+    q.opts.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(i, btn);
+        container.appendChild(btn);
+    });
+    
+    document.getElementById('exp-box').style.display = 'none';
+}
+
+function checkAnswer(idx, btn) {
+    const correct = agriQuestions[currentQ].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if(idx === correct) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+    }
+    
+    document.getElementById('exp-box').innerHTML = `<strong>Fact Check:</strong> ${agriQuestions[currentQ].exp}`;
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function move(step) {
+    currentQ += step;
+    if(currentQ < 0) currentQ = 0;
+    if(currentQ >= agriQuestions.length) currentQ = agriQuestions.length - 1;
+    loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>

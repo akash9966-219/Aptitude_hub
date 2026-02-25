@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptitude Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-main: #ffffff;
+            --accent-quant: #ffcc00;
+            --accent-reason: #00f2fe;
+            --accent-fig: #70ff00;
+            --accent-gk: #ff007c;
+            --accent-puzzle: #a855f7;
+            --accent-test: #f8fafc; /* New Test Accent */
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(45deg, #0f172a, #1e293b, #334155);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        p.subtitle {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .card-grid {
+            display: grid;
+            /* Adjusted for 6 items */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 40px 15px;
+            border-radius: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-12px) scale(1.03);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .icon-box {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Hover Glows */
+        .card.quant:hover { border-color: var(--accent-quant); box-shadow: 0 0 25px rgba(255, 204, 0, 0.4); }
+        .card.reason:hover { border-color: var(--accent-reason); box-shadow: 0 0 25px rgba(0, 242, 254, 0.4); }
+        .card.fig:hover { border-color: var(--accent-fig); box-shadow: 0 0 25px rgba(112, 255, 0, 0.4); }
+        .card.gk:hover { border-color: var(--accent-gk); box-shadow: 0 0 25px rgba(255, 0, 124, 0.4); }
+        .card.puzzle:hover { border-color: var(--accent-puzzle); box-shadow: 0 0 25px rgba(168, 85, 247, 0.4); }
+        .card.test:hover { border-color: var(--accent-test); box-shadow: 0 0 25px rgba(248, 250, 252, 0.4); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Aptitude Master</h1>
+            <p class="subtitle">Elevate your cognitive edge with professional modules</p>
+        </header>
+
+        <div class="card-grid">
+            <div class="card quant" onclick="openSection('quantitative aptitude')">
+                <span class="icon-box">🔢</span>
+                <div class="card-title">Quantitative<br>Aptitude</div>
+            </div>
+
+            <div class="card reason" onclick="openSection('reasoning')">
+                <span class="icon-box">🧠</span>
+                <div class="card-title">Logical<br>Reasoning</div>
+            </div>
+
+            <div class="card fig" onclick="openSection('figures and images')">
+                <span class="icon-box">📐</span>
+                <div class="card-title">Figures &<br>Abstracts</div>
+            </div>
+
+            <div class="card gk" onclick="openSection('current affairs and Gk')">
+                <span class="icon-box">🌍</span>
+                <div class="card-title">Current Affairs<br>& GK</div>
+            </div>
+
+            <div class="card puzzle" onclick="openSection('puzzles')">
+                <span class="icon-box">🧩</span>
+                <div class="card-title">Mind<br>Puzzles</div>
+            </div>
+
+            <div class="card test" onclick="openSection('test')">
+                <span class="icon-box">📝</span>
+                <div class="card-title">Exam<br>Tests</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openSection(section){
+            const routes = {
+                "quantitative aptitude": "quantitative.html",
+                "reasoning": "reasoning.html",
+                "figures and images": "figures.html",
+                "current affairs and Gk": "currentaffairs.html",
+                "puzzles": "puzzles.html",
+                "test": "test.html" // Destination for the new Test section
+            };
+            
+            if(routes[section]) {
+                window.location.href = routes[section];
+            } else {
+                alert("Section coming soon!");
+            }
+        }
+    </script>
+</body>
+</html>

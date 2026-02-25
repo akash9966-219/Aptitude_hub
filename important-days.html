@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dates, Events & Environment Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #065f46; --bg: #f0fdf4; --card: #ffffff; --accent: #10b981; --correct: #059669; --wrong: #dc2626; --text: #064e3b; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: 700; color: var(--primary); border-bottom: 2px solid #ecfdf5; padding-bottom: 10px; }
+        .q-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; font-weight: 600; }
+        .options-grid { display: grid; gap: 12px; }
+        .opt-btn { padding: 16px; border: 2px solid #d1fae5; border-radius: 10px; background: #fff; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover:not(:disabled) { background: #f0fdf4; border-color: var(--accent); }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .explanation { margin-top: 25px; padding: 20px; background: #ecfdf5; border-radius: 8px; border-left: 5px solid var(--primary); display: none; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
+        .btn-nav { padding: 12px 24px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header">
+           <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+            <span id="q-counter"></span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-list" class="options-grid"></div>
+        <div id="exp-area" class="explanation"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="change(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="change(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. On which date is World Human Spirit Day observed annually?", opts: ["February 17", "March 21", "April 7", "January 30"], ans: 0, exp: "Observed on Feb 17 to encourage people to stay mindful and empowered." },
+    { q: "2. When is World Radio Day 2026 observed globally?", opts: ["January 26", "March 8", "April 7", "February 13"], ans: 3, exp: "February 13 marks World Radio Day, celebrating the enduring power of radio." },
+    { q: "3. National Women’s Day in India (Birth anniversary of Sarojini Naidu)?", opts: ["January 26", "March 8", "April 14", "February 13"], ans: 3, exp: "India celebrates National Women's Day on Feb 13, the birth anniversary of the Nightingale of India." },
+    { q: "4. National Productivity Council's 68th Foundation Day date in 2026?", opts: ["January 26", "February 18", "March 12", "February 12"], ans: 3, exp: "Established in 1958, the NPC observes its foundation day on February 12." },
+    { q: "5. International Day of Women and Girls in Science date?", opts: ["January 24", "February 11", "March 8", "April 22"], ans: 1, exp: "Observed on Feb 11 to promote full and equal access to science for women." },
+    { q: "6. On which date is World Pulses Day observed annually?", opts: ["February 10", "March 15", "January 12", "April 7"], ans: 0, exp: "Recognized by the UN on Feb 10 to highlight the importance of pulses as a global food." },
+    { q: "7. When will International Epilepsy Day 2026 be observed?", opts: ["February 7", "February 9", "February 11", "February 15"], ans: 1, exp: "It is observed on the second Monday of February (Feb 9 in 2026)." },
+    { q: "8. World Interfaith Harmony Week observation period?", opts: ["Jan 15–21", "Feb 10–16", "Feb 1–7", "Mar 1–7"], ans: 2, exp: "The first week of February is dedicated to promoting harmony between all religions." },
+    { q: "9. International Day of Zero Tolerance for Female Genital Mutilation 2026?", opts: ["March 8", "February 6", "December 10", "November 25"], ans: 1, exp: "February 6 is the designated day for this global awareness movement." },
+    { q: "10. World Cancer Day observation date?", opts: ["January 30", "March 8", "February 4", "April 7"], ans: 2, exp: "Observed on Feb 4 to unite the world in the fight against cancer." },
+    { q: "11. On which date is World Wetlands Day observed in 2026?", opts: ["February 2", "January 31", "March 2", "April 22"], ans: 0, exp: "February 2 commemorates the signing of the Ramsar Convention on Wetlands." },
+    { q: "12. International Data Privacy Day date?", opts: ["January 28", "February 5", "March 10", "April 7"], ans: 0, exp: "January 28 is used to raise awareness about data protection best practices." },
+    { q: "13. National Geographic Day observation date?", opts: ["January 25", "January 27", "January 26", "January 28"], ans: 1, exp: "Observed on Jan 27 to celebrate over 130 years of geographic exploration." },
+    { q: "14. International Customs Day global observation date?", opts: ["January 24", "January 25", "January 26", "January 27"], ans: 2, exp: "January 26 commemorates the inaugural session of the Customs Cooperation Council." },
+    { q: "15. National Tourism Day in India observation date?", opts: ["January 24", "January 25", "January 26", "January 23"], ans: 1, exp: "India celebrates National Tourism Day on January 25 every year." },
+    { q: "16. National Voters Day in India date?", opts: ["January 25", "January 24", "January 26", "January 23"], ans: 0, exp: "Celebrated on Jan 25 to mark the foundation day of the Election Commission of India." },
+    { q: "17. National Girl Child Day in India date?", opts: ["January 22", "January 24", "January 26", "January 28"], ans: 1, exp: "January 24 was established in 2008 by the Ministry of Women and Child Development." },
+    { q: "18. Kokborok Day (Tripuri Language Day) date?", opts: ["January 19", "January 26", "February 21", "March 5"], ans: 0, exp: "January 19 marks the recognition of Kokborok as an official language in 1979." },
+    { q: "19. Lokpal of India Foundation Day 2026?", opts: ["January 10", "January 12", "January 14", "January 16"], ans: 3, exp: "The Lokpal of India celebrates its foundation on January 16." },
+    { q: "20. National Startup Day 2026 date in India?", opts: ["January 16", "January 15", "January 14", "January 17"], ans: 0, exp: "January 16 was declared National Startup Day to celebrate the ecosystem." },
+    { q: "21. Indian Army Day celebration date?", opts: ["January 14", "January 16", "January 12", "January 15"], ans: 3, exp: "January 15 marks Field Marshal K.M. Cariappa taking over as Commander-in-Chief in 1949." },
+    { q: "22. National Youth Day (Swami Vivekananda birth anniversary)?", opts: ["January 15", "January 12", "January 5", "January 23"], ans: 1, exp: "Observed on Jan 12 since 1985 to honor the teachings of Swami Vivekananda." },
+    { q: "23. 9th Siddha Day 2026 observation date?", opts: ["January 1", "January 3", "January 6", "January 10"], ans: 1, exp: "In 2026, Siddha Day falls on Jan 3, marking the star Ayilyam in the month of Margazhi." },
+    { q: "24. World Day of War Orphans date?", opts: ["January 6", "February 14", "March 21", "December 1"], ans: 0, exp: "January 6 highlights the plight of children orphaned by conflict." },
+    { q: "25. World Hindi Day global observation date?", opts: ["January 14", "February 21", "September 14", "January 10"], ans: 3, exp: "January 10 marks the anniversary of the first World Hindi Conference in 1975." },
+    { q: "26. Earth’s Rotation Day observation date?", opts: ["January 1", "February 28", "January 8", "March 21"], ans: 2, exp: "January 8 commemorates Foucault's 1851 experiment proving the Earth rotates." },
+    { q: "27. Birth anniversary of Rani Velu Nachiyar?", opts: ["January 1", "January 2", "January 4", "January 3"], ans: 3, exp: "Born Jan 3, 1730, she was the first Indian queen to fight against the British." },
+    { q: "28. Birth anniversary of Savitribai Phule?", opts: ["January 1", "January 2", "January 4", "January 3"], ans: 3, exp: "January 3 is the birth anniversary of the pioneer of women's education in India." },
+    { q: "29. International Mind–Body Wellness Day date?", opts: ["January 1", "January 3", "January 5", "January 10"], ans: 1, exp: "Observed on Jan 3 to promote holistic health and self-care." },
+    { q: "30. International Day of Epidemic Preparedness date?", opts: ["December 1", "December 10", "December 27", "December 31"], ans: 2, exp: "December 27 was designated by the UN to stress the importance of global health readiness." },
+    { q: "31. Dates for 40th Asian & 60th Intl Waterbird Census 2026?", opts: ["Jan 5–6", "Jan 8–9", "Jan 10–11", "Jan 12–13"], ans: 2, exp: "The census is scheduled for the second weekend of January (Jan 10–11)." },
+    { q: "32. Good Governance Day in India date?", opts: ["January 26", "December 25", "October 2", "November 14"], ans: 1, exp: "Dec 25 commemorates the birth anniversary of former PM Atal Bihari Vajpayee." },
+    { q: "33. National Consumer Day in India date?", opts: ["December 24", "January 26", "December 15", "November 30"], ans: 0, exp: "December 24 marks the day the Consumer Protection Act 1986 received presidential assent." },
+    { q: "34. Kisan Diwas (National Farmers’ Day) date?", opts: ["December 23", "January 26", "October 2", "November 14"], ans: 0, exp: "Dec 23 marks the birth anniversary of India's 5th PM, Chaudhary Charan Singh." },
+    { q: "35. National Mathematics Day in India date?", opts: ["December 19", "December 20", "December 21", "December 22"], ans: 3, exp: "Dec 22 honors the birth anniversary of the legendary Srinivasa Ramanujan." },
+    { q: "36. International Human Solidarity Day date?", opts: ["December 18", "December 19", "December 21", "December 20"], ans: 3, exp: "Observed on Dec 20 to celebrate unity in diversity." },
+    { q: "37. Goa Liberation Day observation date?", opts: ["December 19", "August 15", "January 26", "May 30"], ans: 0, exp: "Dec 19 marks the 1961 liberation of Goa from 450 years of Portuguese rule." },
+    { q: "38. Minorities Rights Day in India date?", opts: ["November 15", "December 10", "January 26", "December 18"], ans: 3, exp: "Observed on Dec 18 to highlight the rights and safety of minority communities." },
+    { q: "39. International Migrants Day global date?", opts: ["December 18", "November 25", "December 10", "January 15"], ans: 0, exp: "Dec 18 recognizes the contributions and challenges of migrants worldwide." },
+    { q: "40. National Energy Conservation Day in India date?", opts: ["December 5", "December 14", "December 20", "January 1"], ans: 1, exp: "Dec 14 is organized by the BEE to highlight energy efficiency." },
+    { q: "41. Intl Day Against Colonialism in All Its Forms (UN)?", opts: ["December 14", "December 10", "December 18", "November 26"], ans: 0, exp: "December 14 marks the 1960 Declaration on the Granting of Independence to Colonial Peoples." },
+    { q: "42. International Universal Health Coverage Day date?", opts: ["November 20", "October 24", "January 30", "December 12"], ans: 3, exp: "Observed on Dec 12 to advocate for health systems that leave no one behind." },
+    { q: "43. International Day of Neutrality date?", opts: ["February 2", "November 21", "December 12", "January 24"], ans: 2, exp: "Dec 12 highlights neutrality's role in maintaining international peace." },
+    { q: "44. UNICEF Foundation Day 2025 date?", opts: ["December 10", "December 12", "December 15", "December 11"], ans: 3, exp: "UNICEF was established on Dec 11, 1946, to aid children after WWII." },
+    { q: "45. International Mountain Day 2025 date?", opts: ["December 11", "December 10", "December 15", "December 5"], ans: 0, exp: "Observed on Dec 11 to create awareness about the importance of mountains." },
+    { q: "46. International Animal Rights Day 2025 date?", opts: ["December 5", "December 10", "December 15", "December 20"], ans: 1, exp: "Coincides with Human Rights Day on Dec 10 to highlight sentient rights." },
+    { q: "47. Human Rights Day 2025 observation date?", opts: ["December 5", "December 8", "December 10", "December 12"], ans: 2, exp: "Dec 10 marks the anniversary of the 1948 UDHR." },
+    { q: "48. International Anti-Corruption Day 2025 date?", opts: ["December 6", "December 7", "December 8", "December 9"], ans: 3, exp: "Observed on Dec 9 since the UN Convention Against Corruption (2003)." },
+    { q: "49. Day of Victims of Genocide commemoration date?", opts: ["December 7", "December 8", "December 9", "December 10"], ans: 2, exp: "Dec 9 marks the adoption of the 1948 Genocide Convention." },
+    { q: "50. (Duplicate Check) Victims of Genocide commemoration date?", opts: ["December 7", "December 8", "December 9", "December 10"], ans: 2, exp: "Repeated for verification: Dec 9 is the day of remembrance and prevention." },
+    { q: "51. Bodhi Day 2025 (Buddha’s Enlightenment) date?", opts: ["December 5", "December 6", "December 8", "December 10"], ans: 2, exp: "Dec 8 marks the day Siddhartha Gautama achieved enlightenment." },
+    { q: "52. Armed Forces Flag Day 2025 in India?", opts: ["December 1", "December 7", "December 14", "November 30"], ans: 1, exp: "Observed on Dec 7 since 1949 to honor soldiers and their families." },
+    { q: "53. International Civil Aviation Day 2025 date?", opts: ["December 7", "December 14", "November 7", "December 1"], ans: 0, exp: "Dec 7 highlights civil aviation's role in social and economic development." },
+    { q: "54. International Volunteer Day 2025 date?", opts: ["December 3", "December 5", "December 7", "December 10"], ans: 1, exp: "Dec 5 is the UN day to celebrate and encourage volunteerism." },
+    { q: "55. World Soil Day 2025 observation date?", opts: ["December 3", "December 4", "December 5", "December 6"], ans: 2, exp: "Dec 5 focuses on the importance of soil health and sustainable management." }
+];
+
+let curr = 0;
+function load() {
+    const itm = data[curr];
+    document.getElementById('q-counter').innerText = `Page ${curr + 1} / ${data.length}`;
+    document.getElementById('q-text').innerText = itm.q;
+    const list = document.getElementById('opt-list');
+    list.innerHTML = '';
+    itm.opts.forEach((o, i) => {
+        const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
+        b.onclick = () => {
+            const all = document.querySelectorAll('.opt-btn'); all.forEach(x => x.disabled = true);
+            if(i === itm.ans) b.classList.add('correct');
+            else { b.classList.add('wrong'); all[itm.ans].classList.add('correct'); }
+            document.getElementById('exp-area').innerHTML = `<strong>Context:</strong> ${itm.exp}`;
+            document.getElementById('exp-area').style.display = 'block';
+        };
+        list.appendChild(b);
+    });
+    document.getElementById('exp-area').style.display = 'none';
+    document.getElementById('prev').disabled = curr === 0;
+    document.getElementById('next').disabled = curr === data.length - 1;
+}
+function change(v) { curr += v; load(); }
+load();
+</script>
+</body>
+</html>

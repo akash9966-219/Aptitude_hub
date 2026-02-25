@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs - Art & Culture 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #581c87;
+            --bg: #faf5ff;
+            --card: #ffffff;
+            --accent: #a855f7;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #1e1b4b;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--primary); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f3e8ff; padding-bottom: 10px; }
+        .q-text { font-size: 1.2rem; font-weight: 600; line-height: 1.5; margin-bottom: 25px; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt-btn { padding: 16px; border: 2px solid #f3e8ff; border-radius: 10px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s; }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #faf5ff; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .explanation { margin-top: 25px; padding: 20px; background: #fdf4ff; border-radius: 10px; border-left: 5px solid var(--accent); display: none; }
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; }
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; }
+        .btn:disabled { opacity: 0.4; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+
+    <div class="quiz-card">
+        <div class="q-header">
+            <span style="font-weight:bold; color:var(--primary)">Topic: Art & Culture</span>
+            <span id="q-count">Question 1 / 50</span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent)">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const cultureQuestions = [
+    { q: "How many locations across India will host Bharat Rang Mahotsav 2026, the largest theatre festival?", opts: ["25", "30", "40", "50"], ans: 2, exp: "The 25th edition will span 40 locations across India and reach all seven continents." },
+    { q: "In which city does the annual Magh Mela take place on the banks of the sacred Sangam?", opts: ["Varanasi", "Prayagraj", "Haridwar", "Ujjain"], ans: 1, exp: "Prayagraj hosts the Magh Mela at the confluence (Sangam) of Ganga, Yamuna, and Saraswati." },
+    { q: "The Ramnami tribe, known for 'Ram' tattoos, originates from which state?", opts: ["Madhya Pradesh", "Odisha", "Jharkhand", "Chhattisgarh"], ans: 3, exp: "The Ramnami Samaj is a sect centered in Chhattisgarh that tattoos the name of Ram as an act of devotion." },
+    { q: "In which city was India's first digital museum for tribal freedom fighters inaugurated?", opts: ["Nava Raipur", "Ranchi", "Bhopal", "Raipur"], ans: 3, exp: "Raipur (Chhattisgarh) inaugurated a dedicated digital space for tribal icons." },
+    { q: "How many natural sites has India recently added to UNESCO's Tentative List?", opts: ["Five", "Seven", "Nine", "Ten"], ans: 2, exp: "India recently added nine sites including the Bhedaghat-Lametaghat in Jabalpur and the Satpura Tiger Reserve." },
+    { q: "Which city hosted the Global Spiritual Conclave to boost spiritual tourism?", opts: ["Ujjain", "Varanasi", "Haridwar", "Nashik"], ans: 1, exp: "Varanasi often hosts major spiritual conclaves as the spiritual capital of India." },
+    { q: "Which state's traditional bullfighting 'Dhirio' was banned in 1996?", opts: ["Kerala", "Karnataka", "Goa", "Maharashtra"], ans: 2, exp: "Dhirio is a popular but legally restricted bullfighting sport in Goa." },
+    { q: "Which organization released picture postcards for Sholay's 50th anniversary in 2025?", opts: ["Film Federation", "India Post", "Min. of Culture", "NFDC"], ans: 1, exp: "India Post issued special philatelic materials to honor the cult classic film Sholay." },
+    { q: "Where is the historic village Topra Kalan (linked to Ashokan Pillars) located?", opts: ["Uttar Pradesh", "Punjab", "Rajasthan", "Haryana"], ans: 3, exp: "Topra Kalan in Yamunanagar, Haryana, is the original site of the pillar moved to Delhi by Firoz Shah Tughlaq." },
+    { q: "In which state is the Saaral Vizha monsoon cultural festival celebrated?", opts: ["Kerala", "Karnataka", "Andhra Pradesh", "Tamil Nadu"], ans: 3, exp: "Tamil Nadu celebrates Saaral Vizha at Courtallam Falls during the monsoon." },
+    { q: "In which state is the Behdeinkhlam Festival celebrated?", opts: ["Manipur", "Nagaland", "Mizoram", "Meghalaya"], ans: 3, exp: "It is a major harvest festival of the Pnar tribe in Meghalaya." },
+    { q: "Where will India host the first Global Conference on Manuscript Heritage in 2025?", opts: ["Mumbai", "New Delhi", "Hyderabad", "Bengaluru"], ans: 1, exp: "Bharat Mandapam in New Delhi will host the event to reclaim India's knowledge legacy." },
+    { q: "Which state declared Sarvajanik Ganeshotsav a state festival in 2025?", opts: ["Karnataka", "Gujarat", "Madhya Pradesh", "Maharashtra"], ans: 3, exp: "Maharashtra formalized the status of its most iconic public celebration." },
+    { q: "What was recently added to the UNESCO World Heritage List from India in 2025?", opts: ["Maratha Military Forts", "Buddhist Caves of Gujarat", "Stepwells of Rajasthan", "Vijayanagara Temples"], ans: 0, exp: "The Maratha Military Landscapes represent a unique strategic fortress system." },
+    { q: "Which state formed a trust for the Grand Janaki Temple at Punaura Dham?", opts: ["Uttar Pradesh", "Madhya Pradesh", "Bihar", "Jharkhand"], ans: 2, exp: "The Bihar government is developing Sitamarhi as a major spiritual hub." },
+    { q: "Which stitched sail ship, based on Ajanta cave art, was inducted by the Navy?", opts: ["INSV Aryavarta", "INSV Kaundinya", "INSV Samudragupta", "INSV Bharatvarsha"], ans: 1, exp: "The project replicates ancient Indian maritime expertise." },
+    { q: "Which state proposed Lakkundi monuments for UNESCO's tentative list?", opts: ["Karnataka", "Tamil Nadu", "Gujarat", "Maharashtra"], ans: 0, exp: "Lakkundi in Gadag district, Karnataka, is famous for its Chalukyan style architecture." },
+    { q: "Which state is home to the Kokborok language?", opts: ["Mizoram", "Nagaland", "Manipur", "Tripura"], ans: 3, exp: "Kokborok is the official native language of the Tripuri people." },
+    { q: "In which city was the 'Garia and Borsho Boron Utsav' 2025 inaugurated?", opts: ["Agartala", "Shillong", "Imphal", "Aizawl"], ans: 0, exp: "Agartala hosted the festival celebrating Tripura's tribal heritage." },
+    { q: "In which state is ASI exploring submerged remains at Dwarka?", opts: ["Maharashtra", "Gujarat", "Rajasthan", "Karnataka"], ans: 1, exp: "Excavations focus on the legendary city of Lord Krishna off the coast of Gujarat." },
+    { q: "Where will the conclave 'Buddha Dhamma and Culture of NE India' take place?", opts: ["Assam", "Meghalaya", "Nagaland", "Arunachal Pradesh"], ans: 3, exp: "Arunachal Pradesh (Namsai) will host the conclave in April 2025." },
+    { q: "Which city is the origin of the Banaras Shehnai (awarded GI tag)?", opts: ["Varanasi", "Lucknow", "Jaipur", "Patna"], ans: 0, exp: "The instrument is synonymous with the heritage of Varanasi." },
+    { q: "Which state received a GI tag for Ryndia silk and Khasi handloom?", opts: ["Manipur", "Assam", "Meghalaya", "Tripura"], ans: 2, exp: "Meghalaya's 'Ahimsa silk' (Ryndia) gained international recognition." },
+    { q: "What is the new name for the town of Khultabad in Maharashtra?", opts: ["Sambhajinagar", "Dharashiv", "Ratnapur", "Aurangabad"], ans: 2, exp: "The historic town was renamed Ratnapur." },
+    { q: "Which state declared Mitathal and Tighrana Harappan sites as monuments?", opts: ["Rajasthan", "Gujarat", "Punjab", "Haryana"], ans: 3, exp: "Haryana continues to protect these vital Indus Valley sites." },
+    { q: "Which place is known for the betel leaf that received a GI Tag?", opts: ["Madurai", "Coimbatore", "Kumbakonam", "Thanjavur"], ans: 2, exp: "The Kumbakonam Betel Leaf is celebrated for its unique flavor." },
+    { q: "In which city is the traditional Saudagari block print practiced?", opts: ["Jaipur", "Ahmedabad", "Mumbai", "Lucknow"], ans: 1, exp: "Ahmedabad remains the hub for the Saudagari printing tradition." },
+    { q: "Which state CM linked his region to an early Iron Age (5,300 years ago)?", opts: ["Kerala", "Tamil Nadu", "Karnataka", "Andhra Pradesh"], ans: 1, exp: "Tamil Nadu's excavations at Mayiladumparai suggest a much older Iron Age onset." },
+    { q: "Where was a major statue of Thiruvalluvar unveiled?", opts: ["Australia", "Philippines", "Sri Lanka", "United States"], ans: 1, exp: "The statue was unveiled in the Philippines to promote cultural ties." },
+    { q: "Which ministry launched the 'Culinary, Crafts & Clicks' festival?", opts: ["Min. of Culture", "MoHUA", "Min. of Tourism", "Min. of I&B"], ans: 1, exp: "The Ministry of Housing and Urban Affairs hosted this at Rashtrapati Bhavan." },
+    { q: "Which city's Musi River heritage sites were added to World Monuments Watch?", opts: ["Bengaluru", "Chennai", "Jaipur", "Hyderabad"], ans: 3, exp: "The 2025 Watch list includes Musi River structures in Hyderabad." },
+    { q: "Where was the Archaeological Experiential Museum inaugurated?", opts: ["Vadnagar", "Dholavira", "Lothal", "Patan"], ans: 0, exp: "Vadnagar (Gujarat) showcases 2,500 years of continuous habitation." },
+    { q: "In which city has Mahakumbh 2025 commenced?", opts: ["Prayagraj", "Varanasi", "Haridwar", "Ujjain"], ans: 0, exp: "The grand gathering is currently being held in Prayagraj." },
+    { q: "Which region's crafts will get the 'Seal of Authenticity'?", opts: ["Himachal Pradesh", "Jammu & Kashmir", "Uttarakhand", "Punjab"], ans: 1, exp: "J&K is implementing this to protect its pashmina and carpet weavers." },
+    { q: "Where will the 5th National EMRS Cultural Fest 2024 be held?", opts: ["Chennai", "Mumbai", "Kolkata", "Bhubaneswar"], ans: 3, exp: "Odisha (Bhubaneswar) hosted the tribal education society fest." },
+    { q: "In which state did the Bharatiya Kala Mahotsav conclude?", opts: ["Assam", "West Bengal", "Telangana", "Kerala"], ans: 2, exp: "Secunderabad (Telangana) hosted the 8-day celebration of NE culture." },
+    { q: "In which state is the Banjara Virasat Museum located?", opts: ["Gujarat", "Karnataka", "Maharashtra", "Tamil Nadu"], ans: 2, exp: "PM Modi inaugurated the museum at Poharadevi, Washim district." },
+    { q: "Which state had eight products (like rice beer) granted GI tags?", opts: ["West Bengal", "Meghalaya", "Manipur", "Assam"], ans: 3, exp: "Assam's Bodo tribe traditional food and drinks received the tags." },
+    { q: "How many antiquities will India reclaim from the US in 2025?", opts: ["105", "297", "640", "320"], ans: 1, exp: "The US is returning 297 stolen antiquities covering 4,000 years of history." },
+    { q: "Which country is on the Bharat Gaurav luxury tourist train route?", opts: ["Bhutan", "Sri Lanka", "Myanmar", "Nepal"], ans: 3, exp: "The 'Bharat Nepal Maitri Yatra' connects Ayodhya and Janakpur." },
+    { q: "Where was Nadi Utsav 2024 inaugurated?", opts: ["Mumbai", "New Delhi", "Kolkata", "Bengaluru"], ans: 1, exp: "IGNCA, New Delhi hosted the festival to celebrate riverine culture." },
+    { q: "In which city was the 19th Divya Kala Mela inaugurated?", opts: ["Hyderabad", "Chennai", "Visakhapatnam", "Bangalore"], ans: 2, exp: "Visakhapatnam hosted the mela for Divyangjan artisans." },
+    { q: "Which state is building a Vedic-3D museum at Sanskrit University?", opts: ["Maharashtra", "Rajasthan", "Madhya Pradesh", "Uttar Pradesh"], ans: 3, exp: "Varanasi (UP) will house this high-tech astrology and astronomy museum." },
+    { q: "Which two states are building the 'Shri Krishna Gaman Path'?", opts: ["UP and Gujarat", "Maharashtra and Gujarat", "Rajasthan and MP", "Karnataka and Maharashtra"], ans: 2, exp: "The circuit traces the path of Krishna from Mathura to Dwarka." },
+    { q: "Which state organized a Jhumur dance with 8,000 tea artists?", opts: ["West Bengal", "Bihar", "Odisha", "Assam"], ans: 3, exp: "Assam broke records with a massive performance at Sarusajai Stadium." },
+    { q: "With which country did India sign its first Cultural Property Agreement?", opts: ["UK", "France", "USA", "Mongolia"], ans: 2, exp: "The India-USA agreement targets the illicit trafficking of antiquities." },
+    { q: "Which state is home to the Charaideo Maidam (UNESCO site)?", opts: ["Manipur", "Meghalaya", "Assam", "Arunachal Pradesh"], ans: 2, exp: "Charaideo Maidams are the burial grounds of Ahom kings in Assam." },
+    { q: "What project showcases India's heritage through public art?", opts: ["Public Art of India", "Modern Literature", "Traditional Music", "Culinary Arts"], ans: 0, exp: "The initiative places major installations in public spaces nationwide." },
+    { q: "Where was the Artara'24 Fine Arts Exhibition held?", opts: ["London", "New Delhi", "Dubai", "Singapore"], ans: 2, exp: "Dubai hosted the competition to highlight Indian diaspora artists." },
+    { q: "What is 'Kutch Ajrakh' which recently earned a GI tag?", opts: ["Handloom Sarees", "Pottery Art", "Textile Craft", "Metal Sculptures"], ans: 2, exp: "Ajrakh is a traditional block-printing technique from the Kutch region of Gujarat." }
+];
+
+let currentQ = 0;
+
+function load() {
+    const q = cultureQuestions[currentQ];
+    document.getElementById('q-count').innerText = `Question ${currentQ + 1} / 50`;
+    document.getElementById('q-text').innerText = q.q;
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => check(i, btn);
+        container.appendChild(btn);
+    });
+    document.getElementById('exp-box').style.display = 'none';
+}
+
+function check(idx, btn) {
+    const correct = cultureQuestions[currentQ].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    if(idx === correct) btn.classList.add('correct');
+    else { btn.classList.add('wrong'); btns[correct].classList.add('correct'); }
+    document.getElementById('exp-box').innerHTML = `<strong>Cultural Note:</strong> ${cultureQuestions[currentQ].exp}`;
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function move(step) {
+    currentQ += step;
+    if(currentQ < 0) currentQ = 0;
+    if(currentQ >= cultureQuestions.length) currentQ = cultureQuestions.length - 1;
+    load();
+}
+
+load();
+</script>
+</body>
+</html>

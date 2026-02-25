@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 8</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 8</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+     const questions = [
+    { q: "Who was appointed as the new Executive Director of the Reserve Bank of India on July 1, 2025?", options: ["Rajesh Verma", "Anil Kumar Sharma", "Kesavan Ramachandran", "Vikas Mehta"], ans: 2, logic: "Shri Kesavan Ramachandran was appointed as Executive Director (ED) of the RBI effective from July 1, 2025." },
+    { q: "Who has been appointed as the new Head of Public Policy at Meta India?", options: ["Simon Milner", "Rajiv Kumar", "Saurabh Mishra", "Aman Jain"], ans: 3, logic: "Aman Jain was appointed as the Head of Public Policy for Meta in India in late 2025, reporting to Simon Milner." },
+    { q: "Which Indian aerospace company signed a 1 billion deal with GE for 113 F404 engines for LCA Tejas Mk 1A?", options: ["DRDO", "ISRO", "HAL", "BEML"], ans: 2, logic: "Hindustan Aeronautics Limited (HAL) finalized this major deal with GE Aerospace in November 2025." },
+    { q: "By what percentage did India’s coal imports decline in FY 2024-25 compared to the previous year?", options: ["6.5%", "7.9%", "8.9%", "5%"], ans: 1, logic: "India's coal imports fell by 7.9% in FY 2024-25, leading to significant foreign exchange savings." },
+    { q: "Which country is now India's largest source of remittances, according to the RBI survey?", options: ["United Kingdom", "United States", "Canada", "Australia"], ans: 1, logic: "The US has overtaken the UAE to become India's top source of inward remittances, accounting for over 27%." },
+    { q: "Which university topped the QS World University Sustainability Rankings 2026?", options: ["University of Toronto", "University College London", "Lund University", "University of Edinburgh"], ans: 2, logic: "Lund University in Sweden climbed to the first place globally in the QS Sustainability Rankings 2026." },
+    { q: "By what percentage has the lion population in India increased from 2020 to 2025?", options: ["32.2%", "27%", "16.7%", "22%"], ans: 0, logic: "The lion population grew by 32.2%, rising from 674 in 2020 to 891 in 2025." },
+    { q: "On which date is United Nations Day observed each year to commemorate its founding?", options: ["October 20", "October 22", "October 24", "October 26"], ans: 2, logic: "United Nations Day is celebrated annually on October 24." },
+    { q: "Which country held its first Maritime Security and Disarmament Dialogue with India in Oslo in September 2025?", options: ["Sweden", "Norway", "Denmark", "Finland"], ans: 1, logic: "India and Norway held their inaugural dialogue on maritime security and non-proliferation in Oslo." },
+    { q: "Which country became the top contributor of Foreign Direct Investment (FDI) into Dubai in 2024?", options: ["India", "United States", "United Kingdom", "France"], ans: 0, logic: "India emerged as the leading source of FDI for Dubai, surpassing the US and UK." },
+    { q: "Which country is introducing bio-fortified potatoes enriched with iron to combat hidden hunger?", options: ["Peru", "Bangladesh", "Nepal", "India"], ans: 3, logic: "India, with support from the International Potato Center, is introducing iron-enriched potatoes to fight malnutrition." },
+    { q: "As of July 2025, how many pregnant women are registered under Mission Poshan 2.0?", options: ["4.05 Crore", "72.22 Lakh", "1.5 Crore", "50 Lakh"], ans: 1, logic: "According to the Poshan Tracker, over 72.22 lakh pregnant women were registered by July 31, 2025." },
+    { q: "Till which year has the lending under the PM SVANidhi Scheme been extended after its 2025 restructuring?", options: ["2027", "2030", "2025", "2032"], ans: 1, logic: "The Union Cabinet extended the PM SVANidhi lending period until March 31, 2030." },
+    { q: "What is the highest MGNREGS wage rate currently paid in states for FY 2025-26?", options: ["374/day", "234/day", "300/day", "400/day"], ans: 3, logic: "Haryana has the highest wage rate at 400 per day starting April 1, 2025." },
+    { q: "From which city was the Indian Navy car rally flagged off in September 2025?", options: ["Mumbai", "New Delhi", "Lucknow", "Agra"], ans: 1, logic: "The 'NWWA Outreach 2025' car rally concluded in New Delhi after a nationwide journey." },
+    { q: "For which condition was the antibiotic 'Gepotidacin' initially approved by the FDA?", options: ["Urinary tract infections", "Respiratory infections", "Skin infections", "Gastrointestinal infections"], ans: 0, logic: "Gepotidacin (Blujepa) was approved for uncomplicated urinary tract infections (uUTIs) in 2025." },
+    { q: "Which state launched the Mukhyamantri Ekal Mahila Swarozgar Yojana to empower single women?", options: ["Uttar Pradesh", "Himachal Pradesh", "Rajasthan", "Uttarakhand"], ans: 3, logic: "The Uttarakhand government approved this scheme to provide self-employment opportunities for single women." },
+    { q: "Which state organized the 'Bodhi Yatra' to promote Buddhist heritage with ASEAN delegates?", options: ["Uttar Pradesh", "Maharashtra", "Bihar", "Gujarat"], ans: 0, logic: "The Uttar Pradesh government organized the 'Bodhi Yatra' for delegates from five ASEAN nations." },
+    { q: "Which state government announced permanent power connections to farmers for just 5?", options: ["Uttar Pradesh", "Maharashtra", "Rajasthan", "Madhya Pradesh"], ans: 3, logic: "Madhya Pradesh CM Mohan Yadav announced permanent farm power connections at a nominal cost of 5." },
+    { q: "Which space telescope confirmed the discovery of ‘Cloud-9’, a starless dark-matter galaxy?", options: ["James Webb", "Spitzer", "Hubble", "Chandra"], ans: 2, logic: "NASA's Hubble Space Telescope confirmed Cloud-9 as a 'failed galaxy' composed almost entirely of dark matter." }
+];
+    
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

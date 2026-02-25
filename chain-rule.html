@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chain Rule Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Chain Rule (Proportion)</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading question...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Completed!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "3 pumps, 8 hours a day, empty a tank in 2 days. How many hours/day must 4 pumps work to empty it in 1 day?", options: ["9", "10", "11", "12"], correct: 3, explain: "Using M1*D1*H1 = M2*D2*H2: 3 * 2 * 8 = 4 * 1 * H2 => 48 = 4 * H2 => H2 = 12 hours." },
+        { q: "If the cost of x metres of wire is d rupees, what is the cost of y metres?", options: ["Rs. xyd", "Rs. (xd)", "Rs. (yd)", "Rs. yd/x"], correct: 3, explain: "Direct proportion: x metres costs d. 1 metre costs d/x. Therefore, y metres cost y * (d/x) = yd/x." },
+        { q: "6 machines produce 270 bottles/min. How many bottles could 10 machines produce in 4 minutes?", options: ["648", "1800", "2700", "10800"], correct: 1, explain: "Rate of 1 machine = 270/6 = 45 bottles/min. 10 machines in 1 min = 450 bottles. In 4 mins = 450 * 4 = 1800." },
+        { q: "Food for 150 men for 45 days. After 10 days, 25 men left. How many days will remaining food last?", options: ["29", "37", "42", "54"], correct: 2, explain: "After 10 days, remaining food is enough for 150 men for 35 days. Now men left = 150 - 25 = 125. 150 * 35 = 125 * x => x = (150 * 35) / 125 = 42 days." },
+        { q: "39 persons repair a road in 12 days (5 hrs/day). In how many days will 30 persons (6 hrs/day) finish it?", options: ["10", "13", "14", "15"], correct: 1, explain: "M1*D1*H1 = M2*D2*H2 => 39 * 12 * 5 = 30 * D2 * 6 => 2340 = 180 * D2 => D2 = 2340 / 180 = 13 days." },
+        { q: "A man completes 5/8 of a job in 10 days. How many more days to finish the job?", options: ["5", "6", "7", "8"], correct: 1, explain: "5/8 of work in 10 days. 1/8 of work in 10/5 = 2 days. Remaining work = 3/8. Time needed = 3 * 2 = 6 days." },
+        { q: "1/4 kg potato costs 60 paise. How many paise for 200 gm?", options: ["48", "54", "56", "72"], correct: 0, explain: "1/4 kg = 250g. 250g costs 60p. 1g costs 60/250. 200g costs (60/250) * 200 = 60 * 4/5 = 48 paise." },
+        { q: "40 cows eat 40 bags of husk in 40 days. In how many days will 1 cow eat 1 bag?", options: ["1", "1/40", "40", "80"], correct: 2, explain: "M1*D1/W1 = M2*D2/W2 => (40 * 40) / 40 = (1 * D2) / 1 => 40 = D2. It takes 40 days." },
+        { q: "6-cog wheel meshed with 14-cog wheel. Small wheel makes 21 revolutions. Revolutions of large wheel?", options: ["4", "9", "12", "49"], correct: 1, explain: "Inverse proportion: Cogs1 * Revs1 = Cogs2 * Revs2 => 6 * 21 = 14 * x => 126 = 14x => x = 9." },
+        { q: "7 spiders make 7 webs in 7 days. 1 spider makes 1 web in how many days?", options: ["1", "7/2", "7", "49"], correct: 2, explain: "M1*D1/W1 = M2*D2/W2 => (7 * 7) / 7 = (1 * D2) / 1 => 7 = D2." },
+        { q: "17.5m pole casts 40.25m shadow. Height of building casting 28.75m shadow?", options: ["10 m", "12.5 m", "17.5 m", "21.25 m"], correct: 1, explain: "Height/Shadow ratio is constant. 17.5 / 40.25 = H / 28.75 => H = (17.5 * 28.75) / 40.25 = 12.5m." },
+        { q: "Meal for 120 men OR 200 children. 150 children ate. How many men can eat the rest?", options: ["20", "30", "40", "50"], correct: 1, explain: "200 children = 120 men. 1 child = 120/200 = 0.6 men. Remaining food is for 200-150 = 50 children. For men: 50 * 0.6 = 30 men." },
+        { q: "Loom weaves 0.128m/sec. How many seconds to weave 25m?", options: ["178", "195", "204", "488"], correct: 1, explain: "Time = Distance / Speed = 25 / 0.128 = 195.31... ≈ 195 seconds." },
+        { q: "36 men do work in 18 days. How many days for 27 men?", options: ["12", "18", "22", "24"], correct: 3, explain: "M1*D1 = M2*D2 => 36 * 18 = 27 * D2 => D2 = (36 * 18) / 27 = 24 days." },
+        { q: "4 weavers weave 4 mats in 4 days. How many mats for 8 weavers in 8 days?", options: ["4", "8", "12", "16"], correct: 3, explain: "M1*D1/W1 = M2*D2/W2 => (4 * 4) / 4 = (8 * 8) / W2 => 4 = 64 / W2 => W2 = 16 mats." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Defence & Security Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #064e3b; --bg: #f0fdf4; --card: #ffffff; --accent: #10b981; --correct: #22c55e; --wrong: #ef4444; --text: #064e3b; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 1px solid #d1fae5; padding-bottom: 15px; }
+        .q-text { font-size: 1.25rem; font-weight: 700; line-height: 1.5; margin-bottom: 30px; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt-btn { padding: 18px; border: 2px solid #d1fae5; border-radius: 10px; background: white; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover:not(:disabled) { background: #ecfdf5; border-color: var(--accent); }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .explanation { margin-top: 25px; padding: 20px; background: #f0fdf4; border-radius: 10px; border-left: 5px solid var(--accent); display: none; }
+        .controls { display: flex; justify-content: space-between; margin-top: 40px; gap: 20px; }
+        .btn { padding: 15px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header">
+            <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+            <span id="q-count"></span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { q: "1. Which initiative establishes a helicopter assembly line in Karnataka?", opts: ["C295 Project", "Tejas Mk2", "Dhruv Mission", "H125 Project"], ans: 3, exp: "PM Modi and President Macron launched the H125 project for a civil helicopter assembly line in India." },
+    { q: "2. Where was the MILAN Village inaugurated for Exercise MILAN 2026?", opts: ["Kochi", "Mumbai", "Chennai", "Visakhapatnam"], ans: 3, exp: "Visakhapatnam hosted the biennial multi-national naval exercise MILAN 2026." },
+    { q: "3. Where was the new Missile Integration Facility inaugurated by Rajnath Singh?", opts: ["DRDO", "BEL", "HAL", "ISRO"], ans: 1, exp: "The facility was opened at Bharat Electronics Limited (BEL) in Baghmara to boost production." },
+    { q: "4. Joint Declaration of Intent for a 5-year defence roadmap signed with?", opts: ["France", "Italy", "Israel", "Greece"], ans: 0, exp: "India and France strengthened industrial cooperation with a long-term roadmap in 2026." },
+    { q: "5. Countries participating in the IMACC 2026 hosted by the Indian Army?", opts: ["Five", "Seven", "Eight", "Ten"], ans: 1, exp: "Seven friendly foreign countries participated in the Eastern Himalayas challenge." },
+    { q: "6. Where will Exercise Vayushakti-26 be conducted?", opts: ["Pokhran", "Gwalior", "Jodhpur", "Ambala"], ans: 0, exp: "The Pokhran range in Jaisalmer will showcase the IAF's firepower on Feb 27, 2026." },
+    { q: "7. Company supplying carbon fabrics to Indian Army?", opts: ["Agneevasthraa", "Tata Advanced", "L&T", "BEL"], ans: 0, exp: "Mumbai-based Agneevasthraa signed an MoU for high-performance composite materials." },
+    { q: "8. IAF conducted air exercise near Strait of Malacca with?", opts: ["Thailand", "Indonesia", "Malaysia", "Vietnam"], ans: 2, exp: "The Indian Air Force conducted the exercise with Malaysia in early 2026." },
+    { q: "9. India is finalising a 300M Euro deal for SCALP missiles with?", opts: ["France", "Germany", "UK", "Russia"], ans: 0, exp: "Following Operation Sindoor, India is acquiring additional SCALP missiles from France." },
+    { q: "10. State from which Agni-III was successfully test-fired?", opts: ["Odisha", "Andhra Pradesh", "West Bengal", "Tamil Nadu"], ans: 0, exp: "The missile was launched from APJ Abdul Kalam Island, Odisha." },
+    { q: "11. State hosting India–Kyrgyzstan Exercise KHANJAR-XIII?", opts: ["Assam", "Arunachal Pradesh", "Manipur", "Nagaland"], ans: 1, exp: "The joint exercise took place in Arunachal Pradesh in February 2026." },
+    { q: "12. City with the fully automated 30mm ammunition facility?", opts: ["Nagpur", "Pune", "Hyderabad", "Bengaluru"], ans: 0, exp: "Nagpur houses this major facility to boost self-reliance in ammunition." },
+    { q: "13. Port call of Lokayan 26 (Indian Navy vessel in Oman)?", opts: ["INS Sudarshini", "INS Tarangini", "INS Shardul", "INS Vikramaditya"], ans: 1, exp: "INS Tarangini arrived at Salalah, marking the start of Lokayan 26." },
+    { q: "14. Director General of Naval Armament (Feb 2026)?", opts: ["P Upadhyay", "Divakar Jayant", "Rajesh Kumar", "Anil Chauhan"], ans: 1, exp: "Divakar Jayant took charge at Naval Headquarters in February 2026." },
+    { q: "15. Joint Defence Cooperation Committee meeting in Zanzibar?", opts: ["Kenya", "South Africa", "Rwanda", "Tanzania"], ans: 3, exp: "India and Tanzania held their 4th JDCC meeting in February 2026." },
+    { q: "16. Organization rolling out SJ100 aircraft with Russia?", opts: ["HAL", "BHEL", "ISRO", "Tata Advanced"], ans: 0, exp: "HAL is collaborating with Russia's PJSC-UAC for the SuperJet 100." },
+    { q: "17. Rescue operation at Chatergala Pass conducted by?", opts: ["NDRF", "Indian Army", "CPWD", "BRO"], ans: 3, exp: "The Border Roads Organisation (BRO) cleared heavy snow and restored roads." },
+    { q: "18. Port visited by First Training Squadron (1TS)?", opts: ["Singapore", "Phuket", "Colombo", "Jakarta"], ans: 0, exp: "The 1TS arrived at Changi Naval Base, Singapore, in January 2026." },
+    { q: "19. Appointed as DIG in CRPF on central deputation?", opts: ["Ravi Shankar Chhabi", "Anil Kumar Singh", "Rajesh Tiwari", "Suresh Babu"], ans: 1, exp: "Anil Kumar Singh was appointed to the role by the MHA." },
+    { q: "20. State launched Swasth Seema Abhiyan with ITBP?", opts: ["Himachal", "Uttarakhand", "Sikkim", "Arunachal"], ans: 1, exp: "Uttarakhand partnered with ITBP for border village healthcare." },
+    { q: "21. City for Coast Guard joint drill with Japan?", opts: ["Kochi", "Visakhapatnam", "Mumbai", "Chennai"], ans: 3, exp: "Chennai hosted the HNS response drill to enhance maritime safety." },
+    { q: "22. (Repeat) Automated 30mm ammunition facility location?", opts: ["Nagpur", "Pune", "Hyderabad", "Bengaluru"], ans: 0, exp: "Nagpur is the site for this automated production hub." },
+    { q: "23. Vessel flagged off for ‘Sagar Maitri’ Mission V?", opts: ["INS Sagardhwani", "INS Kavaratti", "INS Vikramaditya", "INS Shardul"], ans: 0, exp: "INS Sagardhwani sailed from Kochi for scientific cooperation." },
+    { q: "24. Partnered with BEL for indigenous drone expertise?", opts: ["HAL", "DRDO", "Garuda Aerospace", "Tata Advanced"], ans: 2, exp: "Garuda Aerospace and BEL are collaborating on drone manufacturing." },
+    { q: "25. State where MPATGM was flight-tested by DRDO?", opts: ["Rajasthan", "Maharashtra", "Gujarat", "Odisha"], ans: 0, exp: "The test was successfully conducted in Rajasthan." },
+    { q: "26. Developed the SWaDeS desalination system?", opts: ["ISRO", "BHEL", "HAL", "DRDO"], ans: 3, exp: "DRDO developed this hand-operated system for remote soldiers." },
+    { q: "27. Celebrated its 68th Foundation Day in 2026?", opts: ["ISRO", "DRDO", "BARC", "HAL"], ans: 1, exp: "DRDO highlighted AI and Space achievements on its 68th day." },
+    { q: "28. Signed 293cr contract for Suryastra Rocket System?", opts: ["BEL", "L&T", "NIBE Limited", "Tata Advanced"], ans: 2, exp: "NIBE Limited and an Israeli firm signed the contract for the Indian Army." },
+    { q: "29. Modern warfare force integrating drone operations?", opts: ["Rudra", "Vajra", "Bhairav", "Garuda"], ans: 2, exp: "The Bhairav force integrates over 100,000 drone operators into the Army." },
+    { q: "30. Vice Chief of the Air Staff (Jan 1, 2026)?", opts: ["Nagesh Kapoor", "S. Shrinivas", "Tejinder Singh", "Raghunath Nambiar"], ans: 0, exp: "Air Marshal Nagesh Kapoor assumed the post on New Year's Day 2026." },
+    { q: "31. AOC-in-C of South Western Air Command?", opts: ["Vivek Chaudhari", "Tejinder Singh", "Raghunath Nambiar", "Sandeep Singh"], ans: 1, exp: "Air Marshal Tejinder Singh took charge on January 1, 2026." },
+    { q: "32. AOC-in-C of IAF Training Command?", opts: ["Raghunath Nambiar", "Tejinder Singh", "Pankaj Sinha", "S. Shrinivas"], ans: 3, exp: "Air Marshal Seethepalli Shrinivas assumed charge of Training Command." },
+    { q: "33. Salvo launch of two Pralay missiles conducted by?", opts: ["ISRO", "HAL", "BEL", "DRDO"], ans: 3, exp: "DRDO confirmed the precision and readiness of Pralay missiles." },
+    { q: "34. Supplying 4.25 lakh carbines to Army and Navy?", opts: ["Bharat Forge & PLR", "WASS & Tata", "HAL & BDL", "L&T & DRDO"], ans: 0, exp: "The Bharat Forge and PLR Systems JV won the 4,666cr contract." },
+    { q: "35. Helicopter maiden flight targeted for civil markets?", opts: ["LCH", "Dhruv NG", "Rudra", "LCH Mark-II"], ans: 1, exp: "HAL conducted the maiden flight of the Dhruv NG (Next Generation)." },
+    { q: "36. Pinaka variant with 120 km range tested by DRDO?", opts: ["Pinaka Mk-II", "LRGR-120", "Prahaar", "Agni-P"], ans: 1, exp: "The Pinaka LRGR-120 offers double the range of the standard version." },
+    { q: "37. Maiden flight test location for Pinaka LRGR-120?", opts: ["Pokhran", "Balasore", "Chandipur", "Sriharikota"], ans: 2, exp: "The test was conducted from the ITR in Chandipur, Odisha." },
+    { q: "38. Partnered with DRDO for non-metallic research?", opts: ["BIS", "CSIR", "HAL", "National Test House"], ans: 3, exp: "National Test House and DRDO are collaborating on facility sharing." },
+    { q: "39. Built the indigenously developed Pollution Control Vessel?", opts: ["Mazagon Dock", "Cochin Shipyard", "Goa Shipyard", "GRSE"], ans: 2, exp: "Goa Shipyard Limited built the specialized Samudra Pratap." },
+    { q: "40. Vessel set for voyage to revive maritime legacy?", opts: ["INS Tarangini", "INSV Kaundinya", "INS Sudarshini", "INS Vikrant"], ans: 1, exp: "INSV Kaundinya is undertaking an overseas voyage for maritime heritage." },
+    { q: "41. Name of the 1st indigenously built Pollution Control Vessel?", opts: ["Samudra Rakshak", "Samudra Pratap", "Samudra Prahari", "Samudra Shakti"], ans: 1, exp: "Samudra Pratap was inducted to strengthen marine protection." },
+    { q: "42. Indian Navy submarine decommissioned after 4 decades?", opts: ["INS Shankush", "INS Kalvari", "INS Chakra", "INS Sindhughosh"], ans: 3, exp: "INS Sindhughosh completed 40 years of service." },
+    { q: "43. Completed user trials of Next Generation Akash?", opts: ["DRDO", "ISRO", "HAL", "BEL"], ans: 0, exp: "DRDO successfully tested the Akash-NG for high-altitude defense." },
+    { q: "44. Anti-submarine craft commissioned in December?", opts: ["Anjadip", "Arnala", "Androth", "Abhay"], ans: 1, exp: "INS Arnala is the first of the ASW SWC class ships." },
+    { q: "45. Partnered with RRU for homeland security research?", opts: ["DRDO", "ISRO", "BARC", "NTRO"], ans: 0, exp: "DRDO and Rashtriya Raksha University signed an MoU in late 2025." },
+    { q: "46. Host of Exercise Desert Cyclone joint military drill?", opts: ["Saudi Arabia", "Qatar", "UAE", "Oman"], ans: 2, exp: "The Indian Army participated in Desert Cyclone in the UAE." },
+    { q: "47. City fast-tracking drones through 515 Base Workshop?", opts: ["Secunderabad", "Pune", "Bengaluru", "Jabalpur"], ans: 2, exp: "Bengaluru's workshop is a hub for indigenous drone logistics." },
+    { q: "48. Tripartite MoU for Scorpene maintenance with?", opts: ["France", "Brazil", "South Africa", "Indonesia"], ans: 0, exp: "India and France (Mazagon & Naval Group) signed for maintenance." },
+    { q: "49. 2nd MH-60R helicopter squadron (Goa)?", opts: ["INAS 330", "INAS 335", "INAS 339", "INAS 350"], ans: 2, exp: "INAS 339 (Falcons) was commissioned at INS Hansa." },
+    { q: "50. Highest war memorial for 2020 clash soldiers?", opts: ["Pangong", "Galwan", "Kargil", "Siachen"], ans: 1, exp: "The Galwan War Memorial was inaugurated in eastern Ladakh." },
+    { q: "51. (Repeat) Highest war memorial for Galwan heroes?", opts: ["Pangong", "Galwan", "Kargil", "Siachen"], ans: 1, exp: "It honors the sacrifice of soldiers in the 2020 face-off." },
+    { q: "52. Partnering in Harimau Shakti 2025 (Rajasthan)?", opts: ["Indonesia", "Malaysia", "Thailand", "Singapore"], ans: 1, exp: "Malaysia and India conduct Harimau Shakti annually." },
+    { q: "53. Tested high-speed fighter jet escape system?", opts: ["DRDO", "HAL", "ADA", "ISRO"], ans: 1, exp: "HAL successfully tested the indigenous ejection system." },
+    { q: "54. BSF anti-tunnelling system deployment location?", opts: ["Raj-Pun", "Guj-Raj", "Pun-Jam", "Lad-Jam"], ans: 2, exp: "The system is deployed along the sensitive Punjab-Jammu border." },
+    { q: "55. Joint military exercise ‘Ekuverin’ with which country?", opts: ["Oman", "South Africa", "Maldives", "Nepal"], ans: 2, exp: "Ekuverin is a bilateral exercise between India and Maldives." }
+];
+
+let current = 0;
+function load() {
+    const q = questions[current];
+    document.getElementById('q-count').innerText = `Question ${current + 1} / ${questions.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
+        b.onclick = () => {
+            const btns = document.querySelectorAll('.opt-btn'); btns.forEach(x => x.disabled = true);
+            if(i === q.ans) b.classList.add('correct');
+            else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
+            document.getElementById('exp-box').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('exp-box').style.display = 'block';
+        };
+        container.appendChild(b);
+    });
+    document.getElementById('exp-box').style.display = 'none';
+    document.getElementById('prev-btn').disabled = current === 0;
+    document.getElementById('next-btn').disabled = current === questions.length - 1;
+}
+function move(s) { current += s; load(); }
+load();
+</script>
+</body>
+</html>

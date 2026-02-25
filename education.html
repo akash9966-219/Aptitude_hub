@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Higher Education & Innovation Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e3a8a; --bg: #f8fafc; --card: #ffffff; --accent: #3b82f6; --correct: #10b981; --wrong: #ef4444; --text: #1e293b; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 10px solid var(--primary); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .q-text { font-size: 1.3rem; font-weight: 700; margin-bottom: 25px; line-height: 1.4; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .opt-btn { padding: 15px 20px; border: 2px solid #e2e8f0; border-radius: 12px; background: white; cursor: pointer; text-align: left; font-size: 1.1rem; transition: all 0.2s; color: var(--text); }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #eff6ff; }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .explanation { margin-top: 30px; padding: 20px; background: #f1f5f9; border-radius: 12px; border-top: 4px solid var(--primary); display: none; font-size: 1rem; }
+        .controls { display: flex; justify-content: space-between; margin-top: 40px; gap: 15px; }
+        .btn { padding: 14px 28px; border-radius: 10px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; transition: opacity 0.2s; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header">
+            <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+            <span id="q-count"></span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { q: "1. Top position in Times Business-School Ranking 2026 (Global 12th)?", opts: ["IIFT", "IIM Ahmedabad", "Indian School of Business", "XLRI"], ans: 2, exp: "ISB climbed to an unprecedented 12th rank globally in the 2026 rankings." },
+    { q: "2. Institution establishing Krishnamurthy Tandon School of AI with ₹100cr endowment?", opts: ["IIM Bangalore", "IIT Delhi", "IIM Ahmedabad", "IIM Calcutta"], ans: 2, exp: "IIM Ahmedabad signed an MoU with alumna Chandrika Tandon for this landmark AI school." },
+    { q: "3. Partner of Coromandel International for a Corporate Research Centre?", opts: ["IIT Delhi", "IIM Bangalore", "IIT Madras", "NIT Trichy"], ans: 2, exp: "IIT Madras collaborated to drive joint research in agri-technology and chemicals." },
+    { q: "4. University that inaugurated the IIT Mandi Catalyst Satellite Centre?", opts: ["Amity University", "Galgotias University", "Jamia Millia Islamia", "Manipal University"], ans: 1, exp: "Galgotias University inaugurated this centre to boost Greater Noida's startup ecosystem." },
+    { q: "5. Institution where the Drug Free Campus Campaign was inaugurated by the VP?", opts: ["Delhi University", "JNU", "BHU", "AMU"], ans: 2, exp: "The campaign was launched at Banaras Hindu University to promote student wellness." },
+    { q: "6. Location of the ₹40-crore DST–NIDHI Centre of Excellence for deep-tech?", opts: ["IIT Delhi", "IIM Ahmedabad", "IISc Bengaluru", "NIT Trichy"], ans: 1, exp: "Dr. Jitendra Singh inaugurated this 59,000 sq ft deep-tech hub at IIM Ahmedabad." },
+    { q: "7. Institute launching Global Research Foundation to become a 'multinational university'?", opts: ["IIT Bombay", "IIT Delhi", "JNU", "IIT Madras"], ans: 3, exp: "IIT Madras aims to be the world's first multinational university via its Global Research Foundation." },
+    { q: "8. City where Australia’s Victoria University will open its first India campus by 2026?", opts: ["Bengaluru", "Hyderabad", "Pune", "Gurugram"], ans: 3, exp: "The campus is set to open in Gurugram (NCR) by mid-2026." },
+    { q: "9. IIM with AMBA accreditation and 4 Palmes of Excellence (Eduniversal 2025)?", opts: ["IIM Ahmedabad", "IIM Ranchi", "IIM Bangalore", "IIM Lucknow"], ans: 1, exp: "IIM Ranchi received these prestigious global recognitions in November 2025." },
+    { q: "10. University topping the QS World University Sustainability Rankings 2026?", opts: ["Univ. of Toronto", "Univ. College London", "Lund University", "Univ. of Edinburgh"], ans: 2, exp: "Sweden's Lund University climbed to 1st place globally in sustainability." },
+    { q: "11. Company partnering with MSDE for digital design skills in ITIs?", opts: ["Autodesk", "Siemens", "Adobe", "Dassault Systemes"], ans: 0, exp: "Autodesk partnered with the Ministry to modernize design training." },
+    { q: "12. Institution signing MoU with NCERT for educational research (NEP 2020)?", opts: ["IIT Madras", "IISc Bengaluru", "Delhi University", "IIT Bombay"], ans: 1, exp: "IISc Bengaluru and NCERT are collaborating on technology integration in schools." },
+    { q: "13. State introducing chess in school/college curricula for strategic thinking?", opts: ["Kerala", "Maharashtra", "Karnataka", "Goa"], ans: 3, exp: "Goa has officially integrated chess into its educational framework." },
+    { q: "14. Number of new NIELIT centres inaugurated with the Digital University?", opts: ["Three", "Four", "Six", "Five"], ans: 3, exp: "Five new centres were launched to expand digital literacy." },
+    { q: "15. Objective of 500 new Atal Tinkering Labs in Jammu & Kashmir?", opts: ["Urban higher ed", "Industrial infra", "Intl collab", "School innovation"], ans: 3, exp: "The goal is to strengthen innovation and STEM at the school level in frontier regions." },
+    { q: "16. Institution nominated as a UN Centre of Excellence for AI?", opts: ["IIT Bombay", "IISc Bangalore", "IIIT Hyderabad", "IIT Madras"], ans: 3, exp: "MeitY Secretary announced IIT Madras' nomination at the UN General Assembly." },
+    { q: "17. Estimated logistics cost of India as a % of GDP (2026 assessment)?", opts: ["5.42%", "6.85%", "7.97%", "9.12%"], ans: 2, exp: "Current assessments place the logistics cost at 7.97%, down from previous high estimates." },
+    { q: "18. Country for India’s first overseas Atal Innovation Centre (2025)?", opts: ["USA", "UK", "Singapore", "UAE"], ans: 3, exp: "The first overseas AIC was inaugurated in the UAE." },
+    { q: "19. State government ordering a probe into university course recognition?", opts: ["Madhya Pradesh", "Bihar", "Rajasthan", "Uttar Pradesh"], ans: 1, exp: "The Bihar government initiated a probe into admission irregularities and course validity." },
+    { q: "20. NIRF 2025 Top Position (7th consecutive year)?", opts: ["IIT Delhi", "IISc Bengaluru", "IIT Madras", "IIT Mumbai"], ans: 2, exp: "IIT Madras continues its dominance as India's top-ranked institution." },
+    { q: "21. City for the new IIM set to be established with a ₹550 crore grant?", opts: ["Patna", "Ranchi", "Guwahati", "Nagpur"], ans: 2, exp: "Parliament passed the bill to establish IIM Guwahati, the second IIM in the Northeast." },
+    { q: "22. Primary objective of the ₹4,200 crore MERITE scheme?", opts: ["Rural Jobs", "Technical Ed & Research", "Healthcare", "Renewable Energy"], ans: 1, exp: "MERITE focuses on multidisciplinary education and research in technical institutes." },
+    { q: "23. Institution that launched the ‘Gyanodaya’ Pedagogical Centre?", opts: ["IIM Kozhikode", "IIM Ahmedabad", "IIM Bangalore", "IIM Calcutta"], ans: 0, exp: "IIM Kozhikode unveiled this centre to redefine how management is taught." },
+    { q: "24. World’s most affordable student city (QS Best Student Cities 2026)?", opts: ["Mumbai", "Bengaluru", "New Delhi", "Chennai"], ans: 2, exp: "New Delhi was highlighted for providing value to international and local students." },
+    { q: "25. Location of IICA’s first regional campus in the Northeast?", opts: ["Guwahati", "Shillong", "Imphal", "Aizawl"], ans: 1, exp: "The Indian Institute of Corporate Affairs is setting up in Shillong." },
+    { q: "26. Institute that developed the Bharat Forecasting System (BFS)?", opts: ["ISRO", "NCMRWF Noida", "IMD Delhi", "IITM Pune"], ans: 3, exp: "The Indian Institute of Tropical Meteorology developed the world’s highest-res system." },
+    { q: "27. Indian state officially declared first fully literate?", opts: ["Mizoram", "Kerala", "Himachal Pradesh", "Sikkim"], ans: 1, exp: "Kerala maintains its status as the leading state in literacy." },
+    { q: "28. Institution launching ‘Manasvi’ for high-school girls in STEM?", opts: ["IISc Bangalore", "IIT Delhi", "IIT Bombay", "IIT Kanpur"], ans: 1, exp: "IIT Delhi launched Manasvi to fix the gender ratio in engineering." },
+    { q: "29. Partner for HCLTech's four-year online B.Sc. in AI/Data Science?", opts: ["IIT Guwahati", "IISc Bangalore", "Shiv Nadar University", "IIT Bombay"], ans: 2, exp: "Shiv Nadar Institution of Eminence partnered for this work-integrated degree." },
+    { q: "30. City of the NSDC-PDEU Skill Centre of Excellence inauguration?", opts: ["Bhopal", "Gandhinagar", "Pune", "Jaipur"], ans: 1, exp: "The centre was launched at Pandit Deendayal Energy University, Gandhinagar." },
+    { q: "31. Institute discovering host protein germ elimination (tweezer mechanism)?", opts: ["IISc Bangalore", "IIT Delhi", "IIT Pune", "IIT Bombay"], ans: 0, exp: "IISc researchers made this breakthrough in biological defense mechanisms." },
+    { q: "32. Year of the Odisha University (Amendment) Act?", opts: ["2024", "2020", "2019", "2022"], ans: 1, exp: "The act introduced reforms in the state's higher education governance in 2020." },
+    { q: "33. Location of IIM-Ahmedabad's first international campus?", opts: ["London", "New York", "Dubai", "Singapore"], ans: 2, exp: "IIMA is expanding its footprint to Dubai." },
+    { q: "34. Objective of MoU between RailTel, LTSU Punjab, and NSDC?", opts: ["Rail Infra", "Safety", "Tourism", "Railway Skill Dev"], ans: 3, exp: "The partnership aims to train youth specifically for rail-tech sectors." },
+    { q: "35. Target of 728 Eklavya Model Residential Schools (EMRS)?", opts: ["Tribal children", "Urban youth", "Rural women", "Adults"], ans: 0, exp: "EMRS provides quality middle and high-level education to tribal students." },
+    { q: "36. Institution completing training for India's first Cyber Commandos?", opts: ["IIT Madras", "NIT Trichy", "IIT Kanpur", "IIT Mumbai"], ans: 2, exp: "IIT Kanpur successfully trained the first batch of specialized cyber defense commandos." },
+    { q: "37. Host of Techkriti 2025?", opts: ["IIT Bombay", "IIT Delhi", "IIT Madras", "IIT Kanpur"], ans: 3, exp: "IIT Kanpur hosts this massive technical and entrepreneurial festival annually." },
+    { q: "38. Collaborator with MoSPI for evidence-based policymaking?", opts: ["IIM Bangalore", "IIM Calcutta", "IIM Ahmedabad", "IIT Bombay"], ans: 0, exp: "IIM Bangalore is using data innovation to assist the Ministry." },
+    { q: "39. Location of 'Hack the Future' hackathon?", opts: ["IIT Delhi", "IIT Bombay", "IIT Gandhinagar", "IIT Kanpur"], ans: 2, exp: "IIT Gandhinagar hosted this future-focused tech competition." },
+    { q: "40. APAAR ID aim?", opts: ["Admissions", "Student records", "Exams", "Teacher eval"], ans: 1, exp: "APAAR (One Nation One Student ID) standardizes digital academic records." },
+    { q: "41. Year CBSE starts biannual Class-10 board exams?", opts: ["2026", "2025", "2024", "2027"], ans: 1, exp: "The new framework for twice-a-year exams begins from 2025." },
+    { q: "42. Partner of ERNET India for joint IoT research lab?", opts: ["IIT Delhi", "IIT Bombay", "IIITDM Kancheepuram", "NIT Trichy"], ans: 2, exp: "IIITDM Kancheepuram established this lab for smart electronics." },
+    { q: "43. City of NSDC International Academy launch?", opts: ["Pune", "Hyderabad", "Bengaluru", "Noida"], ans: 3, exp: "Noida serves as the hub for this global-facing skill academy." },
+    { q: "44. THE World Rankings 2025: Indian institution entering CS global top 100?", opts: ["IISc Bengaluru", "IIT Bombay", "IIT Delhi", "IIT Madras"], ans: 0, exp: "IISc Bengaluru ranked 99th (and 96th in some lists) for Computer Science." },
+    { q: "45. India's global rank in QS Future Skills Index 2025?", opts: ["21st", "25th", "23rd", "24th"], ans: 1, exp: "India is ranked 25th, recognized as a 'future skills contender'." },
+    { q: "46. Winner of 34th National Youth Parliament for KVs?", opts: ["Kharagpur", "Delhi", "Bombay", "Madras"], ans: 0, exp: "Kendriya Vidyalaya, IIT Kharagpur emerged as the national winner." },
+    { q: "47. State launching Gunotsav 2025 education evaluation?", opts: ["Bihar", "Assam", "Gujarat", "West Bengal"], ans: 1, exp: "Assam evaluates over 14 lakh students to improve school quality." },
+    { q: "48. QS Sustainability 2025: 1st in India (171st globally)?", opts: ["IIT Bombay", "IIT Kharagpur", "IIT Delhi", "IIT Madras"], ans: 0, exp: "IIT Bombay led the Indian cohort in sustainability rankings." },
+    { q: "49. Company partnering with NCERT for 29-language YouTube channels?", opts: ["Microsoft", "Google", "Apple", "Amazon"], ans: 1, exp: "Google/YouTube partnered to democratize access to educational content." },
+    { q: "50. Oxford Word of the Year 2024?", opts: ["Brain Rot", "Digital Fatigue", "Mind Drain", "Online Overload"], ans: 0, exp: "'Brain Rot' won after public voting, reflecting social media impact." }
+];
+
+let current = 0;
+function load() {
+    const q = questions[current];
+    document.getElementById('q-count').innerText = `Question ${current + 1} / ${questions.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
+        b.onclick = () => {
+            const btns = document.querySelectorAll('.opt-btn'); btns.forEach(x => x.disabled = true);
+            if(i === q.ans) b.classList.add('correct');
+            else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
+            document.getElementById('exp-box').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('exp-box').style.display = 'block';
+        };
+        container.appendChild(b);
+    });
+    document.getElementById('exp-box').style.display = 'none';
+    document.getElementById('prev-btn').disabled = current === 0;
+    document.getElementById('next-btn').disabled = current === questions.length - 1;
+}
+function move(s) { current += s; load(); }
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global & Indian Festivity Quiz 2025</title>
+    <style>
+        :root { --festive-gold: #d4af37; --deep-red: #800000; --bg: #fffdf5; --card: #ffffff; }
+        body { font-family: 'Georgia', serif; background-color: var(--bg); color: #333; padding: 20px; }
+        .quiz-container { max-width: 900px; margin: auto; }
+        .q-card { background: var(--card); border: 2px solid var(--festive-gold); border-radius: 15px; padding: 30px; margin-bottom: 25px; box-shadow: 5px 5px 15px rgba(0,0,0,0.05); }
+        .q-num { color: var(--deep-red); font-weight: bold; font-size: 1.2rem; }
+        .options { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { padding: 12px; border: 1px solid #ddd; background: #fff; cursor: pointer; text-align: left; border-radius: 8px; transition: 0.3s; }
+        .btn:hover { background: #fef9e7; border-color: var(--festive-gold); }
+        .correct { background: #d4edda !important; border-color: #28a745 !important; }
+        .wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
+        .explanation { margin-top: 15px; font-style: italic; color: #555; display: none; padding: 10px; border-left: 3px solid var(--festive-gold); }
+    </style>
+</head>
+<body>
+<div class="quiz-container">
+    <a href="currentaffairs.html">← Back to GK Portal</a>
+    <h1 style="text-align:center; color: var(--deep-red);">Cultural Heritage & Festivals (2024-2025)</h1>
+    <div id="quiz-flow"></div>
+</div>
+
+<script>
+const quizData = [
+    { q: "In which region does the Spituk Gustor festival begin monastic celebrations?", opts: ["Himachal Pradesh", "Sikkim", "Arunachal Pradesh", "Ladakh"], ans: 3, exp: "Spituk Gustor is a two-day festival celebrated in Ladakh to mark the victory of good over evil." },
+    { q: "In which city did 'Udbhav Utsav' international dance festival begin?", opts: ["Bhopal", "Gwalior", "Indore", "Ujjain"], ans: 1, exp: "Gwalior hosts this international event featuring global folk dance teams." },
+    { q: "In which state is the festival of Ningol Chakouba celebrated?", opts: ["Assam", "Tripura", "Manipur", "Mizoram"], ans: 2, exp: "A major festival in Manipur where married women are invited to their parental homes for a feast." },
+    { q: "On which date will Bandi Chhor Divas be celebrated in 2025?", opts: ["Oct 19", "Oct 21", "Oct 23", "Oct 25"], ans: 1, exp: "In 2025, Bandi Chhor Divas falls on October 21, marking Guru Hargobind Ji's release." },
+    { q: "Which edition of the Dehradun Literature Festival will be held in 2025?", opts: ["7th", "5th", "6th", "8th"], ans: 2, exp: "The 6th edition of the Dehradun Lit Fest is scheduled for 2025." },
+    { q: "Which state celebrates 'Mera Hou Chongba' for Hill-valley unity?", opts: ["Nagaland", "Mizoram", "Manipur", "Arunachal"], ans: 2, exp: "Celebrated in Manipur to strengthen ties between different ethnic groups in hills and valleys." },
+    { q: "Where was the Centre for Makhana Excellence launched by Shivraj Singh Chouhan?", opts: ["Gaya", "Patna", "Bhagalpur", "Muzaffarpur"], ans: 3, exp: "Muzaffarpur is a hub for Makhana (fox nut) research and production." },
+    { q: "Which state's Bathukamma Festival achieved two Guinness World Records?", opts: ["Telangana", "Andhra Pradesh", "Karnataka", "Tamil Nadu"], ans: 0, exp: "Telangana set records for largest floral arrangement and synchronized dance in 2025." },
+    { q: "Where was the 3rd Unmesha International Literature Festival 2025 held?", opts: ["Bihar", "Uttar Pradesh", "West Bengal", "Madhya Pradesh"], ans: 3, exp: "The grand festival took place in Madhya Pradesh, celebrating diverse literary voices." },
+    { q: "In which state was the 14th Sirarakhong Hathei Chilli Festival held?", opts: ["Nagaland", "Manipur", "Assam", "Meghalaya"], ans: 1, exp: "Sirarakhong village in Manipur is famous for its unique GI-tagged Hathei chilli." },
+    { q: "Where was Purple Fest 2025 (Inclusion for Divyangjan) organized?", opts: ["Gurugram", "Noida", "Bhopal", "Pune"], ans: 2, exp: "Bhopal hosted the 2025 edition to promote empowerment for persons with disabilities." },
+    { q: "Which state launched the Autumn Calendar 2025 with Cherry Blossom Festival?", opts: ["Assam", "Sikkim", "Meghalaya", "Nagaland"], ans: 2, exp: "Meghalaya's Autumn Calendar features the famous Shillong Cherry Blossom Festival." },
+    { q: "Which state plans to celebrate Bathukamma in Rio Carnival style?", opts: ["Kerala", "Telangana", "Karnataka", "Andhra"], ans: 1, exp: "Telangana is re-imagining the festival as a global carnival to attract tourism." },
+    { q: "In which state is the Nuakhai harvest festival primarily celebrated?", opts: ["Chhattisgarh", "Odisha", "Jharkhand", "Bihar"], ans: 1, exp: "Nuakhai is a major agricultural festival in Western Odisha." },
+    { q: "Where did the Suru Summer Festival 2025 begin with August snowfall?", opts: ["Shimla", "Ladakh", "Manali", "Srinagar"], ans: 1, exp: "Ladakh's Suru Valley saw rare snow during the 2025 summer festivities." },
+    { q: "Which country is hosting the first Art & Culture Festival in Sept 2025?", opts: ["Nepal", "India", "Bhutan", "Sri Lanka"], ans: 0, exp: "Nepal is hosting its inaugural 22-day Arts and Culture Festival in 2025." },
+    { q: "Which region hosted India’s first-ever Astro Tourism Festival?", opts: ["Sikkim", "Himachal", "Ladakh", "Arunachal"], ans: 2, exp: "Ladakh, with its clear dark skies, is the hub for India's first Astro Tourism initiatives." },
+    { q: "In which country is the Kataragama Esala Festival celebrated?", opts: ["Nepal", "Thailand", "India", "Sri Lanka"], ans: 3, exp: "A major festival in Sri Lanka involving Pada Yatra (foot pilgrimage)." },
+    { q: "In which state is the Bonalu folk festival predominantly celebrated?", opts: ["Karnataka", "Andhra", "Telangana", "Tamil Nadu"], ans: 2, exp: "Bonalu is a traditional Hindu festival centered on Goddess Mahakali in Telangana." },
+    { q: "Which country celebrates the Poson Poya festival?", opts: ["Sri Lanka", "Myanmar", "Thailand", "Nepal"], ans: 0, exp: "Sri Lanka celebrates Poson Poya to mark the arrival of Buddhism in the 3rd century BCE." },
+    { q: "Where is the Njattadi (paddy sowing) Festival celebrated?", opts: ["Tamil Nadu", "Karnataka", "Kerala", "Andhra"], ans: 2, exp: "Kerala observes this ritualistic festival during the start of the farming season." },
+    { q: "In which state is the Shirui Lily Festival celebrated?", opts: ["Nagaland", "Arunachal", "Manipur", "Mizoram"], ans: 2, exp: "Manipur celebrates this to honor the rare Shirui Lily, found only in Ukhrul." },
+    { q: "In which state was 'Garia and Borsho Boron Utsav 2025' inaugurated?", opts: ["Tripura", "Assam", "Meghalaya", "Manipur"], ans: 0, exp: "The Tripura CM inaugurated this tribal festival celebrating the harvest and new year." },
+    { q: "In which state is Rongali Bihu primarily celebrated?", opts: ["West Bengal", "Odisha", "Meghalaya", "Assam"], ans: 3, exp: "Assam's most important festival marking the Assamese New Year." },
+    { q: "In which state is the Sarhul Festival primarily celebrated?", opts: ["Odisha", "Chhattisgarh", "Bihar", "Jharkhand"], ans: 3, exp: "A major tribal festival in Jharkhand celebrating nature and the Sal tree." },
+    { q: "Where did the 10th India International Dance & Music Festival conclude?", opts: ["Mumbai", "Bengaluru", "New Delhi", "Chennai"], ans: 2, exp: "The 2025 edition concluded in New Delhi with global artist participation." },
+    { q: "Which state is hosting the 51st Khajuraho Dance Festival in 2025?", opts: ["UP", "Rajasthan", "Gujarat", "MP"], ans: 3, exp: "Madhya Pradesh hosts this prestigious classical dance event annually." },
+    { q: "Where did the 2nd Simolu Festival take place in Feb 2025?", opts: ["Meghalaya", "Assam", "Nagaland", "West Bengal"], ans: 1, exp: "Assam celebrated the 2nd edition focusing on sustainable tourism." },
+    { q: "Which state is set to host the world's largest Jhumur festival in 2025?", opts: ["West Bengal", "Assam", "Odisha", "Jharkhand"], ans: 1, exp: "Assam is organizing a massive Jhumur festival to showcase tea-tribe culture." },
+    { q: "Where was the 38th Surajkund International Crafts Fair inaugurated?", opts: ["Bhopal", "Bhubaneswar", "Faridabad", "Jaipur"], ans: 2, exp: "Faridabad (Haryana) hosts this world-renowned crafts mela." },
+    { q: "Where was the 10th Arunachal Film Festival inaugurated?", opts: ["Guwahati", "Shillong", "Itanagar", "Kohima"], ans: 2, exp: "Itanagar hosted the 10th edition in February 2025." },
+    { q: "Where was the Sci-Fi Science Film Festival of India inaugurated in 2025?", opts: ["Mumbai", "Panaji", "Bangalore", "Pune"], ans: 1, exp: "Goa (Panaji) hosted the Sci-Fi festival to promote scientific temper." },
+    { q: "In which village is the Nagoba Jatara festival celebrated?", opts: ["Keslapur", "Medaram", "Mulugu", "Adilabad"], ans: 0, exp: "Keslapur in Telangana is home to this major tribal fair of the Gond community." },
+    { q: "Which city hosted the inaugural International Pashmina Festival?", opts: ["Pokhara", "Thimphu", "Kathmandu", "Dhaka"], ans: 2, exp: "Kathmandu hosted the first ever international festival for Pashmina wool." },
+    { q: "Which country hosted the 1st International Pashmina Festival?", opts: ["India", "Nepal", "Bhutan", "Sri Lanka"], ans: 1, exp: "Nepal is positioning itself as a leader in Pashmina production." },
+    { q: "Which state did NOT celebrate its Statehood Day on January 21?", opts: ["Manipur", "Meghalaya", "Tripura", "Mizoram"], ans: 3, exp: "Mizoram celebrates Statehood Day on Feb 20; the other three celebrate on Jan 21." },
+    { q: "In which state did the Flamingo Festival 2025 take place?", opts: ["Andhra", "Tamil Nadu", "Kerala", "Karnataka"], ans: 0, exp: "Andhra Pradesh (Nellore) hosts this festival at Pulicat Lake." },
+    { q: "Where did the National Science Drama Festival 2024-25 commence?", opts: ["Mumbai", "New Delhi", "Kolkata", "Bengaluru"], ans: 2, exp: "Kolkata was the venue for the start of the 2024-25 science drama festival." },
+    { q: "In which state is the Gaan-Ngai festival held?", opts: ["Nagaland", "Assam", "Manipur", "Meghalaya"], ans: 2, exp: "Celebrated by the Zeliangrong community in Manipur." },
+    { q: "Which tribe celebrates Boda Tyohar in the Trans-Giri region of HP?", opts: ["Gaddi", "Kullu", "Lahul", "Hatti"], ans: 3, exp: "The Hatti tribe celebrates Boda Tyohar (Magho ko Tyohar) for an entire month." },
+    { q: "Where was the International Kite and Sweet Festival inaugurated?", opts: ["Andhra", "Telangana", "Karnataka", "Tamil Nadu"], ans: 1, exp: "Telangana's Parade Grounds in Hyderabad is the traditional venue." },
+    { q: "In which city did the 21st Third Eye Asian Film Festival commence?", opts: ["Delhi", "Mumbai", "Kolkata", "Hyderabad"], ans: 1, exp: "Mumbai hosted the 21st edition starting January 10, 2025." },
+    { q: "Where is the Kagyed Dance Festival prominently held?", opts: ["Ladakh", "HP", "Arunachal", "Sikkim"], ans: 3, exp: "Kagyed is a significant Buddhist masked dance festival in Sikkim." },
+    { q: "Which country hosted the 18th Elephant and Tourism Festival?", opts: ["India", "Thailand", "Nepal", "Sri Lanka"], ans: 2, exp: "Nepal (Sauraha) is famous for its elephant-themed tourism festivals." },
+    { q: "Where was the National Science Drama Festival 2024 (Dec 27-28) held?", opts: ["Mumbai", "New Delhi", "Bengaluru", "Kolkata"], ans: 1, exp: "The National Science Centre in New Delhi hosted the finals." },
+    { q: "Where was the 100th Tansen Music Festival held?", opts: ["Bhopal", "Indore", "Gwalior", "Jabalpur"], ans: 2, exp: "Gwalior set a Guinness World Record during its 100th Tansen Samaroh." },
+    { q: "In which state is the Eaglenest Bird Festival 2025 held?", opts: ["Assam", "Arunachal", "Nagaland", "Meghalaya"], ans: 1, exp: "Arunachal Pradesh hosts this to promote bird conservation." },
+    { q: "Which tribe celebrates Ngada festival-cum-Mini Hornbill?", opts: ["Rengma Naga", "Ao Naga", "Sumo Naga", "Angami Naga"], ans: 0, exp: "The Rengma Naga tribe celebrates Ngada in Nagaland." },
+    { q: "Which country was the focus at the 30th Kolkata Film Festival (KIFF)?", opts: ["Germany", "France", "Japan", "USA"], ans: 1, exp: "France was the focus country for the 30th KIFF (2024)." },
+    { q: "Which institution hosted the India Intl Science Festival (IISF) 2024?", opts: ["IIT Bombay", "IIT Delhi", "IIT Guwahati", "IIT Kanpur"], ans: 2, exp: "IIT Guwahati was the chosen venue for the 2024 IISF." },
+    { q: "Where is the Hornbill Festival, 'Festival of Festivals', held?", opts: ["Manipur", "Nagaland", "Meghalaya", "Arunachal"], ans: 1, exp: "Nagaland's Kisama Heritage Village is the heart of Hornbill." },
+    { q: "Where was the first-ever Bodoland Mohotsov inaugurated?", opts: ["Guwahati", "Kolkata", "Mumbai", "New Delhi"], ans: 3, exp: "The PM inaugurated the 1st Bodoland Mohotsov in New Delhi in Nov 2024." },
+    { q: "What is the date of Guru Nanak Jayanti (555th anniversary) in 2024?", opts: ["Nov 12", "Nov 14", "Nov 20", "Nov 15"], ans: 3, exp: "November 15, 2024 marked the 555th birth anniversary." },
+    { q: "In which state is Igas Bagwal (Budhi Diwali) celebrated?", opts: ["Himachal", "Uttarakhand", "J&K", "Arunachal"], ans: 1, exp: "Uttarakhand celebrates Igas 11 days after main Diwali." },
+    { q: "Which state primarily celebrates Ningol Chakkouba?", opts: ["Assam", "Manipur", "Meghalaya", "Tripura"], ans: 1, exp: "Manipur celebrates this to honor the bond between brothers and sisters." }
+];
+
+const container = document.getElementById('quiz-flow');
+quizData.forEach((item, index) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-card';
+    qDiv.innerHTML = `
+        <div class="q-num">Question ${index + 1}</div>
+        <div class="q-text">${item.q}</div>
+        <div class="options">
+            ${item.opts.map((opt, i) => `<button class="btn" onclick="check(${index}, ${i}, this)">${opt}</button>`).join('')}
+        </div>
+        <div class="explanation" id="exp-${index}">${item.exp}</div>
+    `;
+    container.appendChild(qDiv);
+});
+
+function check(qIdx, optIdx, btn) {
+    const correct = quizData[qIdx].ans;
+    const parent = btn.parentElement;
+    const btns = parent.querySelectorAll('.btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if (optIdx === correct) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+    }
+    document.getElementById(`exp-${qIdx}`).style.display = 'block';
+}
+</script>
+</body>
+</html>

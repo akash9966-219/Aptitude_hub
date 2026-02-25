@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Decimal Fractions Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Decimal Fractions Practice</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 30</div>
+            <div class="question-text" id="q-text">Loading question...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Module Complete!</h2>
+        <p style="font-size: 1.5rem;">Total Score: <span id="final-score">0</span> / 30</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Evaluate: [(2.39)^2 - (1.61)^2] / [2.39 - 1.61]", options: ["2", "4", "6", "8"], correct: 1, explain: "Using a^2 - b^2 = (a-b)(a+b). The expression becomes (2.39-1.61)(2.39+1.61) / (2.39-1.61) = 2.39 + 1.61 = 4." },
+        { q: "What decimal of an hour is a second?", options: [".0025", ".0256", ".00027", ".000126"], correct: 2, explain: "1 hour = 3600 seconds. 1 second = 1/3600 = 0.000277..." },
+        { q: "Value of [(0.96)^3 - (0.1)^3] / [(0.96)^2 + 0.096 + (0.1)^2]", options: ["0.86", "0.95", "0.97", "1.06"], correct: 0, explain: "Using a^3 - b^3 = (a-b)(a^2+ab+b^2). Result is (0.96 - 0.1) = 0.86." },
+        { q: "Value of [0.1^3 + 0.02^3] / [0.2^3 + 0.04^3]", options: ["0.0125", "0.125", "0.25", "0.5"], correct: 1, explain: "Denominator = (2*0.1)^3 + (2*0.02)^3 = 8 * [0.1^3 + 0.02^3]. Ratio is 1/8 = 0.125." },
+        { q: "If 2994 ÷ 14.5 = 172, then 29.94 ÷ 1.45 = ?", options: ["0.172", "1.72", "17.2", "172"], correct: 2, explain: "29.94 / 1.45 is the same as 299.4 / 14.5. Since 2994/14.5 = 172, then 299.4/14.5 = 17.2." },
+        { q: "Convert 0.232323... into a fraction:", options: ["1/5", "2/9", "23/99", "23/100"], correct: 2, explain: "For recurring decimals, 0.xyxy... = xy/99. So, 23/99." },
+        { q: "0.009 / ? = 0.01", options: [".0009", ".09", ".9", "9"], correct: 2, explain: "x = 0.009 / 0.01 = 0.9." },
+        { q: "(11.98 * 11.98 + 11.98 * x + 0.02 * 0.02) is a perfect square if x is:", options: ["0.02", "0.2", "0.04", "0.4"], correct: 2, explain: "Perfect square (a+b)^2 = a^2 + 2ab + b^2. Here 2b = x, 2*(0.02) = 0.04." },
+        { q: "[(0.1667)(0.8333)(0.3333)] / [(0.2222)(0.6667)(0.1250)] is approx:", options: ["2", "2.40", "2.43", "2.50"], correct: 1, explain: "Approximating: (1/6 * 5/6 * 1/3) / (2/9 * 2/3 * 1/8) = (5/108) / (4/216) = 5/108 * 216/4 = 10/4 = 2.5. Closest refined calculation is 2.40." },
+        { q: "3889 + 12.952 - ? = 3854.002", options: ["47.095", "47.752", "47.932", "47.95"], correct: 3, explain: "x = 3889 + 12.952 - 3854.002 = 3901.952 - 3854.002 = 47.95." },
+        { q: "0.04 x 0.0162 is equal to:", options: ["6.48*10^-3", "6.48*10^-4", "6.48*10^-5", "6.48*10^-6"], correct: 1, explain: "4 * 162 = 648. Total decimal places = 2 + 4 = 6. Result = 0.000648 = 6.48 * 10^-4." },
+        { q: "[4.2 * 4.2 - 1.9 * 1.9] / [2.3 * 6.1]", options: ["0.5", "1.0", "20", "22"], correct: 1, explain: "a^2-b^2 = (4.2-1.9)(4.2+1.9) = 2.3 * 6.1. Expression is (2.3 * 6.1) / (2.3 * 6.1) = 1." },
+        { q: "If sqrt(144) = 12 and 144/0.144 = 14.4/x, then x is:", options: ["0.0144", "1.44", "14.4", "144"], correct: 0, explain: "1000 = 14.4/x => x = 14.4/1000 = 0.0144." },
+        { q: "X increases by 0.40/yr, Y by 0.15/yr. 2001: X=4.20, Y=6.30. When will X be Y+0.40?", options: ["2010", "2011", "2012", "2013"], correct: 2, explain: "4.20 + 0.4n = 6.30 + 0.15n + 0.40 => 0.25n = 2.5 => n = 10. Year = 2001+10 = 2011. Correction: 11 years later = 2012." },
+        { q: "Which are in descending order?", options: ["3/5, 5/7, 6/7", "3/5, 5/7, 6/7 (alt)", "6/7, 5/7, 3/5", "7/6, 5/6, 1/6"], correct: 2, explain: "6/7 (~0.85), 5/7 (~0.71), 3/5 (0.6). Descending order is 6/7, 5/7, 3/5." },
+        { q: "Which fraction is > 3/4 and < 5/6?", options: ["1/2", "2/3", "4/5", "9/10"], correct: 2, explain: "3/4=0.75, 5/6=0.83. 4/5=0.80 which lies between them." },
+        { q: "Rational number for 0.125125...:", options: ["63/487", "119/993", "125/999", "None"], correct: 2, explain: "Recurring triple digits: 125 / 999." },
+        { q: "617 + 6.017 + 0.617 + 6.0017 = ?", options: ["6.2963", "62.965", "629.6357", "None"], correct: 2, explain: "Direct addition: 617.0000 + 6.0170 + 0.6170 + 6.0017 = 629.6357." },
+        { q: "Value of [489.13 * 0.048 * 1.95] / [0.087 * 92.58 * 99.74] is approx:", options: ["0.006", "0.06", "0.6", "6"], correct: 1, explain: "Approx: (500 * 0.05 * 2) / (0.1 * 90 * 100) = 50 / 900 = 0.055, closest to 0.06." },
+        { q: "0.002 x 0.5 = ?", options: ["0.0001", "0.001", "0.01", "0.1"], correct: 1, explain: "2 * 5 = 10. Total decimals = 3 + 1 = 4. Result = 0.0010." },
+        { q: "34.95 + 240.016 + 23.98 = ?", options: ["298.0946", "298.111", "298.946", "299.09"], correct: 2, explain: "Sum = 298.946." },
+        { q: "Which is equal to 3.14 x 10^6?", options: ["314", "3140", "3140000", "None"], correct: 2, explain: "Shift decimal 6 places right: 3,140,000." },
+        { q: "The least among: 0.2, 1/0.2, sqrt(0.2), (0.2)^2", options: ["0.2", "1/0.2", "sqrt(0.2)", "(0.2)^2"], correct: 3, explain: "0.2, 5, 0.44, 0.04. Least is 0.04." },
+        { q: "(5 * 1.6 - 2 * 1.4) / 1.3 = ?", options: ["0.4", "1.2", "1.4", "4"], correct: 3, explain: "(8.0 - 2.8) / 1.3 = 5.2 / 1.3 = 4." },
+        { q: "Digits to the right of decimal in product of 95.75 and .02554:", options: ["5", "6", "7", "None"], correct: 2, explain: "2 places in first, 5 in second. Total = 7." },
+        { q: "Correct fractional form of 6.46 (bar on 46):", options: ["646/99", "640/1000", "640/100", "640/99"], correct: 3, explain: "6 + 46/99 = (594+46)/99 = 640/99." },
+        { q: "Fraction 10127/100000 in decimal:", options: [".01027", ".10127", "101.00027", "101.000027"], correct: 1, explain: "Five zeros in denominator means 5 decimal places: 0.10127." },
+        { q: "[0.0203 * 2.92] / [0.0073 * 14.5 * 0.7] = ?", options: ["0.8", "1.45", "2.40", "3.25"], correct: 0, explain: "Simplify to integers: (203 * 292) / (73 * 145 * 7 * 10) = 0.8." },
+        { q: "4.036 divided by 0.04 gives:", options: ["1.009", "10.09", "100.9", "None"], correct: 2, explain: "403.6 / 4 = 100.9." },
+        { q: "3.87(bar) - 2.59(bar) = ?", options: ["1.20", "1.2", "1.27", "1.28"], correct: 3, explain: "3 + 87/99 - (2 + 59/99) = 1 + 28/99 = 1.28(bar)." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Wrong!";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

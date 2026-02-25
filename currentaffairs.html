@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GK & Current Affairs Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #0ea5e9;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .topic-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .topic-card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .back-nav {
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="index.html" class="btn-back">← Back to Main Portal</a>
+    </div>
+
+    <div class="header">
+        <h1>GK & Current Affairs 2026</h1>
+        <p>Stay updated with the latest trends and global news</p>
+    </div>
+
+    <div class="topics-grid">
+        <a href="agriculture.html" class="topic-card">
+            <div class="icon">🌾</div>
+            <h3>Agriculture</h3>
+        </a>
+
+        <a href="art-culture.html" class="topic-card">
+            <div class="icon">🎭</div>
+            <h3>Art and Culture</h3>
+        </a>
+
+        <a href="awards.html" class="topic-card">
+            <div class="icon">🏆</div>
+            <h3>Awards and Honours</h3>
+        </a>
+
+        <a href="banking.html" class="topic-card">
+            <div class="icon">🏦</div>
+            <h3>Banking</h3>
+        </a>
+
+        <a href="bills-acts.html" class="topic-card">
+            <div class="icon">📜</div>
+            <h3>Bills and Acts</h3>
+        </a>
+
+        <a href="business.html" class="topic-card">
+            <div class="icon">💼</div>
+            <h3>Business</h3>
+        </a>
+
+        <a href="defence.html" class="topic-card">
+            <div class="icon">🛡️</div>
+            <h3>Defence</h3>
+        </a>
+
+        <a href="economy.html" class="topic-card">
+            <div class="icon">📊</div>
+            <h3>Economy</h3>
+        </a>
+
+        <a href="education.html" class="topic-card">
+            <div class="icon">🎓</div>
+            <h3>Education</h3>
+        </a>
+
+        <a href="festivity.html" class="topic-card">
+            <div class="icon">🎆</div>
+            <h3>Festivity</h3>
+        </a>
+
+        <a href="environment.html" class="topic-card">
+            <div class="icon">🌱</div>
+            <h3>Environment</h3>
+        </a>
+
+        <a href="finance.html" class="topic-card">
+            <div class="icon">💰</div>
+            <h3>Finance</h3>
+        </a>
+
+        <a href="important-days.html" class="topic-card">
+            <div class="icon">📅</div>
+            <h3>Important Days</h3>
+        </a>
+
+        <a href="international.html" class="topic-card">
+            <div class="icon">🌍</div>
+            <h3>International</h3>
+        </a>
+
+        <a href="national.html" class="topic-card">
+            <div class="icon">🇮🇳</div>
+            <h3>National</h3>
+        </a>
+
+        <a href="obituary.html" class="topic-card">
+            <div class="icon">🕯️</div>
+            <h3>Obituary</h3>
+        </a>
+
+        <a href="person.html" class="topic-card">
+            <div class="icon">👤</div>
+            <h3>Person</h3>
+        </a>
+
+        <a href="places.html" class="topic-card">
+            <div class="icon">📍</div>
+            <h3>Places</h3>
+        </a>
+
+        <a href="politics.html" class="topic-card">
+            <div class="icon">🏛️</div>
+            <h3>Politics</h3>
+        </a>
+
+        <a href="science.html" class="topic-card">
+            <div class="icon">🔬</div>
+            <h3>Science</h3>
+        </a>
+
+        <a href="sports.html" class="topic-card">
+            <div class="icon">⚽</div>
+            <h3>Sports</h3>
+        </a>
+
+        <a href="state.html" class="topic-card">
+            <div class="icon">🗺️</div>
+            <h3>State</h3>
+        </a>
+
+        <a href="talkies.html" class="topic-card">
+            <div class="icon">🎬</div>
+            <h3>Talkies</h3>
+        </a>
+
+        <a href="technologies.html" class="topic-card">
+            <div class="icon">💻</div>
+            <h3>Technologies</h3>
+        </a>
+
+        <a href="miscellaneous.html" class="topic-card">
+            <div class="icon">🔗</div>
+            <h3>Miscellaneous</h3>
+        </a>
+    </div>
+
+</body>
+</html>

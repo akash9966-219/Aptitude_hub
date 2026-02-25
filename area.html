@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Area and Mensuration Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Area and Mensuration</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Ratio of length:breadth of a park is 3:2. A man cycling at 12 km/hr completes one round in 8 min. Find the area (sq. m).", options: ["15360", "153600", "30720", "307200"], correct: 1, explain: "Distance = 12000 * (8/60) = 1600m (Perimeter). 2(3x + 2x) = 1600 => 10x = 1600 => x = 160. Length=480, Breadth=320. Area = 480 * 320 = 153,600 sq. m." },
+        { q: "An error of 2% in excess is made while measuring the side of a square. Percentage error in calculated area?", options: ["2%", "2.02%", "4%", "4.04%"], correct: 3, explain: "Error in Area = (1 + 0.02)^2 - 1 = 1.0404 - 1 = 0.0404 or 4.04%." },
+        { q: "Ratio of perimeter:breadth is 5:1. Area is 216 sq. cm. What is the length?", options: ["16 cm", "18 cm", "24 cm", "None"], correct: 1, explain: "2(L+B)/B = 5/1 => 2L + 2B = 5B => 2L = 3B => B = 2L/3. Area = L * (2L/3) = 216 => L^2 = 324 => L = 18 cm." },
+        { q: "Percentage increase in area of a rectangle if each side is increased by 20%?", options: ["40%", "42%", "44%", "46%"], correct: 2, explain: "Increase = [x + y + (xy/100)]% = [20 + 20 + (400/100)]% = 44%." },
+        { q: "Park 60mx40m has two crossroads. Lawn area is 2109 sq. m. Width of the road?", options: ["2.91 m", "3 m", "5.82 m", "None"], correct: 1, explain: "Area of roads = (60*40) - 2109 = 291. If width is w: 60w + 40w - w^2 = 291 => w^2 - 100w + 291 = 0. Solving gives w = 3m." },
+        { q: "Diagonal of floor is 7 ft. Shorter side is 4 ft. Area of closet?", options: ["5.14", "13.12", "sqrt(33)", "4*sqrt(33)"], correct: 3, explain: "Other side = sqrt(7^2 - 4^2) = sqrt(49 - 16) = sqrt(33). Area = 4 * sqrt(33) ≈ 4 * 5.74 = 22.97 (Matches 4*sqrt(33))." },
+        { q: "Towel lost 20% length and 10% breadth. Percentage decrease in area?", options: ["10%", "10.08%", "20%", "28%"], correct: 3, explain: "New area = 0.8L * 0.9B = 0.72LB. Decrease = 1 - 0.72 = 0.28 or 28%." },
+        { q: "Man walked diagonally across a square. Percent saved by not walking along edges?", options: ["20", "24", "30", "33"], correct: 2, explain: "Edges = 1+1=2. Diagonal = sqrt(2) ≈ 1.41. Saved = (2 - 1.41)/2 = 0.59/2 = 29.5% ≈ 30%." },
+        { q: "Diagonal of rectangle is sqrt(41) cm and area is 20 sq. cm. Perimeter?", options: ["9 cm", "18 cm", "20 cm", "41 cm"], correct: 1, explain: "L^2 + B^2 = 41 and LB = 20. (L+B)^2 = L^2+B^2 + 2LB = 41 + 40 = 81. L+B = 9. Perimeter = 2(L+B) = 18 cm." },
+        { q: "Tiles required for floor 1517 cm long and 902 cm broad?", options: ["814", "820", "840", "844"], correct: 0, explain: "HCF(1517, 902) = 41 (Tile side). Tiles = (1517 * 902) / (41 * 41) = 37 * 22 = 814." },
+        { q: "Difference L-B = 23. Perimeter = 206. Find area.", options: ["1520", "2420", "2480", "2520"], correct: 3, explain: "2(L+B) = 206 => L+B = 103. L-B = 23. Adding: 2L = 126 => L=63, B=40. Area = 63 * 40 = 2520 sq. m." },
+        { q: "Length is halved, Breadth is tripled. Percentage change in area?", options: ["25% inc", "50% inc", "50% dec", "75% dec"], correct: 1, explain: "New Area = (1/2 L) * (3B) = 1.5 LB. Increase = 0.5 or 50%." },
+        { q: "L = B + 20. Cost of fencing @ 26.50/m is Rs. 5300. Length?", options: ["40", "50", "120", "None"], correct: 3, explain: "Perimeter = 5300 / 26.50 = 200m. 2(L + L-20) = 200 => 2L - 20 = 100 => 2L = 120 => L = 60m. Choice not in list." },
+        { q: "Rect field fenced on 3 sides leaving 20ft side. Area 680. Fencing required?", options: ["34", "40", "68", "88"], correct: 3, explain: "Side = 20. Other side = 680/20 = 34. Case 1: 20+34+34 = 88. Case 2: 34+20+20 = 74. Since 88 is an option, it's the expected answer." },
+        { q: "Tank 25mx12mx6m. Cost of plastering walls and bottom @ 0.75/sq. m?", options: ["Rs. 456", "Rs. 458", "Rs. 558", "Rs. 568"], correct: 2, explain: "Area = Bottom + 4 Walls = (25*12) + 2(25*6 + 12*6) = 300 + 2(150 + 72) = 300 + 444 = 744 sq. m. Cost = 744 * 0.75 = Rs. 558." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

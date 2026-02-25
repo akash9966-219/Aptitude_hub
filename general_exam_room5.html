@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 5</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 5</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+     
+const questions = [
+    { q: "The sharp class division at Harappa and Mohenjo-daro is clear from which of the following?", options: ["Indus seals excavated", "religious beliefs", "tools and implements", "different types of dwellings excavated"], ans: 3, logic: "Excavations revealed a 'Citadel' for the ruling class and a 'Lower Town' for commoners, clearly indicating social stratification based on housing." },
+    { q: "Information about the Early Vedic period is primarily derived from?", options: ["archaeological excavations", "the Rig Veda", "Jatak Katha", "contemporary culture"], ans: 1, logic: "The Rig Veda is the oldest of the Vedas and the primary literary source for understanding the social, religious, and political life of the Early Vedic people." },
+    { q: "Indian envoys were sent to Roman kings; one to Augustus in 27-28 AD and another in 110-120 AD to the court of?", options: ["Cartius", "Trajan", "Nero", "Brutus"], ans: 1, logic: "Historical records indicate that an Indian embassy reached the Roman Emperor Trajan during his reign in the early 2nd century AD." },
+    { q: "What causes the initial increase of the magnetic field in magnetic storms?", options: ["shock wave from solar wind compressing the magnetosphere", "large decrease in field intensity", "gust wind engulfing the magnetosphere", "None of the above"], ans: 0, logic: "When a solar wind shock wave hits Earth, it compresses the magnetosphere, causing a 'Sudden Commencement' or an initial rise in the magnetic field." },
+    { q: "Jesus Christ was crucified in which year?", options: ["4 BC", "4 AD", "20 AD", "30 AD"], ans: 3, logic: "While historical estimates vary slightly, most scholars agree that the crucifixion of Jesus occurred around 30 AD (often cited as 33 AD) during the reign of Pontius Pilate." },
+    { q: "Rabindranath Tagore is also known by which sobriquet?", options: ["Guruji", "Gurudev", "Mahamana", "Netaji"], ans: 1, logic: "Mahatma Gandhi gave Rabindranath Tagore the title 'Gurudev,' meaning 'Divine Teacher.'" },
+    { q: "Which of the following crops is regarded as a plantation crop?", options: ["Coconut", "Cotton", "Sugarcane", "Rice"], ans: 0, logic: "Plantation crops are those grown on a large scale for commercial purposes, typically including coconut, tea, coffee, rubber, and spices." },
+    { q: "Who invented the Electric Generator?", options: ["Alexander Graham Bell", "Michael Faraday", "Alfred B. Nobel", "Thomas Alva Edison"], ans: 1, logic: "Michael Faraday discovered electromagnetic induction in 1831, which led to the creation of the first electric generator (the Faraday Disk)." },
+    { q: "What inspired the invention of reflecting road lights (Cat's Eyes)?", options: ["Car door mirrors", "light a cat's eyes gave off on a fence", "Sun light on steel posts", "Sun light on the windshield"], ans: 1, logic: "Percy Shaw invented 'Cat's Eyes' in 1933 after seeing the reflection of his car headlights in the eyes of a cat sitting on a fence." },
+    { q: "In which year did Ajay Sharma play his only Test match?", options: ["1990", "1989", "1985", "1988"], ans: 3, logic: "A prolific domestic scorer, Ajay Sharma played his solitary Test match for India against the West Indies in January 1988." },
+    { q: "A coating of dust on a computer's main circuit boards has this probable consequence:", options: ["Overheating", "Short circuits", "Slower hard disk", "None"], ans: 0, logic: "Dust acts as an insulator, trapping heat generated by components and preventing proper airflow from fans, leading to overheating." },
+    { q: "The maximum capacity of any single orbital is?", options: ["2", "6", "14", "Cannot be determined"], ans: 0, logic: "According to the Pauli Exclusion Principle, any single atomic orbital can hold a maximum of 2 electrons with opposite spins." },
+    { q: "Which of these are considered the most highly intelligent mammals?", options: ["whales", "dolphins", "elephants", "kangaroos"], ans: 1, logic: "Dolphins are widely recognized for their high encephalization quotient, complex social structures, and problem-solving abilities." },
+    { q: "Photosynthesis is scientifically defined as a process that is:", options: ["reductive and exergonic", "reductive and catabolic", "reductive, endergonic and catabolic", "reductive, endergonic and anabolic"], ans: 3, logic: "It is reductive (converts CO₂), endergonic (absorbs energy), and anabolic (builds complex molecules like glucose)." },
+    { q: "Deforestation in uplands causes river pollution primarily through?", options: ["leaching of salts", "erosion and silting", "inflow of forest material", "increased discharge rate"], ans: 1, logic: "Without tree roots to bind the soil, heavy rain washes soil into rivers, causing siltation and carrying pollutants downstream." },
+    { q: "What was the primary purpose of the establishment of NATO?", options: ["resist armed attack via collective capacity", "defend economic interests of developing nations", "provide collective defence in SE Asia", "None of the above"], ans: 0, logic: "NATO was formed in 1949 as a collective security alliance to defend member nations against potential external aggression." },
+    { q: "The main properties of cosmic ray particles include?", options: ["electric charge", "rest mass", "energy", "All of these"], ans: 3, logic: "Cosmic rays are high-energy particles (mostly protons) that possess charge, mass, and kinetic energy." },
+    { q: "The periods of different eras in geological time are further divided into?", options: ["eons", "epochs", "stages", "Any of the above"], ans: 1, logic: "In the geological time scale, Eras are divided into Periods, and Periods are further divided into Epochs." },
+    { q: "Grammy winner Pandit Vishwa Mohan Bhatt is an exponent of which instrument?", options: ["Guitar", "Violin", "Sarod", "Tabla"], ans: 0, logic: "He is famous for inventing the 'Mohan Veena,' a modified slide guitar used in Indian classical music." },
+    { q: "The 'satellite freight city' is being developed near which of the following cities?", options: ["New Delhi", "Orissa", "Gurgaon", "Kolkata"], ans: 3, logic: "The satellite freight city is a major logistics and infrastructure hub being developed near Kolkata (Dankuni area)." }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

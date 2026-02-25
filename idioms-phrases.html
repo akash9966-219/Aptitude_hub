@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Idioms & Phrases - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #f39c12;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f0f3f6;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .progress-text {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .context-sentence {
+            background: #fff9f0;
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 20px;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .opt-btn:hover { background: #fffcf5; border-color: var(--accent); }
+        .opt-btn.selected { border-color: var(--accent); background: #fff9f0; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="index.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Home</a>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <span id="progress" class="progress-text">Idiom 1 of 53</span>
+        <div id="context" class="context-sentence" style="display:none;"></div>
+        <div id="q-text" class="question-text"></div>
+        <div id="options" class="options-list"></div>
+        <div class="footer">
+            <button class="btn btn-check" id="checkBtn" onclick="validate()">Check Answer</button>
+            <button class="btn btn-next" id="nextBtn" onclick="next()">Next Idiom →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    // --- DEFINITIONS SECTION ---
+    { q: "To make clean breast of", opts: ["To gain prominence", "To praise oneself", "To confess without of reserve", "To destroy before it blooms"], ans: "To confess without of reserve" },
+    { q: "To keeps one's temper", opts: ["To become hungry", "To be in good mood", "To preserve ones energy", "To be aloof from"], ans: "To be in good mood" },
+    { q: "To catch a tartar", opts: ["To trap wanted criminal", "To catch a dangerous person", "To meet with disaster", "To deal with a person who is more than one's match"], ans: "To deal with a person who is more than one's match" },
+    { q: "To drive home", opts: ["To find one's roots", "To return to place of rest", "Back to original position", "To emphasise"], ans: "To emphasise" },
+    { q: "To have an axe to grind", opts: ["A private end to serve", "To fail to arouse interest", "To have no result", "To work for both sides"], ans: "A private end to serve" },
+    { q: "To cry wolf", opts: ["To listen eagerly", "To give false alarm", "To turn pale", "To keep off starvation"], ans: "To give false alarm" },
+    { q: "To end in smoke", opts: ["To make completely understand", "To ruin oneself", "To excite great applause", "To overcome someone"], ans: "To ruin oneself" },
+    { q: "To be above board", opts: ["To have a good height", "To be honest in any business deal", "They have no debts", "To try to be beautiful"], ans: "To be honest in any business deal" },
+    { q: "To pick holes", opts: ["To find some reason to quarrel", "To destroy something", "To criticise someone", "To cut some part of an item"], ans: "To criticise someone" },
+    { q: "To leave someone in the lurch", opts: ["To come to compromise", "Constant annoyance", "To put someone at ease", "To desert someone in his difficulties"], ans: "To desert someone in his difficulties" },
+    { q: "To play second fiddle", opts: ["To be happy and healthy", "To reduce importance of senior", "To support the role and view of another person", "To do back seat driving"], ans: "To support the role and view of another person" },
+    { q: "A man of straw", opts: ["A man of no substance", "A very active person", "A worthy fellow", "An unreasonable person"], ans: "A man of no substance" },
+    { q: "To smell a rat", opts: ["To see signs of plague", "To get bad smell", "To suspect foul dealings", "To be in a bad mood"], ans: "To suspect foul dealings" },
+
+    // --- CONTEXTUAL SECTION ---
+    { context: "Sobhraj could be easily arrested because the police were tipped off in a advance.", q: "Tipped off", opts: ["Toppled over", "Bribed", "Given advance information", "Threatened"], ans: "Given advance information" },
+    { context: "I met him after a long time, but he gave me the cold shoulder.", q: "The cold shoulder", opts: ["scolded me", "insulted me", "abused me", "ignored me"], ans: "ignored me" },
+    { context: "This matter has been hanging fire for the last many months.", q: "Hanging fire", opts: ["going on slowly", "hotly debated", "stuck up", "ignored"], ans: "going on slowly" },
+    { context: "In the armed forces, it is considered a great privilege to die in harness.", q: "Die in harness", opts: ["die on a horse back", "die in the battlefield", "die while still working", "die with honour"], ans: "die while still working" },
+    { context: "Although he has failed in the written examination, he is using backstairs influence to get the job.", q: "Backstairs influence", opts: ["Political influence", "Backing influence", "Deserving influence", "Secret and unfair influence"], ans: "Secret and unfair influence" },
+    { context: "Companies producing goods play to the gallery to boost their sales.", q: "Play to the gallery", opts: ["advertise", "cater to public taste", "attempt to appeal to popular taste", "depend upon public approval"], ans: "attempt to appeal to popular taste" },
+    { context: "I am afraid he is burning the candle at both ends and ruining his life.", q: "Burning the candle at both ends", opts: ["wasting his money", "becoming overgenerous", "overtaxing his energies", "losing his objectives"], ans: "overtaxing his energies" },
+    { context: "Despite the trust bestowed on the minister he turned out to be a snake in the grass during the revolution.", q: "A snake in the grass", opts: ["a secret enemy", "a treacherous person", "an unforeseen danger", "an unexpected misfortune"], ans: "a secret enemy" },
+    { context: "The thief took to his heels when he saw a policeman on the beat.", q: "Took to his heels", opts: ["had pain in heels", "ran away from the scene", "confronted the policeman", "could not decide"], ans: "ran away from the scene" },
+    { context: "The accounts of the murder made her flesh creep.", q: "Made her flesh creep", opts: ["Made her sad", "Surprised her", "Made her cry bitterly", "Fill her with horror"], ans: "Fill her with horror" }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `Question ${idx + 1} of ${data.length}`;
+    
+    const ctxEl = document.getElementById('context');
+    if (item.context) {
+        ctxEl.style.display = 'block';
+        ctxEl.innerText = item.context;
+    } else {
+        ctxEl.style.display = 'none';
+    }
+
+    document.getElementById('q-text').innerText = item.q;
+    
+    const optBox = document.getElementById('options');
+    optBox.innerHTML = '';
+    item.opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = o;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        optBox.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function validate() {
+    if (!selected) return alert("Please select an option.");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('correct');
+        if (b.innerText === selected && selected !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Idioms Practice Completed!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Grouping of Images</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --accent: #6366f1;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #1e293b;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--accent); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .instruction { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .q-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 25px; }
+
+        .q-image-box { 
+            background: #ffffff; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 30px;
+            display: inline-block;
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .q-image { max-width: 100%; height: auto; mix-blend-mode: multiply; }
+
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; 
+            margin-top: 20px;
+        }
+
+        .opt-btn { 
+            padding: 18px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            background: white; 
+            cursor: pointer; 
+            font-weight: 500; 
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #f5f7ff; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .explanation { 
+            margin-top: 25px; 
+            padding: 20px; 
+            background: #f5f7ff; 
+            border-radius: 10px; 
+            border-left: 5px solid var(--accent);
+            display: none;
+            text-align: left;
+        }
+
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .btn { 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            border: none; 
+            background: var(--primary); 
+            color: white; 
+            cursor: pointer; 
+            font-weight: 600;
+            flex: 1;
+        }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="figures.html" class="back-link">← Back to Figure Portal</a>
+
+    <div class="quiz-card">
+        <div class="instruction">Grouping Q<span id="q-num">1</span> of 15</div>
+        <div class="q-text">Group the given figures into three classes using each figure only once.</div>
+        
+        <div class="q-image-box">
+            <img id="q-img" src="" alt="Grouping of Images" class="q-image">
+        </div>
+
+        <div class="options-grid" id="options">
+            </div>
+
+        <div id="exp-box" class="explanation">
+            <strong>Grouping Strategy:</strong>
+            Look for patterns like:
+            <ul style="margin-top:10px">
+                <li>Number of lines or components (e.g., all figures made of 3 lines).</li>
+                <li>Presence of internal marks (e.g., all figures containing a small dot).</li>
+                <li>Shapes within shapes (e.g., a triangle inside a circle).</li>
+                <li>Symmetry or Identical Parts.</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prev" onclick="change(-1)">Previous</button>
+            <button class="btn" id="next" onclick="change(1)">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/15.png", opts: ["1,4 ; 2,3 ; 5,6", "1,5 ; 2,6 ; 4,3", "1,6 ; 2,3 ; 4,5", "1,2 ; 3,6 ; 4,5"], ans: 0 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/6.png", opts: ["1,3,9 ; 2,5,6 ; 4,7,8", "1,3,9 ; 2,7,8 ; 4,5,6", "1,2,4 ; 3,5,7 ; 6,8,9", "1,3,6 ; 2,4,8 ; 5,7,9"], ans: 0 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/1.png", opts: ["7,8,9 ; 2,4,3 ; 1,5,6", "1,3,2 ; 4,5,7 ; 6,8,9", "1,6,8 ; 3,4,7 ; 2,5,9", "1,6,9 ; 3,4,7 ; 2,5,8"], ans: 3 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/12.png", opts: ["1,2,3 ; 4,5,6 ; 7,8,9", "1,3,5 ; 2,4,6 ; 7,8,9", "1,5,9 ; 3,6,2 ; 4,7,8", "1,9,7 ; 2,8,5 ; 3,4,6"], ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/11.png", opts: ["1,4,7 ; 2,5,8 ; 3,6,9", "1,4,7 ; 2,5,9 ; 3,6,7", "1,3,4 ; 2,5,8 ; 6,7,9", "1,2,3 ; 4,5,6 ; 7,8,9"], ans: 0 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/4.png", opts: ["1,5,7 ; 2,4,6 ; 3,9,8", "1,5,7 ; 2,4,8 ; 3,6,9", "1,4,7 ; 2,5,8 ; 3,6,9", "1,7,9 ; 3,5,8 ; 2,4,6"], ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/16.png", opts: ["1,2,6 ; 3,4,7 ; 5", "1,3 ; 2,6 ; 4,5,7", "1,2,6,7 ; 3 ; 4,5", "1,3 ; 2,4,5 ; 6,7"], ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/22.png", opts: ["1,2,5 ; 3,7,8 ; 4,6,9", "1,7,2 ; 3,9,6 ; 4,5,8", "2,3,8 ; 4,6,9 ; 1,5,7", "5,6,9 ; 3,4,1 ; 2,7,8"], ans: 0 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/21.png", opts: ["2,4,7 ; 1,8,9 ; 3,5,6", "2,6,9 ; 1,5,7 ; 3,4,8", "2,6,7 ; 1,5,8 ; 3,4,9", "2,8,7 ; 1,5,9 ; 3,4,6"], ans: 2 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/3.png", opts: ["1,3,5 ; 2,6,9 ; 4,7,8", "2,3,4 ; 5,6,8 ; 9,1,7", "1,3,5 ; 2,6,8 ; 4,7,9", "3,2,4 ; 6,5,8 ; 7,9,1"], ans: 2 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/7.png", opts: ["3,4,9 ; 5,7,8 ; 1,2,6", "1,5,6 ; 2,4,8 ; 3,7,9", "4,6,8 ; 3,5,7 ; 1,2,9", "1,2,7 ; 3,5,9 ; 4,6,8"], ans: 3 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/14.png", opts: ["1,5,8 ; 3,4,7 ; 2,6,9", "1,3,6 ; 4,5,9 ; 2,7,8", "1,3,6 ; 2,5,7 ; 4,8,9", "6,7,8 ; 1,3,7 ; 2,4,9"], ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/17.png", opts: ["1,3,6 ; 4,5,8 ; 2,7,9", "2,3,9 ; 4,5,8 ; 1,6,7", "1,6,8 ; 3,7,9 ; 2,4,5", "3,8,9 ; 1,2,7 ; 4,5,6"], ans: 0 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/2.png", opts: ["1,2,4 ; 3,5,6 ; 7,8,9", "1,7,8 ; 3,5,6 ; 2,4,9", "1,3,4 ; 2,8,9 ; 5,6,7", "1,7,8 ; 2,3,6 ; 4,5,9"], ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/grouping-of-images/18.png", opts: ["1,3,7 ; 2,4,6 ; 5,8,9", "1,4,6 ; 2,5,7 ; 3,8,9", "1,4,8 ; 2,5,6 ; 3,7,9", "1,4,8 ; 2,7,9 ; 3,5,6"], ans: 2 }
+];
+
+let current = 0;
+
+function load() {
+    const q = questions[current];
+    document.getElementById('q-num').innerText = current + 1;
+    document.getElementById('q-img').src = q.src;
+    document.getElementById('exp-box').style.display = 'none';
+    
+    const cont = document.getElementById('options');
+    cont.innerHTML = '';
+    
+    q.opts.forEach((o, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.innerText = o;
+        b.onclick = () => check(i, b);
+        cont.appendChild(b);
+    });
+    
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next').disabled = current === questions.length - 1;
+}
+
+function check(choice, btn) {
+    const correct = questions[current].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct) b.classList.add('correct');
+        else if (i === choice) b.classList.add('wrong');
+    });
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function change(n) {
+    current += n;
+    load();
+}
+
+load();
+</script>
+</body>
+</html>

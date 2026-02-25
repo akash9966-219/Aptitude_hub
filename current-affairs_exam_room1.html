@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 1</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 1</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Which state has the Balaghat district selected as the pilot district for the World’s Largest Grain Storage Plan?", options: ["Maharashtra", "Chhattisgarh", "Madhya Pradesh", "Uttar Pradesh"], ans: 2, logic: "Madhya Pradesh's Balaghat was chosen to pilot this cooperative sector storage initiative." },
+            { q: "Who is approved as the new MD and CEO of City Union Bank from May 1, 2026?", options: ["N Kamakodi", "R Vijay Anandh", "Vishwavir Ahuja", "Shyam Srinivasan"], ans: 1, logic: "R Vijay Anandh will succeed N Kamakodi following RBI approval." },
+            { q: "Who was appointed as Director in the Department of Defence under the Central Staffing Scheme?", options: ["Ritu Mahajan", "Sunita Verma", "M Anitha", "Poonam Gupta"], ans: 2, logic: "M Anitha (IRS) was approved for the role by the Appointments Committee of the Cabinet." },
+            { q: "Which bank launched CHAKRA to promote financing for sunrise sectors under Viksit Bharat 2047?", options: ["RBI", "SBI", "PNB", "Bank of Baroda"], ans: 3, logic: "Bank of Baroda launched CHAKRA as a Centre of Excellence for strategic financing." },
+            { q: "Which company announced the 15 billion ‘America-India Connect’ subsea cable initiative?", options: ["Google", "Microsoft", "Amazon", "Meta"], ans: 0, logic: "Google announced this 15 billion project to boost AI connectivity between India and the US." },
+            { q: "Where did Raksha Mantri Rajnath Singh inaugurate the new Missile Integration Facility?", options: ["DRDO", "BEL", "HAL", "ISRO"], ans: 1, logic: "The facility was inaugurated at Bharat Electronics Limited (BEL)." },
+            { q: "Which company announced a 10 trillion investment for India’s sovereign AI compute infrastructure?", options: ["Tata Group", "Adani Group", "Reliance", "Infosys"], ans: 2, logic: "Reliance (Jio) committed 10 trillion over seven years for AI infrastructure." },
+            { q: "What were India’s record-high total forex reserves for the week ended February 13?", options: ["573.603 Billion", "128.466 Billion", "700.000 Billion", "725.727 Billion"], ans: 3, logic: "Reserves hit a peak of 725.727 billion in February 2026." },
+            { q: "What was India’s WPI inflation rate in January 2026?", options: ["1.81%", "2.75%", "0.83%", "2.51%"], ans: 0, logic: "WPI inflation hit a 10-month high of 1.81%." },
+            { q: "On which date is World Pulses Day observed annually?", options: ["February 10", "March 15", "January 12", "April 7"], ans: 0, logic: "February 10 is the global day for pulses established by the UN." },
+            { q: "On which date is National Voters Day observed in India?", options: ["January 25", "January 24", "January 26", "January 23"], ans: 0, logic: "January 25 marks the foundation day of the Election Commission of India." },
+            { q: "On which date is International Customs Day observed globally?", options: ["January 24", "January 25", "January 26", "January 27"], ans: 2, logic: "Observed globally on January 26." },
+            { q: "On which date is World Cancer Day observed globally?", options: ["January 30", "March 8", "February 4", "April 7"], ans: 2, logic: "February 4 is the international day for cancer awareness." },
+            { q: "Which country agreed with India on a joint work plan for security and cybersecurity policy?", options: ["Australia", "Canada", "Germany", "Japan"], ans: 2, logic: "Germany and India established this joint security roadmap." },
+            { q: "Which country benefits from the IFC’s 166 million programme for inclusive growth?", options: ["India", "Bangladesh", "Sri Lanka", "Nepal"], ans: 1, logic: "Bangladesh received this 166 million IFC support for SMEs." },
+            { q: "Who won the 2026 FIDE Freestyle Chess World Championship?", options: ["Fabiano Caruana", "Levon Aronian", "Magnus Carlsen", "Nodirbek Abdusattorov"], ans: 2, logic: "Magnus Carlsen defeated Caruana to win the inaugural Freestyle title." },
+            { q: "Which state announced a new spaceport at Hope Island for private missions?", options: ["Tamil Nadu", "Kerala", "Odisha", "Andhra Pradesh"], ans: 3, logic: "Andhra Pradesh announced the Hope Island spaceport project." },
+            { q: "Which state’s Pharmacy Council signed an MoU with the IPC for drug safety?", options: ["Maharashtra", "Kerala", "Goa", "Gujarat"], ans: 1, logic: "Kerala signed the MoU to enhance Pharmacovigilance." },
+            { q: "Which institution hosted the Indo-French Centre for AI in Health (IF-CAIH)?", options: ["AIIMS Delhi", "IIT Delhi", "Sorbonne University", "Paris Brain Institute"], ans: 0, logic: "AIIMS Delhi was the host institution for this joint center." },
+            { q: "Which institution hosted the D’Future – India Digital Conclave 2026?", options: ["IIM Udaipur", "IIM Ahmedabad", "IIT Hyderabad", "NIT Warangal"], ans: 0, logic: "IIM Udaipur organized the conclave in Hyderabad." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 6</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 6</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+     const questions = [
+    { q: "Which is the first Indian private company to sign an accord with the Government of Myanmar for offshore oil exploration?", options: ["Reliance Energy", "Essar Oil", "GAIL", "ONGC"], ans: 1, logic: "Essar Oil was the first Indian private player to enter Myanmar's oil and gas sector, signing for blocks in the Rakhine coast." },
+    { q: "John F. Kennedy was known for which of the following?", options: ["popular President of USA", "first Roman Catholic President", "writer of 'Profiles in Courage'", "All the above"], ans: 3, logic: "JFK was a Pulitzer-winning author and the 35th US President. He remains one of the most iconic figures in American history." },
+    { q: "The Salal Project is constructed on which river?", options: ["Chenab", "Jhelum", "Ravi", "Sutlej"], ans: 0, logic: "The Salal Power Station is a run-of-the-river hydropower project on the Chenab River in Jammu and Kashmir." },
+    { q: "Light from Alpha Centauri reaches the earth in approximately how much time?", options: ["4.2 seconds", "42 seconds", "4.2 years", "42 years"], ans: 2, logic: "Alpha Centauri is about 4.37 light-years away. Since a light-year is the distance light travels in one year, it takes roughly 4.2 to 4.3 years to reach us." },
+    { q: "CORN FLAKES - Who made them first?", options: ["Nabisco", "Kellogg", "Quaker", "Archers"], ans: 1, logic: "John Harvey Kellogg originally developed corn flakes in the late 19th century as a healthy food for patients." },
+    { q: "How many wickets did Yograj Singh take in his 1st ODI match?", options: ["1", "2", "4", "3"], ans: 1, logic: "Yograj Singh (father of Yuvraj Singh) took 2 wickets for 44 runs in his ODI debut against New Zealand in 1980." },
+    { q: "In electronics, 'FET' stands for which type of transistor?", options: ["Field", "Factor", "Flash", "Force"], ans: 0, logic: "FET stands for Field-Effect Transistor. It uses an electric field to control the flow of current in a semiconductor." },
+    { q: "A program that does not replicate but damages security or data is known as a?", options: ["Joke Program", "Worm", "Trojan", "Hoax"], ans: 2, logic: "Unlike worms, a Trojan Horse does not self-replicate. It disguises itself as legitimate software to gain unauthorized access to a system." },
+    { q: "The mass number of an atom is equal to which of the following?", options: ["number of protons", "number of protons and electrons", "number of nucleons", "number of neutrons"], ans: 2, logic: "Nucleons are the particles in the nucleus (protons + neutrons). The total count of these defines the mass number." },
+    { q: "Which languages are primarily spoken in the state of Sikkim?", options: ["Nepali, Hindi, Lepcha, Bhutani", "Marathi", "Bengali, Tripuri", "Manipuri"], ans: 0, logic: "Sikkim is multi-ethnic; while Nepali is the lingua franca, Lepcha, Bhutia (Sikkimese), and Hindi are widely spoken." },
+    { q: "Which of the following is the largest airport in the world by land area?", options: ["Palam Airport", "Indira Gandhi International Airport", "Cochin International Airport", "King Khalid International Airport"], ans: 3, logic: "Located in Riyadh, Saudi Arabia, King Khalid International Airport (KKIA) is the largest in terms of land area (approx. 780 sq km)." },
+    { q: "In cricket, the term 'cover point' refers to?", options: ["position on the offside, in front of wicket", "ball off the batsman's leg", "off-break by left-hander", "None of the above"], ans: 0, logic: "Cover point is a fielding position on the off-side, located between 'point' and 'cover'." },
+    { q: "The velocity of light was first measured by which scientist?", options: ["Einstein", "Newton", "Romer", "Galileo"], ans: 2, logic: "Ole Romer provided the first quantitative measurement of the speed of light in 1676 by observing the motion of Jupiter's moon, Io." },
+    { q: "The world's largest international organisation and successor to the League of Nations is?", options: ["UNESCO", "UNO", "UNICEF", "None of the above"], ans: 1, logic: "The United Nations Organization (UNO) was established in 1945 to maintain international peace and security." },
+    { q: "What is the capital of the Union Territory of Dadra and Nagar Haveli?", options: ["Daman", "Silvassa", "Dispur", "Shilling"], ans: 1, logic: "Silvassa is the capital of Dadra and Nagar Haveli (now part of the merged UT of Dadra and Nagar Haveli and Daman and Diu)." },
+    { q: "In which sports field is Bahadur Singh a famous figure?", options: ["Athletics", "Swimming", "Boxing", "Weight Lifting"], ans: 0, logic: "Bahadur Singh Chouhan is a renowned Indian shot putter and a gold medalist at the Asian Games." },
+    { q: "India won its first-ever Olympic Hockey gold medal at which location?", options: ["London", "Rome", "Berlin", "Amsterdam"], ans: 3, logic: "India won its first Olympic gold in field hockey at the 1928 Amsterdam Games, beginning a long period of dominance." },
+    { q: "Which of the following fields is A. Nageshwara Rao associated with?", options: ["Sports", "Literature", "Motion Pictures", "Politics"], ans: 2, logic: "Akkineni Nageswara Rao (ANR) was a legendary Indian actor and producer, primarily known for his work in Telugu cinema." },
+    { q: "Who is the author of the book 'The Future of Freedom'?", options: ["Richard Wolfee", "Peter Hudson", "Tamara Lipper", "Fareed Zakaria"], ans: 3, logic: "Fareed Zakaria wrote this influential book exploring the variables of 'illiberal democracy' around the world." },
+    { q: "The average salinity of sea water is approximately?", options: ["3%", "3.5%", "2.5%", "2%"], ans: 1, logic: "The salinity of ocean water is usually expressed as 35 parts per thousand, which is equivalent to 3.5%." }
+];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

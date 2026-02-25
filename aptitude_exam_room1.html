@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptitude Test 1 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #fbbf24; /* Amber for Test 1 */
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 20px; 
+            background: rgba(255,255,255,0.01);
+            border-radius: 15px;
+            border-left: 5px solid transparent; 
+            transition: all 0.3s ease;
+        }
+        
+        .q-text { font-size: 1.15rem; font-weight: 600; margin-bottom: 15px; line-height: 1.6; }
+        
+        .option-label {
+            display: flex; align-items: center; padding: 12px 20px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 10px; transition: 0.2s;
+        }
+        
+        /* Feedback Highlights - Triggered via JS */
+        .option-label.is-correct { 
+            background: rgba(34, 197, 94, 0.2) !important; 
+            border-color: var(--correct) !important; 
+            font-weight: bold;
+        }
+        .option-label.is-wrong { 
+            background: rgba(239, 68, 68, 0.2) !important; 
+            border-color: var(--wrong) !important; 
+        }
+
+        input[type="radio"] { margin-right: 15px; transform: scale(1.2); }
+
+        .btn-submit {
+            background: var(--accent); color: #000; border: none;
+            padding: 18px; font-size: 1.2rem; font-weight: 800;
+            border-radius: 12px; cursor: pointer; width: 100%;
+        }
+
+        .explanation {
+            margin-top: 15px; padding: 15px; background: rgba(34, 197, 94, 0.1);
+            border-radius: 8px; display: none; border-left: 4px solid var(--correct);
+            font-size: 0.95rem; color: #e2e8f0;
+        }
+
+        #result-screen { display: none; text-align: center; }
+        .score-val { font-size: 4rem; color: var(--accent); display: block; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container" id="test-content">
+        <h1 style="color: var(--accent)">Aptitude Test 1</h1>
+        <div id="questions-wrapper"></div>
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 1</button>
+    </div>
+
+    <div class="test-container" id="result-screen">
+        <h1>Assessment Result</h1>
+        <span class="score-val" id="final-score">0/20</span>
+        <button class="btn-submit" onclick="location.href='test1.html'">Back to Dashboard</button>
+    </div>
+
+    <script>
+        // Question Data Array
+        const questions = [
+            { q: "On dividing a number by 68, we get 269 as quotient and 0 as remainder. On dividing the same number by 67, what will be the remainder?", options: ["0", "1", "2", "3"], ans: 1, logic: "Number = 68 * 269. (67+1)*269. Remainder is 1 * 269 = 269. 269/67 leaves remainder 1." },
+            { q: "What least number must be subtracted from 13601, so that the remainder is divisible by 87?", options: ["23", "31", "29", "37"], ans: 2, logic: "13601 ÷ 87 leaves a remainder of 29." },
+            { q: "What will be remainder when (67^67 + 67) is divided by 68?", options: ["1", "63", "66", "67"], ans: 2, logic: "(-1)^67 + 67 = -1 + 67 = 66." },
+            { q: "A number when divided by 6 leaves remainder 3. When the square of the number is divided by 6, the remainder is:", options: ["0", "1", "2", "3"], ans: 3, logic: "Let n=9. 9^2=81. 81/6 leaves remainder 3." },
+            { q: "[(469 + 174)^2 - (469 - 174)^2] / (469 x 174) = ?", options: ["2", "4", "295", "643"], ans: 1, logic: "Formula: [(a+b)^2 - (a-b)^2]/ab = 4ab/ab = 4." },
+            { q: "A fires 5 shots to B's 3. A kills once in 3 shots, B kills once in 2. When B has missed 27 times, A has killed:", options: ["30 birds", "60 birds", "72 birds", "90 birds"], ans: 0, logic: "B missed 27 and hit 27 (since 1 in 2). B fired 54. A:B=5:3, so A fired 90. 1/3 of 90 = 30." },
+            { q: "25 buckets fill a tank. If bucket capacity is reduced to 2/5th, how many buckets are needed?", options: ["10", "35", "62.5", "80"], ans: 2, logic: "Inverse proportion: 25 / (2/5) = 62.5." },
+            { q: "Interchanged digit difference is 36. Ratio is 1:2. Find difference between sum and difference of digits:", options: ["4", "8", "16", "12"], ans: 1, logic: "9(x-y)=36 => x-y=4. Digits are 4 and 8. (12 - 4) = 8." },
+            { q: "60L mixture, milk:water is 2:1. To make it 1:2, water to be added:", options: ["20 litres", "30 litres", "40 litres", "60 litres"], ans: 3, logic: "Milk=40, Water=20. To make it 1:2, Water must be 80. Added = 60." },
+            { q: "A in 16 days, B in 12 days. With C, they finish in 4 days. C alone:", options: ["9 1/5 days", "9 3/5 days", "9 2/5 days", "10 days"], ans: 1, logic: "1/C = 1/4 - (1/16 + 1/12) = 5/48. Time = 48/5 = 9.6." },
+            { q: "At 14 km/hr vs 10 km/hr, a person walks 20 km more. Actual distance:", options: ["50 km", "56 km", "70 km", "80 km"], ans: 0, logic: "Speed diff 4km/h covers 20km. Time = 5hrs. 10 * 5 = 50km." },
+            { q: "Train 360m long at 45 km/hr passes bridge 140m long in:", options: ["40 sec", "42 sec", "45 sec", "48 sec"], ans: 0, logic: "Total Dist = 500m. Speed = 12.5 m/s. 500/12.5 = 40." },
+            { q: "Speed of boat in still water? (I: Up 48km in 6h, II: Down 48km in 4h)", options: ["(A)", "(B)", "(C)", "(D)", "(E)"], ans: 4, logic: "Both statements are necessary to find boat speed and stream speed." },
+            { q: "725 lent, then 362.50 more at double rate after 8 months. Total interest 33.50. Original rate?", options: ["3.6%", "4.5%", "5.0%", "6.0%"], ans: 2, logic: "Calculation results in R = 5%." },
+            { q: "12% p.a. SI, after 3 years interest is 5400. Principal?", options: ["2000", "10000", "15000", "20000"], ans: 2, logic: "P = (5400 * 100) / (12 * 3) = 15000." },
+            { q: "12500 amounts to 15500 in 4 years. Rate of interest?", options: ["3%", "4%", "5%", "6%"], ans: 3, logic: "Interest = 3000. R = (3000 * 100) / (12500 * 4) = 6%." },
+            { q: "If log10 7 = a, then log10(1/70) = ?", options: ["-(1+a)", "(1+a)^-1", "a/10", "1/10a"], ans: 0, logic: "log(1/70) = log(1) - log(70) = 0 - (log 7 + log 10) = -(a + 1)." },
+            { q: "Area of playground is 1600 m². Perimeter? (I: Perfect square, II: Fencing cost 3200 at 20/m)", options: ["(A)", "(B)", "(C)", "(D)"], ans: 2, logic: "Either statement alone is sufficient." },
+            { q: "Height of circular cone? (I: Area = Rectangle area (L=33), II: Base area 154)", options: ["(A)", "(B)", "(C)", "(D)"], ans: 3, logic: "Neither statement provides enough info to find the vertical height." },
+            { q: "On what dates of April, 2001 did Wednesday fall?", options: ["1, 8, 15...", "2, 9, 16...", "3, 10, 17...", "4, 11, 18, 25"], ans: 3, logic: "April 1, 2001 was Sunday. Thus, Wednesday was the 4th." }
+        ];
+
+        // Render Questions Dynamically
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `q-block-${index}`;
+            block.innerHTML = `
+                <div class="q-text">${index + 1}. ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="label-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="exp-${index}">
+                    <strong>Correct Answer:</strong> ${item.options[item.ans]}<br>
+                    <strong>Logic:</strong> ${item.logic}
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        // Timer Logic
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+
+        // Process and Reveal Results
+        function processResults() {
+            clearInterval(timerInt);
+            let score = 0;
+            
+            questions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const correctLabel = document.getElementById(`label-${index}-${item.ans}`);
+                const explanationBox = document.getElementById(`exp-${index}`);
+                const questionBlock = document.getElementById(`q-block-${index}`);
+                
+                // 1. Reveal Explanation
+                explanationBox.style.display = 'block';
+
+                // 2. Always Highlight Correct Answer in Green
+                correctLabel.classList.add('is-correct');
+
+                // 3. Check User Selection
+                if (selected) {
+                    const userVal = parseInt(selected.value);
+                    if (userVal === item.ans) {
+                        score++;
+                        questionBlock.style.borderLeft = "5px solid var(--correct)";
+                        questionBlock.style.background = "rgba(34, 197, 94, 0.05)";
+                    } else {
+                        // Highlight the wrong choice in Red
+                        const wrongLabel = document.getElementById(`label-${index}-${userVal}`);
+                        wrongLabel.classList.add('is-wrong');
+                        questionBlock.style.borderLeft = "5px solid var(--wrong)";
+                        questionBlock.style.background = "rgba(239, 68, 68, 0.05)";
+                    }
+                } else {
+                    // No selection made
+                    questionBlock.style.borderLeft = "5px solid var(--wrong)";
+                }
+                
+                // 4. Disable all inputs
+                const inputs = document.getElementsByName(`q${index}`);
+                inputs.forEach(input => input.disabled = true);
+            });
+
+            // Update UI
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>

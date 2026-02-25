@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 11</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 11</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+   const questions = [
+    { q: "The President convenes and prorogues all sessions of Parliament in consultation with?", options: ["the speaker", "the prime minister", "the PM and the leader of Opposition", "None of the above"], ans: 1, logic: "According to constitutional convention, the President exercises these powers on the aid and advice of the Council of Ministers headed by the Prime Minister." },
+    { q: "Groundwater that is not confined by impermeable layers is known as?", options: ["unconfined groundwater", "confined groundwater", "aquifer", "artesian"], ans: 0, logic: "Unconfined groundwater occurs when the upper surface (water table) is open to the atmosphere through permeable material." },
+    { q: "Which popular treat was invented by 11-year-old Frank Epperson in 1905?", options: ["Popsicle", "Banana split", "Cotton candy", "Cracker Jacks"], ans: 0, logic: "Frank Epperson accidentally left a glass of soda water with a stirring stick outside overnight in freezing temperatures, creating the first 'Epsicle' (later Popsicle)." },
+    { q: "What is the middle name of the former Delhi batsman and commentator Aakash Chopra?", options: ["Mohanlal", "Shyamlal", "Amarnath", "Chotaram"], ans: 1, logic: "The full name of the former Indian opening batsman and renowned analyst is Aakash Shyamlal Chopra." },
+    { q: "What is the computer term for putting information in numerical or alphabetical order?", options: ["Crop", "Report", "Record", "Sort"], ans: 3, logic: "Sorting is the process of arranging data into a meaningful order (ascending or descending) to make it easier to search and analyze." },
+    { q: "Which search tool is best for finding websites handpicked and recommended by humans?", options: ["Subject directories", "Search engines", "Meta-search engines", "Discussion groups"], ans: 0, logic: "Unlike automated search engines, subject directories are created and maintained by human editors who categorize and review links." },
+    { q: "What are organic substances that control growth and development in small amounts called?", options: ["vitamins", "hormones", "enzymes", "None of the above"], ans: 1, logic: "Hormones act as chemical messengers in the body, coordinating complex processes like growth, metabolism, and fertility." },
+    { q: "Pollination is best defined as which of the following?", options: ["transfer of pollen from anther to stigma", "germination of pollen grains", "growth of pollen tube", "visiting flowers by insects"], ans: 0, logic: "Pollination is the physical act of transferring pollen from the male part of a flower (anther) to the female part (stigma)." },
+    { q: "What is the main purpose of ASEAN?", options: ["accelerate economic progress and stability", "maintain higher standards of living", "provide collective defence", "None of the above"], ans: 0, logic: "ASEAN was established in 1967 primarily to promote economic growth, social progress, and cultural development in Southeast Asia." },
+    { q: "Which countries were members of the South-East Asia Treaty Organisation (SEATO)?", options: ["Australia, France, New Zealand", "Philippines, Thailand", "UK and USA", "All of the above"], ans: 3, logic: "SEATO was an international organization for collective defense created by the Southeast Asia Collective Defense Treaty signed in 1954." },
+    { q: "The National Emblem was officially adopted by the Government of India on?", options: ["January 26, 1950", "August 15, 1947", "August 2, 1950", "July 12, 1947"], ans: 0, logic: "The State Emblem of India, adapted from the Lion Capital of Ashoka, was adopted on the same day India became a Republic." },
+    { q: "Which pilotless target aircraft was fabricated at the ADE in Bangalore?", options: ["Lakshya", "Cheetah", "Nishant", "Arjun"], ans: 0, logic: "Lakshya is a reusable aerial target system used for training pilots and testing surface-to-air and air-to-air missiles." },
+    { q: "In which year did Afghanistan end its monarchy and become a republic?", options: ["1949", "1973", "1965", "2000"], ans: 1, logic: "In 1973, Mohammed Daoud Khan overthrew the king, Mohammed Zahir Shah, while the king was in Italy, ending the Afghan monarchy." },
+    { q: "When did India host the Commonwealth Heads of Government Meeting (CHOGM)?", options: ["1961 at Bangalore", "1976 at Pune", "1983 at New Delhi", "None of the above"], ans: 2, logic: "India hosted the 7th CHOGM in New Delhi in 1983, which was chaired by then Prime Minister Indira Gandhi." },
+    { q: "Which of the following cities in Tamil Nadu has an airport?", options: ["Chennai", "Tiruchirapalli", "Madurai", "All of the above"], ans: 3, logic: "Tamil Nadu has a well-developed aviation network with major airports in Chennai, Coimbatore, Madurai, and Tiruchirapalli." },
+    { q: "The lowermost and oldest epoch of the Tertiary Period is known as the?", options: ["Pliocene", "Palaeozoic", "Holocene", "Palaeocene"], ans: 3, logic: "The Paleocene Epoch began approximately 66 million years ago, immediately following the extinction of the dinosaurs." },
+    { q: "The 0º meridian passing through London is called the?", options: ["equator", "Tropic of Cancer", "Prime Meridian", "Tropic of Capricorn"], ans: 2, logic: "The Prime Meridian passes through the Royal Observatory in Greenwich, London, and serves as the reference for longitudes." },
+    { q: "The movement of heavy particles by rolling or sliding along an eroded surface is called?", options: ["saltation", "suspension", "traction", "solution"], ans: 2, logic: "In geomorphology, traction refers to the transport of the largest/heaviest bedload particles along the bottom of a stream or desert." },
+    { q: "Who is the author of the book 'My Frozen Turbulence in Kashmir'?", options: ["Anees Jung", "Jagmohan", "M.J. Akbar", "Nissim Ezekiel"], ans: 1, logic: "Jagmohan Malhotra, the former Governor of Jammu and Kashmir, wrote this book detailing his experiences and the political situation in the state." },
+    { q: "Which of the following countries is NOT a member of the G-8 (now G-7)?", options: ["Germany", "France", "Italy", "Spain"], ans: 3, logic: "Spain is not a member of the G-7 group of advanced economies, though it often attends as a guest." }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

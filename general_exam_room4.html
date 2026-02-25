@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 4</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 4</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+     const questions = [
+    { q: "The iron and steel industries of which country are almost fully dependent on imported raw materials?", options: ["Britain", "Japan", "Poland", "Germany"], ans: 1, logic: "Japan lacks significant domestic deposits of iron ore and coking coal, requiring it to import nearly all raw materials for its massive steel production." },
+    { q: "The iron ore mined at Bailadila (Chhattisgarh) is mostly of which type?", options: ["haematite", "siderite", "limonite", "magnetite"], ans: 0, logic: "Bailadila is world-famous for its high-grade Haematite ore, which is essential for steel making." },
+    { q: "India's first indigenously built submarine was?", options: ["INS Savitri", "INS Shalki", "INS Delhi", "INS Vibhuti"], ans: 1, logic: "INS Shalki (S46) was the first submarine built in India, commissioned in 1992 at Mazagon Dock Limited." },
+    { q: "Rana Pratap Sagar in Rajasthan is famous for which of the following?", options: ["hydropower generation", "aluminum industry", "brassware", "sports goods"], ans: 0, logic: "Located on the Chambal River, the Rana Pratap Sagar Dam is a major critical infrastructure for hydroelectric power generation." },
+    { q: "The 2002 Commonwealth Games were held in which country?", options: ["Canada", "UK", "Australia", "Malaysia"], ans: 1, logic: "The 17th Commonwealth Games took place in Manchester, United Kingdom." },
+    { q: "Which of the following crops needs maximum water per hectare?", options: ["Barley", "Maize", "Sugarcane", "Wheat"], ans: 2, logic: "Sugarcane is a long-duration crop (10-12 months) that requires intensive irrigation, consuming significantly more water than cereal crops." },
+    { q: "Sir C.V. Raman won the Nobel Prize for his work on which radiation phenomenon?", options: ["Scattering", "Diffraction", "Interference", "Polarization"], ans: 0, logic: "The 'Raman Effect' explains the scattering of light by molecules, which leads to a change in wavelength." },
+    { q: "If a television picture is distorted up and down like a fun-house mirror, which circuit requires repair?", options: ["Vertical", "Tuning", "Horizontal", "Filament"], ans: 0, logic: "The vertical deflection circuit controls the height and linear expansion of the picture on a CRT screen." },
+    { q: "Who created the 'Pretty Good Privacy' (PGP) encryption data communication?", options: ["Phil Zimmermann", "Tim Berners-Lee", "Marc Andreessen", "Ken Thompson"], ans: 0, logic: "Phil Zimmermann released PGP in 1991, which became the most widely used email encryption software in the world." },
+    { q: "Mumps is a disease caused by which of the following?", options: ["fungus", "bacterium", "virus", "None of these"], ans: 2, logic: "Mumps is a contagious viral infection that primarily affects the salivary (parotid) glands." },
+    { q: "The placenta is a biological structure formed by?", options: ["union of foetal and uterine tissue", "foetus only", "fusion of germ layers", "None of these"], ans: 0, logic: "The placenta is a unique organ that develops during pregnancy, formed by both embryonic and maternal (uterine) tissues to facilitate nutrient exchange." },
+    { q: "The helicopter fleet of the Indian Air Force consists of which models?", options: ["Chetak", "Cheetah", "MI-8s, MI-17s, MI-26", "All of the above"], ans: 3, logic: "The IAF operates a diverse fleet including light utility helicopters (Chetak/Cheetah) and heavy-lift/utility Mi-series helicopters." },
+    { q: "Which of the following are the current members of SAARC?", options: ["Bhutan, Bangladesh, India and Pakistan", "Bhutan, Bangladesh, Maldives, Nepal, India, Pakistan, Afghanistan, Sri Lanka", "Afghanistan, Pakistan, Thailand, Indonesia, Nepal and Sri Lanka", "None of the above"], ans: 1, logic: "SAARC currently consists of 8 member nations in South Asia; Afghanistan was the last to join in 2007." },
+    { q: "The ratio of the weight of water vapour to the total weight of air (including vapour) is called?", options: ["specific humidity", "mixing ratio", "relative humidity", "absolute humidity"], ans: 0, logic: "Specific humidity measures the mass of water vapour per unit mass of moist air." },
+    { q: "A 'sidereal month' may be defined as?", options: ["period for one orbit around Earth", "period to return to the same position relative to stars", "period of rotation of moon", "None of the above"], ans: 1, logic: "A sidereal month is the time it takes the Moon to return to the same position against the background of fixed stars (approx. 27.3 days)." },
+    { q: "The highest award for services to the development of Indian cinema is named after?", options: ["Raj Kapoor", "Dada Saheb Phalke", "Meena Kumari", "Amitabh Bachchan"], ans: 1, logic: "The Dadasaheb Phalke Award is India's highest award in cinema, presented annually at the National Film Awards." },
+    { q: "In India, the first television programme was broadcasted in which year?", options: ["1959", "1965", "1976", "1957"], ans: 0, logic: "Television began in India as an experimental telecast in Delhi on September 15, 1959, with help from UNESCO." },
+    { q: "The United Nations declared 1993 as the International Year of the?", options: ["disabled", "forests", "girl child", "indigenous people"], ans: 3, logic: "The UN designated 1993 to draw attention to the rights and cultures of indigenous populations worldwide." },
+    { q: "The UN Conference on Trade and Development (UNCTAD) is headquartered in?", options: ["Geneva", "Rome", "Paris", "Vienna"], ans: 0, logic: "UNCTAD is a permanent intergovernmental body headquartered in Geneva, Switzerland." },
+    { q: "Who suggested that most of the mass of the atom is located in the nucleus?", options: ["Thompson", "Bohr", "Rutherford", "Einstein"], ans: 2, logic: "Ernest Rutherford's gold foil experiment led to the discovery of the atomic nucleus, proving that atoms are mostly empty space with a dense core." }
+];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

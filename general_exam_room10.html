@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 10</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 10</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+   const questions = [
+    { q: "The Nagaland State of India cannot be termed as a 'state' in the strict sense of political theory because it lacks?", options: ["sovereignty", "bicameral legislature", "a high court exclusively of its own", "None of the above"], ans: 0, logic: "In political science, a 'State' must possess four elements: population, territory, government, and sovereignty. Indian states lack absolute sovereignty as they are part of a federal union." },
+    { q: "The national flag was presented to the nation on 14th August 1947 on behalf of which group?", options: ["the minorities of India", "the National Integration Council", "the women of India", "the people of India"], ans: 2, logic: "Hansa Mehta presented the first national flag of free India to the Constituent Assembly on behalf of the women of India." },
+    { q: "Deficit financing leads to inflation, but it can be checked if?", options: ["government expenditure increases aggregate supply in ratio to demand", "only aggregate demand is increased", "expenditure is used for debt payment only", "All of the above"], ans: 0, logic: "Inflation occurs when too much money chases too few goods; if deficit spending successfully boosts production (supply), it offsets the inflationary pressure." },
+    { q: "Since 1983, the RBI's responsibility regarding regional rural banks was transferred to?", options: ["ARDC", "SBI", "NABARD", "PACs"], ans: 2, logic: "NABARD (National Bank for Agriculture and Rural Development) took over the regulatory and supervisory functions for RRBs to better focus on rural credit." },
+    { q: "The largest fresh water lake in Africa by surface area is?", options: ["Lake Victoria", "Lake Tanganyika", "Lake Malawi", "Lake Rudolf"], ans: 0, logic: "Lake Victoria is the world's largest tropical lake and the second-largest freshwater lake by surface area (approx. 59,947 sq km)." },
+    { q: "The missile 'Prithvi' aims to?", options: ["test a heat-shield", "hit target without Air Force help", "defend installations like oil-fields", "None of the above"], ans: 1, logic: "Prithvi is a surface-to-surface short-range ballistic missile. Its purpose is to provide the Army with tactical strike capability independent of air support." },
+    { q: "What is the predominant type of Indian agriculture?", options: ["Commercial agriculture", "Extensive agriculture", "plantation agriculture", "subsistence agriculture"], ans: 3, logic: "Most Indian farmers practice subsistence agriculture, where the main goal is to grow enough food to feed their own families with little surplus for trade." },
+    { q: "Lux is the SI unit of which of the following?", options: ["intensity of illumination", "luminous efficiency", "luminous flux", "luminous intensity"], ans: 0, logic: "Lux is used to measure illuminance, which is the total luminous flux incident on a surface per unit area." },
+    { q: "India reached the final of the Davis Cup for the first time in?", options: ["1964", "1966", "1970", "1974"], ans: 1, logic: "India reached the Challenge Round in 1966 after defeating Brazil in the inter-zonal semi-finals, eventually losing to Australia." },
+    { q: "The number of electrons present in H+ (hydrogen ion) is?", options: ["zero", "one", "two", "three"], ans: 0, logic: "A neutral Hydrogen atom has 1 electron. An H+ ion is formed by losing that single electron, leaving only a proton." },
+    { q: "Primary phloem in plants develops from which tissue?", options: ["lateral meristem", "protoderm", "extrastelar cambium", "provascular tissue"], ans: 3, logic: "Primary vascular tissues, including primary phloem and primary xylem, differentiate from the procambium (provascular tissue)." },
+    { q: "The highest rank in the Indian Army is that of?", options: ["Brigadier", "General", "Lieutenant General", "Major General"], ans: 1, logic: "The Chief of the Army Staff (COAS) holds the rank of General. (Note: Field Marshal is an honorary rank above General but is not a regular active rank)." },
+    { q: "The Kvinna Till Kvinna foundation (Sweden) won the Right Livelihood Award in 2002 for?", options: ["healing wounds of ethnic hatred", "exposing torture", "youth ethnic reconciliation", "None of the above"], ans: 0, logic: "The foundation was recognized for supporting women in war-torn regions to become agents of peace and reconciliation." },
+    { q: "In which year was William Shakespeare born?", options: ["1564 AD", "1618 AD", "1642 AD", "1776 AD"], ans: 0, logic: "William Shakespeare was born in April 1564 in Stratford-upon-Avon, England." },
+    { q: "The study of human geography includes the study of?", options: ["human society and culture", "behaviour and urban systems", "economics and politics", "All of the above"], ans: 3, logic: "Human geography is a broad branch of geography that covers how human activity affects or is influenced by the earth's surface." },
+    { q: "The time at a specific place on Earth is determined by?", options: ["parallels of longitude", "parallels of latitude", "distance from equator", "distance from prime meridian"], ans: 0, logic: "Longitude determines time zones. As the Earth rotates 360° in 24 hours, each 15° of longitude represents a one-hour time difference." },
+    { q: "India first won the Olympic Hockey Gold at which location?", options: ["London", "Amsterdam", "Berlin", "Rome"], ans: 1, logic: "The Indian men's hockey team won its first Olympic gold at the 1928 Amsterdam Games." },
+    { q: "Who is the author of the book 'India of our Dreams'?", options: ["Dr. S. Radhakrishnan", "Dr. C. Subramanian", "M.V. Kamath", "Dr. Rajendra Prasad"], ans: 2, logic: "M.V. Kamath, a celebrated Indian journalist and former chairman of Prasar Bharati, authored this book." },
+    { q: "Atoms are composed of which particles?", options: ["electrons and protons", "electrons only", "protons only", "electrons and nuclei"], ans: 3, logic: "An atom consists of a central nucleus (containing protons and neutrons) and electrons that move around the nucleus." },
+    { q: "Which are the important raw materials required in the cement industry?", options: ["Gypsum and Clay", "Clay", "Limestone and Clay", "Limestone"], ans: 2, logic: "Limestone provides calcium carbonate, and clay provides silica and alumina, which are the primary ingredients for cement clinker." }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

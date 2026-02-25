@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Java Progrraming Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Java Programming Test 5</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 5</button>
+        <a href="test6.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+   const questions = [
+  {
+    q: `interface Base {
+    boolean m1 ();
+    byte m2(short s);
+}
+Which two code fragments will compile?
+1. interface Base2 implements Base {}
+2. abstract class Class2 extends Base { public boolean m1(){ return true; } }
+3. abstract class Class2 implements Base {}
+4. abstract class Class2 implements Base { public boolean m1(){ return (7 > 4); } }
+5. abstract class Class2 implements Base { protected boolean m1(){ return (5 > 7); } }`,
+    options: ["1 and 2", "2 and 3", "3 and 4", "1 and 5"],
+    ans: 2,
+    logic: `Explanation: Option 3 is valid because an abstract class doesn't need to implement interface methods. Option 4 is valid as it provides a public implementation of m1. Option 1 is wrong (interfaces 'extend' interfaces), 2 is wrong (classes 'implement' interfaces), and 5 is wrong (cannot reduce visibility of overridden methods).`
+  },
+  {
+    q: `You want subclasses in any package to have access to members of a superclass. Which is the most restrictive access that accomplishes this objective?`,
+    options: ["public", "private", "protected", "transient"],
+    ans: 2,
+    logic: `Explanation: 'protected' allows access to subclasses in any package. While 'public' also allows this, 'protected' is more restrictive.`
+  },
+  {
+    q: `class A {  
+    protected int method1(int a, int b) { return 0; } 
+}
+Which is valid in a class that extends class A?`,
+    options: [
+      "public int method1(int a, int b) {return 0; }",
+      "private int method1(int a, int b) { return 0; }",
+      "public short method1(int a, int b) { return 0; }",
+      "static protected int method1(int a, int b) { return 0; }"
+    ],
+    ans: 0,
+    logic: `Explanation: When overriding, you can maintain or increase visibility (protected to public), but you cannot decrease it (private) or change the return type to a non-covariant primitive (short).`
+  },
+  {
+    q: `What will be the output of the program?
+class Test {
+    static int s;
+    public static void main(String [] args) {
+        Test p = new Test();
+        p.start();
+        System.out.println(s);
+    }
+    void start() {
+        int x = 7;
+        twice(x);
+        System.out.print(x + " ");
+    }
+    void twice(int x) {
+        x = x*2;
+        s = x;
+    }
+}`,
+    options: ["7 7", "7 14", "14 0", "14 14"],
+    ans: 1,
+    logic: `Explanation: Java is pass-by-value. The 'x' in start() remains 7. The 'twice' method modifies its local 'x' to 14 and assigns that value to the static variable 's'.`
+  },
+  {
+    q: `What will be the output of the program?
+class Test {
+    public static void main(String [] args) {
+        Test p = new Test();
+        p.start();
+    }
+    void start() {
+        boolean b1 = false;
+        boolean b2 = fix(b1);
+        System.out.println(b1 + " " + b2);
+    }
+    boolean fix(boolean b1) {
+        b1 = true;
+        return b1;
+    }
+}`,
+    options: ["true true", "false true", "true false", "false false"],
+    ans: 1,
+    logic: `Explanation: The boolean 'b1' is passed by value, so the original 'b1' in start() is unaffected. 'b2' receives the return value 'true'.`
+  },
+  {
+    q: `What will be the output of the program?
+class PassS {
+    public static void main(String [] args) {
+        PassS p = new PassS();
+        p.start();
+    }
+    void start() {
+        String s1 = "slip";
+        String s2 = fix(s1);
+        System.out.println(s1 + " " + s2);
+    }
+    String fix(String s1) {
+        s1 = s1 + "stream";
+        System.out.print(s1 + " ");
+        return "stream";
+    }
+}`,
+    options: ["slip stream", "slipstream stream", "stream slip stream", "slipstream slip stream"],
+    ans: 3,
+    logic: `Explanation: fix() prints 'slipstream '. Then start() prints the original 'slip' (Strings are immutable) and the returned value 'stream'.`
+  },
+  {
+    q: `import java.awt.*;
+class Ticker extends Component {
+    public static void main (String [] args) {
+        Ticker t = new Ticker();
+        /* Missing Statements ? */
+    }
+}
+Which two statements, inserted independently, could legally be inserted?
+1. boolean test = (Component instanceof t);
+2. boolean test = (t instanceof Ticker);
+3. boolean test = t.instanceof(Ticker);
+4. boolean test = (t instanceof Component);`,
+    options: ["1 and 4", "2 and 3", "1 and 3", "2 and 4"],
+    ans: 3,
+    logic: `Explanation: Statement 2 is true (t is a Ticker). Statement 4 is true because Ticker extends Component. Statement 1 is wrong syntax (Type instanceof object), and 3 is not a method call.`
+  },
+  {
+    q: `public void test(int x) { 
+    int odd = 1; 
+    if(odd) /* Line 4 */ {
+        System.out.println("odd"); 
+    } else {
+        System.out.println("even"); 
+    } 
+}
+Which statement is true?`,
+    options: ["Compilation fails.", "'odd' will always be output.", "'even' will always be output.", "Result depends on x."],
+    ans: 0,
+    logic: `Explanation: In Java, the condition in an 'if' statement must be a boolean. Unlike C++, an integer (1) cannot be converted to a boolean.`
+  },
+  {
+    q: `What will be the output of the program?
+public class Test {  
+    public static void main(String args[]) { 
+        int i = 1, j = 0; 
+        switch(i) { 
+            case 2: j += 6; 
+            case 4: j += 1; 
+            default: j += 2; 
+            case 0: j += 4; 
+        } 
+        System.out.println("j = " + j); 
+    } 
+}`,
+    options: ["j = 0", "j = 2", "j = 4", "j = 6"],
+    ans: 3,
+    logic: `Explanation: 'i' is 1, which matches the 'default' case. Because there are no 'break' statements, execution falls through from 'default' (j=2) to 'case 0' (j=2+4=6).`
+  },
+  {
+    q: `What will be the output of the program?
+int i = 1, j = 10; 
+do {
+    if(i > j) break; 
+    j--; 
+} while (++i < 5); 
+System.out.println("i = " + i + " and j = " + j);`,
+    options: ["i = 6 and j = 5", "i = 5 and j = 5", "i = 6 and j = 4", "i = 5 and j = 6"],
+    ans: 3,
+    logic: `Explanation: The loop runs for i=1, 2, 3, 4. During these 4 iterations, j is decremented 4 times (10 to 6). The condition fails when i becomes 5.`
+  },
+  {
+    q: `import java.io.*;
+public class MyProgram {
+    public static void main(String args[]) {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream("test.txt");
+            out.write(122);
+        } catch(IOException io) {
+            System.out.println("IO Error.");
+        } finally {
+            out.close();
+        }
+    }
+}
+Which of these is true?`,
+    options: ["Successful compilation.", "Error at line 4.", "Error at line 6.", "Error at line 18."],
+    ans: 3,
+    logic: `Explanation: The 'out.close()' call in the 'finally' block can throw an IOException, which must be caught or declared to be thrown. (Line 18 is the close call).`
+  },
+  {
+    q: `Which statement is true?`,
+    options: [
+      "catch(X x) can catch subclasses of X.",
+      "The Error class is a RuntimeException.",
+      "Errors must be enclosed in try blocks.",
+      "All Exceptions must be enclosed in try blocks."
+    ],
+    ans: 0,
+    logic: `Explanation: A catch block for class X will also catch any objects that are instances of subclasses of X.`
+  },
+  {
+    q: `Which is a valid declaration of a float?`,
+    options: ["float f = 1F;", "float f = 1.0;", "float f = '1';", "float f = 1.0d;"],
+    ans: 0,
+    logic: `Explanation: '1.0' is a double by default. To declare a float, you must use the 'f' or 'F' suffix.`
+  },
+  {
+    q: `What will be the output of the program?
+import java.util.*; 
+class H {
+    public static void main (String[] args) { 
+        Object x = new Vector().elements(); 
+        System.out.print((x instanceof Enumeration)+","); 
+        System.out.print((x instanceof Iterator)+","); 
+        System.out.print(x instanceof ListIterator); 
+    } 
+}`,
+    options: ["false,false,false", "false,false,true", "false,true,false", "true,false,false"],
+    ans: 3,
+    logic: `Explanation: Vector.elements() returns an 'Enumeration'. It does not implement 'Iterator' or 'ListIterator'.`
+  },
+  {
+    q: `What will be the output of the program?
+TreeSet map = new TreeSet();
+map.add("one");
+map.add("two");
+map.add("three");
+map.add("four");
+map.add("one");
+Iterator it = map.iterator();
+while (it.hasNext() ) {
+    System.out.print( it.next() + " " );
+}`,
+    options: ["one two three four", "four three two one", "four one three two", "one two three four one"],
+    ans: 2,
+    logic: `Explanation: TreeSet stores unique elements (so "one" appears once) and sorts them in natural (alphabetical) order: four, one, three, two.`
+  },
+  {
+    q: `class Foo { class Bar{ } }
+class Test {
+    public static void main (String [] args) {
+        Foo f = new Foo();
+        /* Line 10: Missing statement ? */
+    }
+}
+Which statement creates an instance of Bar?`,
+    options: ["Foo.Bar b = new Foo.Bar();", "Foo.Bar b = f.new Bar();", "Bar b = new f.Bar();", "Bar b = f.new Bar();"],
+    ans: 1,
+    logic: `Explanation: To instantiate a non-static inner class, you must use an instance of the outer class: outerInstance.new Inner().`
+  },
+  {
+    q: `Which will contain the body of the thread?`,
+    options: ["run();", "start();", "stop();", "main();"],
+    ans: 0,
+    logic: `Explanation: The 'run()' method is where the code executed by the thread resides.`
+  },
+  {
+    q: `Which three guarantee that a thread will leave the running state?
+1. yield()
+2. wait()
+3. notify()
+4. notifyAll()
+5. sleep(1000)
+6. aLiveThread.join()
+7. Thread.killThread()`,
+    options: ["1, 2 and 4", "2, 5 and 6", "3, 4 and 7", "4, 5 and 7"],
+    ans: 1,
+    logic: `Explanation: wait(), sleep(), and join() all cause the current thread to pause execution and leave the running state.`
+  },
+  {
+    q: `What will be the output of the program?
+public class Test {  
+    public static void main(String[] args) { 
+        int x = 0;  
+        assert (x > 0) ? "assertion failed" : "assertion passed" ; 
+        System.out.println("finished");  
+    } 
+}`,
+    options: ["finished", "Compilation fails.", "AssertionError thrown and finished output.", "AssertionError thrown with message."],
+    ans: 1,
+    logic: `Explanation: The second part of an 'assert' statement must return a value. While the ternary operator returns a value, 'assert' itself doesn't work this way. However, the syntax error here is that the expression is not a valid statement for assertion.`
+  },
+  {
+    q: `What will be the output of the program?
+public class BoolTest {
+    public static void main(String [] args) {
+        int result = 0;
+        Boolean b1 = new Boolean("TRUE");
+        Boolean b2 = new Boolean("true");
+        Boolean b3 = new Boolean("tRuE");
+        Boolean b4 = new Boolean("false");
+        if (b1 == b2) result = 1;
+        if (b1.equals(b2) ) result = result + 10;
+        if (b2 == b4) result = result + 100;
+        if (b2.equals(b4) ) result = result + 1000;
+        if (b2.equals(b3) ) result = result + 10000;
+        System.out.println("result = " + result);
+    }
+}`,
+    options: ["0", "1", "10", "11010"],
+    ans: 3,
+    logic: `Explanation: b1, b2, and b3 all represent 'true' (case-insensitive). b1==b2 is false (different objects). b1.equals(b2) is true (+10). b2==b4 is false. b2.equals(b4) is false. b2.equals(b3) is true (+10000). Total: 10010.`
+  }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

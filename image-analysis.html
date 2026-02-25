@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Image Analysis Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --bg: #f5f5f4;
+            --card: #ffffff;
+            --accent: #14b8a6;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #1e293b;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--accent); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .instruction { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .q-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 25px; line-height: 1.4; }
+
+        .q-image-box { 
+            background: #ffffff; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 30px;
+            display: inline-block;
+            border: 1px solid #ccfbf1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .q-image { max-width: 100%; height: auto; mix-blend-mode: multiply; }
+
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            margin-top: 20px;
+        }
+
+        .opt-btn { 
+            padding: 15px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            background: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .explanation { 
+            margin-top: 25px; 
+            padding: 20px; 
+            background: #f0fdfa; 
+            border-radius: 10px; 
+            border-left: 5px solid var(--accent);
+            display: none;
+            text-align: left;
+        }
+
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; gap: 10px; }
+        .btn { 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            border: none; 
+            background: var(--primary); 
+            color: white; 
+            cursor: pointer; 
+            font-weight: 600;
+            flex: 1;
+        }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="figures.html" class="back-link">← Back to Figure Portal</a>
+
+    <div class="quiz-card">
+        <div class="instruction">Image Analysis Q<span id="q-num">1</span> of 13</div>
+        <div class="q-text">Which of the figures (1), (2), (3) or (4) can be formed from the pieces given in figure (X)?</div>
+        
+        <div class="q-image-box">
+            <img id="q-img" src="" alt="Figure Analysis reasoning" class="q-image">
+        </div>
+
+        <div class="options-grid" id="options">
+            <button class="opt-btn" onclick="check(1)">1</button>
+            <button class="opt-btn" onclick="check(2)">2</button>
+            <button class="opt-btn" onclick="check(3)">3</button>
+            <button class="opt-btn" onclick="check(4)">4</button>
+        </div>
+
+        <div id="exp-box" class="explanation">
+            <strong>Visualization Guide:</strong>
+            Count the number of pieces in Figure (X) and note their specific shapes (e.g., two large triangles, one small square). Eliminate options that have the wrong number of pieces or shapes of a different size.
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prev" onclick="change(-1)">Previous</button>
+            <button class="btn" id="next" onclick="change(1)">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/2.png", ans: 2 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/11.png", ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/12.png", ans: 2 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/3.png", ans: 4 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/4.png", ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/6.png", ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/13.png", ans: 3 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/1.png", ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/10.png", ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/7.png", ans: 4 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/5.png", ans: 4 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/9.png", ans: 1 },
+    { src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/8.png", ans: 3 }
+];
+
+let current = 0;
+
+function load() {
+    document.getElementById('q-num').innerText = current + 1;
+    document.getElementById('q-img').src = questions[current].src;
+    document.getElementById('exp-box').style.display = 'none';
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => {
+        b.className = 'opt-btn';
+        b.disabled = false;
+    });
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next').disabled = current === questions.length - 1;
+}
+
+function check(choice) {
+    const correct = questions[current].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach((b, i) => {
+        b.disabled = true;
+        if (i + 1 === correct) b.classList.add('correct');
+        else if (i + 1 === choice) b.classList.add('wrong');
+    });
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function change(n) {
+    current += n;
+    load();
+}
+
+load();
+</script>
+</body>
+</html>
