@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Syllogism Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --accent: #9b59b6;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .statement-box {
+            background: #f8f0fb;
+            border-left: 5px solid var(--accent);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .statement-box h4 { margin: 0 0 10px 0; color: var(--accent); text-transform: uppercase; font-size: 0.8rem; }
+        
+        .conclusions-box {
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #faf5ff; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .sidebar {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            height: fit-content;
+            border-top: 5px solid var(--accent);
+            position: sticky;
+            top: 20px;
+        }
+
+        .btn-next {
+            background: var(--accent);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        #explanation {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="progress">Question 1 / 28</span>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <div class="statement-box">
+            <h4>Statements</h4>
+            <div id="statements"></div>
+        </div>
+
+        <div class="conclusions-box">
+            <h4 style="text-transform: uppercase; font-size: 0.8rem; color: #7f8c8d;">Conclusions</h4>
+            <div id="conclusions"></div>
+        </div>
+
+        <div class="options-list" id="options"></div>
+        <button class="btn-next" id="nextBtn" onclick="loadNext()">Next Question →</button>
+    </div>
+
+    <div class="sidebar">
+        <h3 style="margin-top:0; color: var(--accent);">Logical Explanation</h3>
+        <div id="explanation">
+            <em>Select an answer to see the detailed logical reasoning for this specific question.</em>
+        </div>
+    </div>
+</div>
+
+<script>
+// Data structure is identical to previous turns but with the added explanation field logic
+const data = [
+    { s: "Some actors are singers. All the singers are dancers.", c: "I. Some actors are dancers. <br>II. No singer is actor.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 0, hint: "Since 'Some actors are singers' and 'All singers are dancers', the part of the actor circle that overlaps with singers is automatically inside the dancer circle. Therefore, some actors are definitely dancers. Conclusion II is false because Statement 1 clearly says some actors ARE singers." },
+    { s: "All the harmoniums are instruments. All the instruments are flutes.", c: "I. All the flutes are instruments. <br>II. All the harmoniums are flutes.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 1, hint: "This follows a chain: Harmoniums → Instruments → Flutes. This means all Harmoniums are Flutes (Conclusion II). However, 'All flutes are instruments' is wrong because the flute circle is the largest and contains parts that might not be instruments." },
+    { s: "Some mangoes are yellow. Some tixo are mangoes.", c: "I. Some mangoes are green. <br>II. Tixo is a yellow.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 3, hint: "I: The statements only talk about yellow mangoes; we cannot assume anything about green ones. II: Tixo and Yellow are both related to Mangoes, but they may not touch each other at all. Since neither is certain, neither follows." },
+    { s: "Some ants are parrots. All the parrots are apples.", c: "I. All the apples are parrots. <br>II. Some ants are apples.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 1, hint: "Conclusion I is the reverse of statement 2 and isn't necessarily true. Conclusion II is true because the group of ants that are parrots must also be apples, as every single parrot is an apple." },
+    { s: "Some papers are pens. All the pencils are pens.", c: "I. Some pens are pencils. <br>II. Some pens are papers.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 4, hint: "I: If all pencils are pens, it naturally follows that some of those pens are pencils. II: If some papers are pens, then some of those pens must be papers. Both are basic logical deductions." },
+    { s: "All the actors are girls. All the girls are beautiful.", c: "I. All the actors are beautiful. <br>II. Some girls are actors.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 4, hint: "I: Because all actors are in the 'girls' circle and all girls are in the 'beautiful' circle, all actors are beautiful. II: Since all actors are girls, there is a portion of girls that are definitely actors." },
+    { s: "All the windows are doors. No door is a wall.", c: "I. Some windows are walls. <br>II. No wall is a door.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 1, hint: "If no door is a wall, then nothing inside the 'door' circle (like windows) can be a wall. This makes I false. II is just a direct reversal of statement 2, so it is true." },
+    { s: "All cups are books. All books are shirts.", c: "I. Some cups are not shirts. <br>II. Some shirts are cups.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 1, hint: "Since all cups are books and all books are shirts, all cups ARE shirts (making I false). II is true because the 'shirts' circle contains 'books' which contains 'cups', so some shirts are cups." },
+    { s: "Some cows are crows. Some crows are elephants.", c: "I. Some cows are elephants. <br>II. All crows are elephants.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 3, hint: "Both statements are 'Some'. In such cases, there is no definitive link between the first subject (Cows) and the last subject (Elephants) through the middle term (Crows)." },
+    { s: "All the pencils are pens. All the pens are inks.", c: "I. All the pencils are inks. <br>II. Some inks are pencils.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 4, hint: "This is a standard nesting relationship. Pencils inside Pens inside Inks. Therefore, all Pencils are Inks and some part of the Ink circle is occupied by Pencils." },
+    { s: "Some dogs are bats. Some bats are cats.", c: "I. Some dogs are cats. <br>II. Some cats are dogs.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 3, hint: "Two 'Some' statements do not create a mandatory bridge between Dogs and Cats. They might overlap, but they don't have to." },
+    { s: "All the trucks are flies. Some scooters are flies.", c: "I. All the trucks are scooters. <br>II. Some scooters are trucks.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 3, hint: "Trucks and Scooters both relate to 'Flies', but they are not necessarily related to each other. One is a subset of flies, the other is an overlap; they don't have to touch." },
+    { s: "All buildings are chalks. No chalk is toffee.", c: "I. No building is toffee <br>II. All chalks are buildings.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 0, hint: "If no chalk is a toffee, then anything categorized as a chalk (buildings) also cannot be a toffee. II is wrong because 'All A are B' does not mean 'All B are A'." },
+    { s: "All cars are cats. All fans are cats.", c: "I. All cars are fans. <br>II. Some fans are cars.", opts: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 3, hint: "Both Cars and Fans are inside the Cat circle, but they don't have to overlap with each other. They could be two separate circles inside the big Cat circle." },
+    { s: "No door is dog. All the dogs are cats.", c: "I. No door is cat. <br>II. No cat is door. <br>III. Some cats are dogs. <br>IV. All the cats are dogs.", opts: ["Only (2) and (4)", "Only (1) and (3)", "Only (3) and (4)", "Only (3)", "All the four"], ans: 3, hint: "Only III is certain because Statement 2 says All dogs are cats, which implies some cats are dogs. Door and Cat might still overlap in the area outside of 'Dogs'." },
+    { s: "All green are blue. All blue are white.", c: "I. Some blue are green. <br>II. Some white are green. <br>III. Some green are not white. <br>IV. All white are blue.", opts: ["Only (1) and (2)", "Only (1) and (3)", "Only (1) and (4)", "Only (2) and (4)"], ans: 0, hint: "Since Green is inside Blue and Blue is inside White, Green is inside everything. This makes 'Some blue are green' and 'Some white are green' definitely true." },
+    { s: "All men are vertebrates. Some mammals are vertebrates.", c: "I. All men are mammals. <br>II. All mammals are men. <br>III. Some vertebrates are mammals. <br>IV. All vertebrates are men.", opts: ["Only (4)", "Only (2)", "Only (3)", "Only (1)", "Only (1) and (3)"], ans: 2, hint: "Only III follows because 'Some mammals are vertebrates' implies the reverse. There is no proof that Men and Mammals overlap at all." },
+    { s: "All the phones are scales. All the scales are calculators.", c: "I. All the calculators are scales. <br>II. All the phones are calculators <br>III. All the scales are phones. <br>IV. Some calculators are phones.", opts: ["Only (1) and (4)", "Only (3) and (4)", "Only (2) and (4)", "Only (1) and (2)", "Only (1) and (3)"], ans: 2, hint: "Phones ⊂ Scales ⊂ Calculators. This means All Phones are Calculators (II) and some Calculators are Phones (IV)." },
+    { s: "Some tables are T.V. Some T.V. are radios.", c: "I. Some tables are radios. <br>II. Some radios are tables. <br>III. All the radios are T.V. <br>IV. All the T.V. are tables.", opts: ["Only (2) and (4)", "Only (1) and (3)", "Only (4)", "Only (1) and (4)", "None of the four."], ans: 4, hint: "Two 'Some' statements with a middle term (T.V.) do not allow any certain conclusion between Tables and Radios." },
+    { s: "Some pens are books. Some books are pencils.", c: "I. Some pens are pencils. <br>II. Some pencils are pens. <br>III. All pencils are pens. <br>IV. All books are pens.", opts: ["Only (1) and (3)", "Only (2) and (4)", "All the four", "None of the four", "Only (1)"], ans: 3, hint: "Similar to the TV/Radio problem, two 'Some' statements don't bridge the first and third terms. None of these follow with certainty." },
+    { s: "All the goats are tigers. All the tigers are lions.", c: "I. All the goats are lions. <br>II. All the lions are goats. <br>III. Some lions are goats. <br>IV. Some tigers are goats.", opts: ["All the four", "Only (1), (2) and (3)", "Only (1), (3) and (4)", "Only (2), (3) and (4)"], ans: 2, hint: "I, III, and IV follow. II is incorrect because the outer 'Lions' circle is larger than the inner 'Goats' circle." },
+    { s: "All the books are pencils. No pencil is eraser.", c: "I. All the pencils are books. <br>II. Some erasers are books. <br>III. No book is eraser. <br>IV. Some books are erasers.", opts: ["Only (3)", "Only (1) and (3)", "Only (1) and (2)", "Only (2) and (3)", "Only (3) and (4)"], ans: 0, hint: "Since all books are inside the pencil circle and no part of that circle touches erasers, no book can be an eraser." },
+    { s: "All the research scholars are psychologists. Some psychologists are scientists.", c: "I. All the research scholars are scientists. <br>II. Some research scholars are scientists. <br>III. Some scientists are psychologists. <br>IV. Some psychologists are research scholars.", opts: ["Only (3) and (4)", "None of the four", "All the four", "Only (3)", "Only (2) and (4)"], ans: 0, hint: "III follows from Statement 2. IV follows because if all scholars are psychologists, then some psychologists are scholars." },
+    { s: "All the locks are keys. All the keys are bats. Some watches are bats.", c: "I. Some bats are locks. <br>II. Some watches are keys. <br>III. All the keys are locks.", opts: ["Only (1) and (2)", "Only (1)", "Only (2)", "Only (1) and (3)"], ans: 1, hint: "Locks ⊂ Keys ⊂ Bats. This makes I true. III is the reverse of a statement. II is not certain because watches only touch 'bats'." },
+    { s: "Some keys are staplers. Some staplers are stickers. All the stickers are pens.", c: "I. Some pens are staplers. <br>II. Some stickers are keys. <br>III. No sticker is key. <br>IV. Some staplers are keys.", opts: ["Only (1) and (2)", "Only (2) and (4)", "Only (2) and (3)", "Only (1) and (4) and either (2) or (3)"], ans: 3, hint: "I is certain because Staplers overlap Stickers, and all Stickers are Pens. Either II or III must be true (complementary pair), and IV is possible but not certain based on statements." },
+    { s: "Some questions are answers. Some answers are writers. All the writers are poets.", c: "I. Some writers are answers. <br>II. Some poets are questions. <br>III. All the questions are poets. <br>IV. Some poets are answers.", opts: ["Only (1) and (2)", "Only (1) and (4)", "Only (1) and (3)", "Only (2) and (4)"], ans: 1, hint: "I is a reversal of Statement 2. IV is true because writers are inside the poets circle and writers overlap with answers." },
+    { s: "Some envelops are gums. Some gums are seals. Some seals are adhesives.", c: "I. Some envelopes are seals. <br>II. Some gums are adhesives. <br>III. Some adhesives are seals. <br>IV. Some adhesives are gums.", opts: ["Only (3)", "Only (1)", "Only (2)", "Only (4)"], ans: 0, hint: "Only III is certain because it's a direct reversal of statement 3. All other conclusions skip terms using only 'some' statements, which is invalid." },
+    { s: "All the papers are books. All the bags are books. Some purses are bags.", c: "I. Some papers are bags. <br>II. Some books are papers. <br>III. Some books are purses.", opts: ["Only (1)", "Only (2) and (3)", "Only (1) and (2)", "Only (1) and (3)"], ans: 1, hint: "II is true because all papers are books. III is true because purses overlap bags, and all bags are books, so purses must overlap books." }
+];
+
+let currentIdx = 0;
+
+function render() {
+    const q = data[currentIdx];
+    document.getElementById('progress').innerText = `Question ${currentIdx + 1} / ${data.length}`;
+    document.getElementById('statements').innerHTML = q.s.split('. ').join('.<br>');
+    document.getElementById('conclusions').innerHTML = q.c;
+    document.getElementById('explanation').innerHTML = "<em>Select an answer to see the detailed logical reasoning for this specific question.</em>";
+    
+    const optArea = document.getElementById('options');
+    optArea.innerHTML = '';
+    
+    q.opts.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = text;
+        btn.onclick = () => check(i, q.ans, btn);
+        optArea.appendChild(btn);
+    });
+    
+    document.getElementById('nextBtn').style.display = 'none';
+}
+
+function check(idx, correct, btn) {
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if(idx === correct) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+    }
+    
+    document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong><br>${data[currentIdx].hint}`;
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function loadNext() {
+    if(currentIdx < data.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        alert("Syllogism practice complete!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

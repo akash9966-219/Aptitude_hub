@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; white-space: pre-line; }
+        .q-image { max-width: 100%; margin-bottom: 20px; border-radius: 8px; background: white; padding: 10px; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 2</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 2</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Look at the sequence and find the pattern.", img: "https://www.indiabix.com/_files/images/logical-reasoning/5-94-q-1.png", options: ["1", "2", "3", "4"], ans: 2, logic: "Each step involves a 45-degree rotation and an alternating shift in the internal elements. Position 3 follows the established pattern." },
+            { q: "Choose the correct pattern from the options provided.", img: "https://www.indiabix.com/_files/images/logical-reasoning/5-101-q-1.png", options: ["1", "2", "3", "4"], ans: 1, logic: "Observation of the shaded regions and line movements shows that Option 2 is the logical successor." },
+            { q: "Necessary Part: diploma", options: ["principal", "curriculum", "employment", "graduation"], ans: 3, logic: "A diploma is a document certifying that one has completed a course of study; therefore, graduation is the necessary event to receive it." },
+            { q: "DIVISION : SECTION", options: ["layer : tier", "tether : bundle", "chapter : verse", "riser : stage", "dais : speaker"], ans: 0, logic: "Division and section are synonyms in many contexts; layer and tier represent the same relationship of horizontal levels." },
+            { q: "Artificial Language:\nhapllesh means cloudburst\nsrenchoch means pinball\nresbosrench means ninepin\nWhich word could mean 'cloud nine'?", options: ["leshsrench", "ochhapl", "haploch", "haplresbo"], ans: 3, logic: "hapl = cloud, lesh = burst, srench = pin, och = ball, resbo = nine. Therefore, 'cloud nine' is hapl + resbo." },
+            { q: "Artificial Language:\nmalgauper means peach cobbler\nmalgaport means peach juice\nmoggagrop means apple jelly\nWhich word could mean 'apple juice'?", options: ["moggaport", "malgaauper", "gropport", "moggagrop"], ans: 0, logic: "malga = peach, auper = cobbler, port = juice, mogga = apple, grop = jelly. So 'apple juice' is moggaport." },
+            { q: "Joe is younger than Kathy.\nMark was born after Joe.\nKathy is older than Mark.\nIf the first two statements are true, the third is:", options: ["true", "false", "uncertain"], ans: 0, logic: "If Kathy > Joe and Joe > Mark, then Kathy must be > Mark. The statement is true." },
+            { q: "Yoga popular but not for everyone. If you want high-energy aerobic, yoga isn't the best choice.\nThis supports:", options: ["Yoga more popular than aerobics", "Think about needs before starting regimen", "Yoga changing fitness", "Yoga benefits mind", "Yoga isn't rigorous"], ans: 1, logic: "The passage explicitly advises examining what you want from a routine before signing up." },
+            { q: "Statement: Vegetable prices are soaring in the market.\nConclusions: I. Rare commodity. II. People cannot eat them.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "High price doesn't necessarily mean a commodity is rare (it could be inflation or high demand), nor does it mean people 'cannot' eat them—it just makes it harder." },
+            { q: "Statement: 'M' Society notice: sales persons not allowed inside.\nAssumptions: I. They will stay away. II. Guard may stop them.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "A notice is put up assuming people will follow it (I) and that there is a mechanism (guard) to enforce it (II)." },
+            { q: "Statement: Brilliant/industrious students do not always excel in written exams.\nAssumptions: I. Good for mediocre. II. Brilliant students can't always write good answers.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "The statement directly implies that for some reason, even brilliant students may fail to produce the required answers in this specific format (II)." },
+            { q: "Statement: Pensioners arrears not credited 2 months after announcement.\nAssumptions: I. Banks take care. II. 2 months is sufficient time.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "The complaint about the delay assumes that the period of two months should have been more than enough for the process to complete (II)." },
+            { q: "Statement: Money is the root cause of all family problems.\nAssumptions: I. Every problem has a cause. II. Families always have problems.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "By identifying 'money' as the cause, the statement assumes that problems indeed have underlying causes (I). It doesn't mean families *always* have problems." },
+            { q: "Statement: Police interrogated servant, watchman, and liftman for murder case.\nAssumptions: I. They can give a clue. II. Known persons are involved.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Interrogation happens because these people might have seen something (I) and because statistics/logic suggest proximity to the victim increases likelihood of involvement (II)." },
+            { q: "Statement: Development plans develop in papers only.\nAction: I. Regular field supervision. II. Cut paper supply.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Supervision ensures execution (I). Cutting paper supply (II) is an absurd response to a metaphorical problem." },
+            { q: "Statement: Large number of students failed due to faulty questions.\nAction: I. Supplementary exam. II. Enquiry and suspension.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Fairness requires giving students a second chance (I) and holding those responsible for the error accountable (II)." },
+            { q: "Statement: Severe drought in State A, people leaving.\nAction: I. Food for work. II. Provide water.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "To stop exodus, the government must provide both the means to survive/earn (I) and basic life necessities like water (II)." },
+            { q: "Statement: Govt stopping financial support for voluntary orgs.\nAction: I. Collaborate with foreign agencies. II. Explore other sources.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "Since the government told them to raise their own funds, exploring diverse sources (II) is the direct logical action. Foreign collaboration (I) is just one specific, not necessarily guaranteed, option." },
+            { q: "Statement: Should educated unemployed get allowance?\nArguments: I. Yes (monetary help). II. No (promotes idleness).", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Both are strong socio-economic arguments: one focuses on welfare/opportunity, the other on incentive/dependency." },
+            { q: "Statement: Lack of coordination leads to students moving between colleges.\nAction: I. Share information. II. Centralized University admissions. III. Section for anti-social action.", options: ["Only I", "Only II", "Only III", "I and III", "II and III"], ans: 0, logic: "If the problem is a lack of coordination regarding 'ousted' students, sharing that specific information (I) is the most direct solution. Direct admission (II) is too broad an overhaul for this specific issue."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                ${item.img ? `<img src="${item.img}" class="q-image" alt="Question Image">` : ''}
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

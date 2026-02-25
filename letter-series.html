@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Letter Series - Logical Reasoning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #fdfefe;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-top: 5px solid var(--accent);
+        }
+
+        .series-heading {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .series-box {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: #fffcf9;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid #ffe8d6;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .opt-btn {
+            padding: 18px;
+            border: 2px solid #eee;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.2s;
+            color: var(--primary);
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fffcf9; }
+        .opt-btn.selected { border-color: var(--accent); background: #fff5eb; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress-text { font-weight: 600; color: #95a5a6; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Logical Menu</a>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <span class="series-heading">Identify the next term in the series:</span>
+        <div id="q-text" class="series-box"></div>
+        <div id="options" class="options-container"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress-text">1 / 12</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="validate()">Check</button>
+                <button class="btn btn-next" id="nextBtn" onclick="next()">Next →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "SCD, TEF, UGH, ____, WKL", opts: ["CMN", "UJI", "VIJ", "IJT"], ans: "VIJ" },
+    { q: "B2CD, _____, BCD4, B5CD, BC6D", opts: ["B2C2D", "BC3D", "B2C3D", "BCD7"], ans: "BC3D" },
+    { q: "FAG, GAF, HAI, IAH, ____", opts: ["JAK", "HAL", "HAK", "JAI"], ans: "JAK" },
+    { q: "ELFA, GLHA, ILJA, _____, MLNA", opts: ["OLPA", "KLMA", "LLMA", "KLLA"], ans: "KLLA" },
+    { q: "CMM, EOO, GQQ, _____, KUU", opts: ["GRR", "GSS", "ISS", "ITT"], ans: "ISS" },
+    { q: "ZA5, Y4B, XC6, W3D, _____", opts: ["E7V", "V2E", "VE5", "VE7"], ans: "V2E" },
+    { q: "QPO, NML, KJI, _____, EDC", opts: ["HGF", "CAB", "JKL", "GHI"], ans: "HGF" },
+    { q: "JAK, KBL, LCM, MDN, _____", opts: ["OEP", "NEO", "MEN", "PFQ"], ans: "NEO" },
+    { q: "BCB, DED, FGF, HIH, ___", opts: ["JKJ", "HJH", "IJI", "JHJ"], ans: "JKJ" },
+    { q: "P5QR, P4QS, P3QT, _____, P1QV", opts: ["PQW", "PQV2", "P2QU", "PQ3U"], ans: "P2QU" },
+    { q: "QAR, RAS, SAT, TAU, _____", opts: ["UAV", "UAT", "TAS", "TAT"], ans: "UAV" },
+    { q: "DEF, DEF2, DE2F2, _____, D2E2F3", opts: ["DEF3", "D3EF3", "D2E3F", "D2E2F2"], ans: "D2E2F2" }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `${idx + 1} / ${data.length}`;
+    document.getElementById('q-text').innerText = item.q;
+    
+    const optBox = document.getElementById('options');
+    optBox.innerHTML = '';
+    item.opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = o;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        optBox.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function validate() {
+    if (!selected) return alert("Please select an option.");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('correct');
+        if (b.innerText === selected && selected !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Letter Series Practice Completed!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; white-space: pre-line; }
+        .q-image { max-width: 100%; margin-bottom: 20px; border-radius: 8px; background: white; padding: 10px; display: block;}
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 6</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 6</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Look carefully at the sequence of symbols to find the pattern. Select correct pattern.", img: "https://www.indiabix.com/_files/images/logical-reasoning/5-90-q-1.png", options: ["1", "2", "3", "4"], ans: 1, logic: "Each symbol moves one position clockwise in each successive frame. The second option follows this rotation pattern correctly." },
+            { q: "Choose the picture that would go in the empty box so that the two bottom pictures are related in the same way as the top two.", img: "https://www.indiabix.com/_files/images/logical-reasoning/5-221-q-1.png", options: ["1", "2", "3", "4"], ans: 1, logic: "The relationship is a 180-degree rotation. The bottom-right figure must be a 180-degree rotation of the bottom-left figure." },
+            { q: "slar = jump, slary = jumping, slarend = jumped. Which word could mean 'playing'?", options: ["clargslarend", "clargy", "ellaclarg", "slarmont"], ans: 1, logic: "The suffix '-y' denotes the present participle (continuous). If 'clarg' is 'play', then 'clargy' is 'playing'." },
+            { q: "plekapaki = fruitcake, pakishillen = cakewalk, treftalan = buttercup. Which word could mean 'cupcake'?", options: ["shillenalan", "treftpleka", "pakitreft", "alanpaki"], ans: 3, logic: "paki = cake, alan = cup. In this language, the modifier comes first. Therefore, 'alanpaki' means cupcake." },
+            { q: "Eileen is planning a 35th birthday dinner for her husband, a simple man who prefers baseball and jeans over fancy suits. Which restaurant is best?", options: ["Alfredo's (Elegant Italian)", "Pancho's (Mexican Buffet)", "Parisian Bistro (4-star French)", "Marty's (Baseball-themed clubhouse)"], ans: 3, logic: "Marty's matches the husband's preference for a casual, baseball-themed environment while still being a 'special' celebratory meal." },
+            { q: "On what does Quinn rely in making her argument regarding the driving age?", options: ["statistics", "emotion", "fairness", "anecdotes", "actualities"], ans: 2, logic: "Quinn repeatedly uses phrases like 'This is unfair' and 'It would not be fair', basing the argument on the concept of equity." },
+            { q: "Statement: The 'Official Secrets Act' is a major source of corruption in country X.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "Neither conclusion follows. Abolishing it 'immediately' is an extreme action not suggested, and the statement doesn't prove 'intention' to encourage corruption." },
+            { q: "Statement: 50% of animal by-products are protein. US chemists developed a method to isolate 45% using a Japanese enzyme.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "I is false because US chemists used a specific Japanese enzyme, not that they *can't* develop them. II is not supported by the text." },
+            { q: "I: Govt imported sugar. II: Domestic sugar prices fell sharply.", options: ["I is cause, II is effect", "II is cause, I is effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 0, logic: "Importing large quantities increases supply, which logically leads to a decrease in market price." },
+            { q: "Statement: Re-establishing lost ties is the first step in treating addicts via personal attention.", options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "The statement assumes personal interest helps (I) and that there is a connection between addiction and broken ties (II)." },
+            { q: "Statement: Sachin wrote to his brother to collect an application form personally from the University.", options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "I is implicit because he asked his brother to go (assuming a 3rd party can collect it). II is implicit as he wouldn't write the letter if it wouldn't arrive in time." },
+            { q: "Statement: What a fool I am to rely on trickster like Shaleen!", options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Calling Shaleen a trickster implies he is unreliable. Calling oneself a fool is an exclamation of regret, not a factual assumption of general intelligence." },
+            { q: "Statement: Large numbers in ward X suffer from fatal malaria.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Fumigation addresses the source (I) and public advice addresses personal prevention (II). Both are standard emergency responses." },
+            { q: "Statements: All windows are doors. No door is wall.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "If all windows are doors and no door is a wall, no window can be a wall (I). No wall is a door (II) is a direct contrapositive of the second statement." },
+            { q: "Statement: Should import duty on electronic goods be dispensed with?", options: ["Only I strong", "Only II strong", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "I is strong (revenue loss). II is strong (protection of local industry). Both are valid economic arguments." },
+            { q: "Statement: Should there be uniforms for students in colleges?", options: ["Only I strong", "Only II strong", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "II is strong as college is a place for individual expression and transition to adulthood, whereas 'ambience' (I) is a weak, subjective justification." },
+            { q: "Statement: Should religion be taught in schools?", options: ["All strong", "None strong", "Only I strong", "Only II strong", "Only I and III strong"], ans: 2, logic: "In a secular state, religious instruction in state schools is logically inconsistent with the national framework (I)." },
+            { q: "Statement: 'Join X-tuition classes for sure success... excellent teachers.'", options: ["Only I and II", "Only II and III", "Only I and III", "Only II implicit", "All are implicit"], ans: 0, logic: "I and II are implicit because they appeal to the student's desire for success. III is not implicit because the ad claims teachers *are* the reason for success." },
+            { q: "Statements: All tigers are lions. No cow is lion. Some camels are cows.", options: ["None follows", "Only I", "Only II", "Only III", "Either I or II"], ans: 0, logic: "Lions and cows are separate. Tigers are inside lions. Some camels are cows. None of the listed conclusions provide a definitive link between the groups." },
+            { q: "Statements: Some pictures are frames. Some frames are idols. All idols are curtains.", options: ["Only I and II", "Only II and III", "Only I and III", "All follow", "None of these"], ans: 1, logic: "If some frames are idols and all idols are curtains, then some frames are curtains (II). Also, since idols are frames, some idols are frames (III)."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                ${item.img ? `<img src="${item.img}" class="q-image" alt="Question Image">` : ''}
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

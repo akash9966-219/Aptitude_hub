@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; white-space: pre-line; }
+        .q-image { max-width: 100%; margin-bottom: 20px; border-radius: 8px; background: white; padding: 10px; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 3</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 3</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "candle:lamp ,floodlight:hut\n cottage: ?", options: ["tent", "city", "dwelling", "house"], ans: 3, logic: "The relationship is one of increasing size/complexity. A lamp is bigger than a candle, a floodlight is bigger than a lamp. Similarly, a cottage is bigger than a hut, and a house is bigger than a cottage." },
+            { q: "All the trees in the park are flowering trees.\nSome of the trees in the park are dogwoods.\nAll dogwoods in the park are flowering trees.\nIf the first two statements are true, the third is:", options: ["true", "false", "uncertain"], ans: 0, logic: "Since all trees in the park are flowering trees and dogwoods are in the park, all dogwoods in that park must be flowering trees." },
+            { q: "Spot is bigger than King and smaller than Sugar.\nRalph is smaller than Sugar and bigger than Spot.\nKing is bigger than Ralph.\nIf the first two statements are true, the third is:", options: ["true", "false", "uncertain"], ans: 1, logic: "Size order: King < Spot < Ralph < Sugar. Therefore, King is smaller than Ralph, making the statement false." },
+            { q: "Practicing physicians increased by 20%, but healthcare managers increased by 600%. This supports:", options: ["Doctors resent interference", "Inadequate training", "Care for patients", "Less independent than used to be", "Making less money"], ans: 3, logic: "The text states doctors have lost authority over schedules, fees, and treatments, directly supporting a loss of independence." },
+            { q: "Speaker: Burning the flag represents freedom of speech. Respect cannot be legislated. Which weakens this?", options: ["Action is not part of freedom of speech", "Flag burners commit other crimes", "Flag recognized in 1812", "State flags never burned", "Most people against burning"], ans: 0, logic: "The argument relies on the premise that flag burning *is* protected speech. Proving it is *not* considered speech dismantles the logical core." },
+            { q: "Art insists that it alone shall touch the work. Nothing shall attain the work except through art itself. Supports:", options: ["Art governed by external rules", "Art for art and life", "Art for art's sake alone", "Artist realizes dreams", "Artist for society"], ans: 2, logic: "The passage emphasizes art's autonomy from any external influence, which is the definition of 'Art for art's sake'." },
+            { q: "Drug prevention: Banning sale + instructing users on danger + rehabilitation. Supports:", options: ["On the increase", "Can always be reduced", "Due to lack of facilities", "Eliminated by banning", "May be channelized"], ans: 4, logic: "The passage suggests a multi-faceted 'system' (ban + education + medical) to manage the issue." },
+            { q: "To pass the examination, one must work hard.", options: ["Related with hard work", "All who work hard pass", "Overcome anxiety", "Without hard work, one does not pass", "Hard-working is satisfied"], ans: 3, logic: "The statement sets hard work as a *necessary* condition. If you don't do it, you won't pass." },
+            { q: "I. Govt fixed lower fees for profissional courses.\nII. Parents launched agitation last year against high fees.", options: ["I is cause, II is effect", "II is cause, I is effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 1, logic: "The protest/agitation (II) by parents likely forced the government to act and regulate/lower the fees (I)." },
+            { q: "Statement: Next Governing Board meeting will be held after one year.\nAssumptions: I. Institute remains in function. II. Board dissolved after one year.", options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Scheduling a meeting in a year assumes the organization will still exist (I). It contradicts the idea of being dissolved (II)." },
+            { q: "Statement: Cinema halls incurring losses as people prefer TV.\nAction: I. Demolish for residential units. II. Convert to shopping malls.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "Both actions are extreme and don't attempt to fix the cinema business itself or consider economic viability; they are 'giving up' rather than logical courses of action." },
+            { q: "Statement: Cyclone forecast for coastal areas in 48 hours.\nAction: I. Advise fishermen to stay back. II. Alert people to prepare for shifting.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Both are standard, logical emergency procedures to prevent loss of life at sea and on land." },
+            { q: "Statements: Some books are tables. Some tables are mirrors.\nConclusions: I. Some mirrors are books. II. No book is mirror.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 2, logic: "There is no definite connection between books and mirrors. Since they either must have a connection or not, 'Either I or II' follows." },
+            { q: "Statements: All fishes are grey. Some fishes are heavy.\nConclusions: I. All heavy fishes are grey. II. All light fishes are not grey.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "If ALL fishes are grey, then any specific subset (heavy ones) must also be grey (I). II is false because all fishes are grey, light or heavy." },
+            { q: "Statement: Should Indian scientists abroad be called back?\nArguments: I. Serve motherland. II. Enough talent; let them stay.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "Argument I is emotional and ignores professional needs. Argument II is a subjective opinion. Neither provides a strong logical/economic foundation." },
+            { q: "Statement: Should vehicles older than 15 years be rejected in metros?\nArguments: I. Lower pollution. II. Difficult for owners to shift.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Lowering pollution (I) is a strong public health/environmental argument. Owner difficulty (II) is a private inconvenience that doesn't outweigh public benefit." },
+            { q: "Statement: Is pen mightier than a sword?\nArguments: I. Writers influence thinking. II. Force conquers all.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "The argument for 'pen' (I) explains *how* it is mighty (influence). Argument II is a generalization that ignores historical shifts led by ideas." },
+            { q: "Statement: 200 villages damaged by cyclone; Rs 200 crore burden.\nAction: I. Shift people. II. Support from Center. III. Relief tax on corporate.", options: ["None follows", "I and II follow", "II and III follow", "I and III follow", "None of these"], ans: 2, logic: "Seeking financial aid (II) and raising revenue (III) are logical responses to a financial burden. Shifting entire populations (I) is not a solution to a financial burden." },
+            { q: "Statement: Should seniority be the only criterion for promotion?\nArguments: I. Injustice to deserving juniors. II. Seniors feel humiliated. III. Experience must be rewarded.", options: ["None", "Only I", "I and III", "I and II", "All strong"], ans: 1, logic: "Argument I is strong because 'merit' is a logical requirement for higher positions. II and III are weak as they prioritize feelings or reward over suitability." },
+            { q: "Statement: Should workers participate in management?\nArguments: I. Present theory. II. Illiterate. III. Higher productivity. IV. Higher wages.", options: ["Only I and II", "None", "Only II and III", "All", "None of these"], ans: 2, logic: "Arguments II and III address the practical implications (competence and productivity) of the policy, making them strong points for debate."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                ${item.img ? `<img src="${item.img}" class="q-image" alt="Question Image">` : ''}
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Places & Summits Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #0f172a; --bg: #f8fafc; --card: #ffffff; --accent: #3b82f6; --correct: #10b981; --wrong: #ef4444; --text: #1e293b; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 8px solid var(--accent); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 0.9rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
+        .q-text { font-size: 1.25rem; line-height: 1.6; margin-bottom: 30px; font-weight: 600; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 550px) { .options { grid-template-columns: 1fr; } }
+        .opt { padding: 16px; border: 2px solid #f1f5f9; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s; font-weight: 500; }
+        .opt:hover:not(:disabled) { border-color: var(--accent); background: #eff6ff; }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 18px; background: #f0f9ff; border-radius: 10px; border-left: 4px solid var(--accent); display: none; font-size: 0.95rem; }
+        .nav { display: flex; justify-content: space-between; margin-top: 35px; gap: 15px; }
+        .btn-nav { padding: 14px 28px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">BACK</button>
+            <button class="btn-nav" id="next" onclick="move(1)">NEXT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which city hosted the 23rd BioAsia 2026 Summit?", opts: ["Hyderabad", "Bengaluru", "Chennai", "Pune"], ans: 0, exp: "Hyderabad returns as the host for the 23rd edition, focusing on biopharma and AI-driven healthcare." },
+    { q: "2. City where the DRDO-awarded Electronic Warfare project will be executed?", opts: ["Bengaluru", "Pune", "Hyderabad", "Chennai"], ans: 2, exp: "The project was awarded to a Hyderabad-based firm for indigenous defense electronics manufacturing." },
+    { q: "3. Where was the CBDC-based PDS launched by Amit Shah?", opts: ["Ahmedabad", "Gandhinagar", "Jaipur", "Bhopal"], ans: 1, exp: "Launched in Gandhinagar, this system uses Digital Currency for transparent food grain distribution." },
+    { q: "4. India’s first National Cow Culture Museum location?", opts: ["Varanasi", "Lucknow", "Agra", "Mathura"], ans: 3, exp: "The museum in Mathura showcases the historical and cultural significance of bovines in India." },
+    { q: "5. India’s first ‘Musical Road’ playing 'Jai Ho' location?", opts: ["Pune", "Mumbai", "Ahmedabad", "Bengaluru"], ans: 2, exp: "The specialized road in Ahmedabad uses grooves to vibrate car tires at frequencies that play the tune." },
+    { q: "6. Manufacturing facility for hydrogen storage composite vessels location?", opts: ["Madurai", "Bengaluru", "Hyderabad", "Pune"], ans: 0, exp: "Madurai was selected for this indigenous facility under the hydrogen storage project." },
+    { q: "7. Where was 'Operation Shastra' launched to curb social media intimidation?", opts: ["Mumbai", "New Delhi", "Kolkata", "Bengaluru"], ans: 3, exp: "Bengaluru Police launched this large-scale crackdown against digital fear-mongering." },
+    { q: "8. First district with 100% insurance coverage in Rajasthan?", opts: ["Jaipur", "Jodhpur", "Udaipur", "Alwar"], ans: 3, exp: "Alwar achieved full coverage under the 'Insurance for All by 2047' vision." },
+    { q: "9. Where did PLASTINDIA 2026 take place (Feb 5–10)?", opts: ["Mumbai", "New Delhi", "Bengaluru", "Hyderabad"], ans: 1, exp: "The global plastics exhibition was held at Bharat Mandapam, New Delhi." },
+    { q: "10. Where was the AIM SUMVAAD incubator conclave 2026 hosted?", opts: ["New Delhi", "Mumbai", "Bengaluru", "Hyderabad"], ans: 0, exp: "Hosted at the Dr. Ambedkar International Centre in New Delhi by NITI Aayog." },
+    { q: "11. City for the MAHE Global Health Summit 2026?", opts: ["Dubai", "Manipal", "New Delhi", "Bengaluru"], ans: 0, exp: "MAHE organized its global summit in Dubai to foster international health collaborations." },
+    { q: "12. 5th Bollywood Maha Arogya Shivir location (largest health camp 2026)?", opts: ["Mumbai", "Delhi", "Chennai", "Bengaluru"], ans: 0, exp: "Held at Andheri West, Mumbai, benefiting over 56,000 patients." },
+    { q: "13. Where is the 39th Surajkund International Atmanirbhar Crafts Mela?", opts: ["Faridabad", "Gurugram", "Noida", "Jaipur"], ans: 0, exp: "The world-famous fair is held annually in Faridabad, Haryana." },
+    { q: "14. City where the 12th Smile International Film Festival (SIFFCY) began?", opts: ["Mumbai", "New Delhi", "Kolkata", "Chennai"], ans: 1, exp: "The children's film festival was inaugurated in New Delhi." },
+    { q: "15. Where is Gulfood 2026 being held (India as Partner Country)?", opts: ["Dubai", "Abu Dhabi", "Doha", "Riyadh"], ans: 0, exp: "India made a historic debut as a partner country at Gulfood in Dubai." },
+    { q: "16. India’s first open-sea marine fish farming project region?", opts: ["Lakshadweep", "Andaman", "Gujarat Coast", "Kerala Coast"], ans: 1, exp: "Launched in the Andaman & Nicobar Islands to boost finfish and seaweed cultivation." },
+    { q: "17. Location for the 60th EU-India Summit (Security Partnership)?", opts: ["Brussels", "New Delhi", "Paris", "Berlin"], ans: 1, exp: "The strategic summit was hosted in New Delhi in early 2026." },
+    { q: "18. City where the Municipal Corp launched its first government creche?", opts: ["Cuttack", "Rourkela", "Puri", "Bhubaneswar"], ans: 3, exp: "Bhubaneswar Municipal Corporation introduced this for working mothers in the public sector." },
+    { q: "19. 86th All India Presiding Officers’ Conference (AIPOC) city?", opts: ["Bhopal", "Lucknow", "Jaipur", "Patna"], ans: 1, exp: "The conference was held at the Uttar Pradesh Vidhan Sabha in Lucknow." },
+    { q: "20. India’s first open-sea marine fish farming (Blue Economy)?", opts: ["Lakshadweep", "Gujarat Coast", "Tamil Nadu Coast", "Andaman"], ans: 3, exp: "The Andaman region leads the Blue Economy initiative with this pilot project." },
+    { q: "21. Cities connected by India’s first sleeper Vande Bharat?", opts: ["Delhi and Mumbai", "Kolkata and Guwahati", "Chennai and Bengaluru", "Patna and Ranchi"], ans: 0, exp: "The first long-distance sleeper variant connects the national capital with the financial capital." },
+    { q: "22. 28th Commonwealth Speakers' Conference 2026 location?", opts: ["Mumbai", "Bengaluru", "New Delhi", "Chennai"], ans: 2, exp: "Inaugurated by the PM in New Delhi with delegates from 53 nations." },
+    { q: "23. 5th Tri-Services Veterans Day parade location?", opts: ["New Delhi", "Mumbai", "Chennai", "Kolkata"], ans: 1, exp: "Mumbai is the only city to host this city-level parade at Marine Drive." },
+    { q: "24. UP Regional AI Impact Conference 2026 location?", opts: ["Lucknow", "Kanpur", "Varanasi", "Prayagraj"], ans: 0, exp: "Lucknow hosted the regional impact summit in January 2026." },
+    { q: "25. 9th Narco Coordination Centre (NCORD) meeting location?", opts: ["New Delhi", "Mumbai", "Hyderabad", "Chandigarh"], ans: 0, exp: "Chaired by Amit Shah at Vigyan Bhawan, New Delhi." },
+    { q: "26. Topped India’s Women-Friendly Cities ranking (TCWI 2025)?", opts: ["Bengaluru", "Chennai", "Pune", "Hyderabad"], ans: 1, exp: "Chennai consistently ranks first for safety and inclusivity for women." },
+    { q: "27. 3rd International Conference on Indian Languages location?", opts: ["Chennai", "Kolkata", "New Delhi", "Hyderabad"], ans: 2, exp: "The Vice President inaugurated this linguistic summit in New Delhi." },
+    { q: "28. 'Viksit Bharat, Viksit Ports' programme location for TN projects?", opts: ["Coimbatore", "Madurai", "Tiruchirappalli", "Chennai"], ans: 3, exp: "The port projects were launched at the Chennai Port Trust." },
+    { q: "29. National Textiles Ministers’ Conference 2026 city?", opts: ["Guwahati", "Shillong", "Imphal", "Itanagar"], ans: 1, exp: "Shillong, Meghalaya hosted the conference to discuss North-East textile growth." },
+    { q: "30. BIMSTEC cancer care training Phase-II launch city?", opts: ["Chennai", "Visakhapatnam", "Hyderabad", "Kochi"], ans: 0, exp: "The specialized training was inaugurated at a premier oncology center in Chennai." },
+    { q: "31. City declaring human rabies a notifiable disease in 2026?", opts: ["Mumbai", "New Delhi", "Kolkata", "Chennai"], ans: 1, exp: "Delhi took this step to ensure mandatory reporting of all rabies cases." },
+    { q: "32. 9th Siddha Day celebrations location (Jan 2026)?", opts: ["Bengaluru", "Chennai", "Hyderabad", "Thiruvananthapuram"], ans: 1, exp: "Chennai hosted the event themed 'Siddha for Global Health'." },
+    { q: "33. QUAD ambassadors rare public meeting location (2026)?", opts: ["Tokyo", "Beijing", "Washington D.C.", "New Delhi"], ans: 3, exp: "The ambassadors met in New Delhi to reiterate Indo-Pacific stability." },
+    { q: "34. Exposition of Sacred Piprahwa Relics location?", opts: ["Varanasi", "Lucknow", "New Delhi", "Bodh Gaya"], ans: 2, exp: "The relics were exhibited at the National Museum in New Delhi." },
+    { q: "35. Kashmir district where 2,000-year-old Buddhist site was found?", opts: ["Anantnag", "Baramulla", "Kupwara", "Pulwama"], ans: 1, exp: "Excavations at Jehanpora village in Baramulla revealed Kushan-era stupas." },
+    { q: "36. Abhyuday Madhya Pradesh Growth Summit location?", opts: ["Bhopal", "Gwalior", "Indore", "Jabalpur"], ans: 1, exp: "Gwalior hosted the summit commemorating Atal Bihari Vajpayee's legacy." },
+    { q: "37. 2nd WHO Global Summit on Traditional Medicine location?", opts: ["Gandhinagar", "Geneva", "New Delhi", "Bangkok"], ans: 2, exp: "New Delhi co-hosted the 2nd edition (the first was in Gandhinagar)." },
+    { q: "38. Venue for UNESCO Intangible Cultural Heritage session (2025)?", opts: ["Red Fort", "India Gate", "Qutub Minar", "Rashtrapati Bhavan"], ans: 0, exp: "Red Fort was selected as the symbolic venue for the UNESCO session." },
+    { q: "39. 7th India International Seaweed Expo & Summit city?", opts: ["Mumbai", "Chennai", "Kochi", "Visakhapatnam"], ans: 2, exp: "Kochi hosted the event at the ICAR-CMFRI campus." },
+    { q: "40. 3rd RESOLVE–2025 international insolvency convention city?", opts: ["Mumbai", "Chennai", "Kolkata", "Bengaluru"], ans: 0, exp: "The ICAI organized this global convention in Mumbai." },
+    { q: "41. CII IndiaEdge 2025 Industry Forum location?", opts: ["Mumbai", "New Delhi", "Hyderabad", "Bengaluru"], ans: 1, exp: "New Delhi served as the hub for these sustainable growth reforms." },
+    { q: "42. Regional AI Impact Conference 2025 city (North East)?", opts: ["Aizawl", "Imphal", "Shillong", "Kohima"], ans: 2, exp: "Shillong hosted the 2025 edition focusing on regional tech impact." },
+    { q: "43. Ananth Centre of Excellence for Navigation (ACEN) location?", opts: ["Bengaluru", "Hyderabad", "Thiruvananthapuram", "Chennai"], ans: 2, exp: "Inaugurated by the ISRO Chief in Thiruvananthapuram as a private-sector hub." },
+    { q: "44. 60th DGP–IGP Conference 2025 city?", opts: ["Raipur", "Bhopal", "Lucknow", "Patna"], ans: 0, exp: "Raipur, Chhattisgarh hosted the 60th edition at IIM Raipur." },
+    { q: "45. Vision for Sujalam Bharat Summit 2025 city?", opts: ["Mumbai", "Bengaluru", "New Delhi", "Jaipur"], ans: 2, exp: "The Ministry of Jal Shakti organized the water conservation summit in New Delhi." },
+    { q: "46. Safran’s largest global MRO facility location?", opts: ["Bengaluru", "Pune", "Chennai", "Hyderabad"], ans: 3, exp: "Hyderabad was chosen for the giant LEAP aircraft engine maintenance facility." },
+    { q: "47. Sixth International Agronomy Congress (IAC-2025) city?", opts: ["Hyderabad", "Mumbai", "New Delhi", "Bengaluru"], ans: 2, exp: "The premier agricultural science event began in New Delhi." },
+    { q: "48. 69th National School Games U-19 Table Tennis location?", opts: ["Jammu and Kashmir", "Haryana", "Gujarat", "Rajasthan"], ans: 0, exp: "Jammu University hosted the tournament featuring hundreds of young paddlers." },
+    { q: "49. CAG Centre of Excellence for Financial Audit city?", opts: ["Hyderabad", "Bengaluru", "Mumbai", "New Delhi"], ans: 3, exp: "The CAG established this specialized center in the national capital." },
+    { q: "50. National Urban Conclave 2025 inauguration city?", opts: ["New Delhi", "Gurugram", "Mumbai", "Bengaluru"], ans: 1, exp: "Union Minister Manohar Lal inaugurated the conclave in Gurugram." }
+];
+
+let currentIdx = 0;
+function move(d) { currentIdx += d; show(); }
+function show() {
+    const q = data[currentIdx];
+    document.getElementById('q-count').innerText = `ID: PLACE_${currentIdx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const b = document.createElement('button'); b.className = 'opt'; b.innerText = o;
+        b.onclick = () => {
+            document.querySelectorAll('.opt').forEach(btn => btn.disabled = true);
+            if(i === q.ans) b.classList.add('correct');
+            else { b.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(b);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = currentIdx === 0;
+    document.getElementById('next').disabled = currentIdx === data.length - 1;
+}
+show();
+</script>
+</body>
+</html>

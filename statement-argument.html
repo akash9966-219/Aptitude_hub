@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Statement & Argument</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #fdfdfd;
+            --card: #ffffff;
+            --accent: #3498db;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .main-quiz {
+            flex: 2;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .statement-box {
+            background: #f1f9ff;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 6px solid var(--accent);
+            margin-bottom: 25px;
+        }
+
+        .arg-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .arg-box {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #edf2f7;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .opt {
+            padding: 15px;
+            border: 2px solid #edf2f7;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .opt:hover { border-color: var(--accent); background: #f0f7ff; }
+        .opt.selected { border-color: var(--accent); background: #ebf5ff; }
+        .opt.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn { padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        @media (max-width: 800px) {
+            .container { flex-direction: column; }
+            .arg-container { flex-direction: column; }
+            .sidebar { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="progress">Pair 1 / 50</span>
+</div>
+
+<div class="container">
+    <div class="sidebar">
+        <h3>Strength Rules</h3>
+        <ul style="font-size: 0.85rem; padding-left: 20px; line-height: 1.6;">
+            <li><strong>Strong:</strong> Important, realistic, and directly related.</li>
+            <li><strong>Weak:</strong> Opinions, vague, or purely based on emotions.</li>
+            <li><strong>Neither:</strong> Both are weak or factually irrelevant.</li>
+        </ul>
+    </div>
+
+    <div class="main-quiz">
+        <div class="statement-box">
+            <span class="label">The Statement</span>
+            <div id="stmt-text" style="font-weight: 600; font-size: 1.1rem;"></div>
+        </div>
+
+        <div class="arg-container">
+            <div class="arg-box">
+                <span class="label">Argument I</span>
+                <div id="arg1-text"></div>
+            </div>
+            <div class="arg-box">
+                <span class="label">Argument II</span>
+                <div id="arg2-text"></div>
+            </div>
+        </div>
+
+        <div class="options-grid">
+            <button class="opt" onclick="select(0)">Only argument I is strong</button>
+            <button class="opt" onclick="select(1)">Only argument II is strong</button>
+            <button class="opt" onclick="select(2)">Either I or II is strong</button>
+            <button class="opt" onclick="select(3)">Neither I nor II is strong</button>
+            <button class="opt" onclick="select(4)">Both I and II are strong</button>
+        </div>
+
+        <div class="footer">
+            <div id="feedback" style="font-weight:bold;"></div>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="check()">Evaluate Arguments</button>
+                <button class="btn btn-next" id="nextBtn" onclick="next()">Next Statement →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const dataset = [
+    { s: "Should India encourage exports, when most things are insufficient for internal use itself?", a: ["Yes. We have to earn foreign exchange to pay for our imports.", "No. Even selective encouragement would lead to shortages."], ans: 0 },
+    { s: "Should Western patented drugs be tried on sample basis before licensing in India?", a: ["Yes. Doses and duration may differ for Indian population.", "No. This is just not feasible and cannot be implemented."], ans: 0 },
+    { s: "Should India make efforts to harness solar energy to fulfil its requirements?", a: ["Yes, Most of the energy sources used at present is exhaustible.", "No. Harnessing solar energy requires a lot of capital, which India lacks in."], ans: 0 },
+    { s: "Should there be students union in college/university?", a: ["No. This will create a political atmosphere in the campus.", "Yes, Students are future political leaders."], ans: 2 },
+    { s: "Should India give away Kashmir to Pakistan?", a: ["No. Kashmir is a beautiful state and earns foreign exchange.", "Yes. This would help settle conflicts."], ans: 1 },
+    { s: "Should cottage industries be encouraged in rural areas?", a: ["Yes. Rural people are creative.", "Yes. This would help to solve unemployment to some extent."], ans: 1 },
+    { s: "Should young entrepreneurs be encouraged?", a: ["Yes. They will help in industrial development.", "Yes. They will reduce burden on employment market."], ans: 4 },
+    { s: "Should all annual examinations up to Std. V be abolished?", a: ["Yes. Young students should not be burdened.", "No. Students will not study seriously."], ans: 1 },
+    { s: "Should Indian scientists working abroad be called back to India?", a: ["Yes. They must serve motherland first.", "No. We have enough talent; let them stay."], ans: 3 },
+    { s: "Should we scrap the system of formal education beyond graduation?", a: ["Yes. It means taking employment early.", "No. It will mean lack of depth of knowledge."], ans: 1 },
+    { s: "Should there be an upper age limit of 65 years for contesting elections?", a: ["Yes. People above 65 lose dynamism.", "No. Lifespan has increased and people stay active."], ans: 1 },
+    { s: "Should new big industries be started in Mumbai?", a: ["Yes. It will create job opportunities.", "No. It will add to pollution."], ans: 4 },
+    { s: "Should high chimneys be installed in industries?", a: ["Yes. It reduces pollution at ground level.", "No. It increases pollution in upper atmosphere."], ans: 0 },
+    { s: "Does India need so many plans for development?", a: ["Yes. Nothing can be achieved without proper planning.", "No. Too much time and money is wasted."], ans: 0 },
+    { s: "Should articles of only deserving authors be allowed to be published?", a: ["Yes. It will save a lot of paper.", "No. It is not possible to draw a line between deserving and undeserving."], ans: 1 },
+    { s: "Should colleges be given the status of a university in India?", a: ["Yes. Colleges are in a better position to assess students.", "No. There will be nepotism and corruption."], ans: 1 },
+    { s: "Should prestigious people committing crime unknowingly get special treatment?", a: ["Yes. They do not commit crime intentionally.", "No. Everybody is equal before the law."], ans: 1 },
+    { s: "Can pollution be controlled?", a: ["Yes. If everyone cooperates.", "No. Growth and population are beyond control."], ans: 4 },
+    { s: "Should the railways in India be privatized in a phased manner?", a: ["Yes. This is the only way to bring competitiveness.", "No. This will pose a threat to national security."], ans: 3 },
+    { s: "Should internal assessment in colleges be abolished?", a: ["Yes. This reduces favoritism.", "No. Teaching faculty will lose control."], ans: 0 },
+    { s: "Should all unauthorized structures in the city be demolished?", a: ["No. Where will the people reside?", "Yes. This sends a clear message to refrain from unauthorized builds."], ans: 1 },
+    { s: "Should there be a maximum limit for the number of ministers?", a: ["No. Party should have freedom to decide.", "Yes. To avoid unnecessary expenditure."], ans: 1 },
+    { s: "Should foreign films be banned in India?", a: ["Yes. They depict an alien culture affecting values.", "No. Foreign films are of high artistic standard."], ans: 3 },
+    { s: "Is buying things on instalments profitable to the customer?", a: ["Yes. He has to pay less.", "No. Paying instalments upsets family budget."], ans: 1 },
+    { s: "Should Doordarshan be given autonomous status?", a: ["Yes. For fair and impartial coverage.", "No. Coverage will be decided by a few with unhealthy outlooks."], ans: 0 },
+    { s: "Should adult education have priority over compulsory education?", a: ["No. It helps compulsory education success.", "Yes. It helps eliminate adult illiteracy."], ans: 4 },
+    { s: "Should new universities be established in India?", a: ["No. We haven't achieved literacy targets.", "No. We will face the problem of unemployed qualified people."], ans: 4 },
+    { s: "Should non-vegetarian food be totally banned?", a: ["Yes. It is expensive.", "No. Nothing should be banned in a democracy."], ans: 1 },
+    { s: "Should a total ban be put on trapping wild animals?", a: ["Yes. Trappers are making a lot of money.", "No. Bans are not effective."], ans: 3 },
+    { s: "Should Government close down loss-making public enterprises?", a: ["No. Employees will lose jobs.", "Yes. Rule is 'survival of the fittest'."], ans: 0 },
+    { s: "Should government jobs in rural areas have more incentives?", a: ["Yes. Essential for attracting servants.", "No. Rural areas are already cheaper and healthier."], ans: 0 },
+    { s: "Should there be a cap on contestants for elections?", a: ["Yes. Makes elections more meaningful for voters.", "No. In a democracy, anyone eligible can contest."], ans: 4 },
+    { s: "Should so much money be spent on advertisements?", a: ["Yes. Essential in a capitalist economy.", "No. Leads to wastage of resources."], ans: 3 },
+    { s: "Should all legislators be forced to resign from their profession?", a: ["Yes. They can devote more time.", "No. Nobody will contest elections."], ans: 3 },
+    { s: "Should computer knowledge be compulsory at secondary level?", a: ["No. Our need is bread for everyone.", "Yes. We cannot compete internationally without it."], ans: 1 },
+    { s: "Should there be uniforms for college students?", a: ["Yes. Improves ambience and decent dress.", "No. College students should not be regimented."], ans: 1 },
+    { s: "Should India engage in dialogue to stop cross border tension?", a: ["Yes. Only way to stop loss of lives.", "No. Neighbors cannot be relied upon."], ans: 0 },
+    { s: "Should there be a world government?", a: ["Yes. Eliminates tension.", "No. Developed countries will dominate."], ans: 1 },
+    { s: "Should clerical cadre transfers between cities be stopped?", a: ["No. Transfers are routine matters.", "Yes. Involves lot of expenditure/inconvenience vs benefits."], ans: 1 },
+    { s: "Is paying ransom to kidnappers proper course of action?", a: ["Yes. Victims must be saved at all cost.", "No. Encourages kidnappers."], ans: 1 },
+    { s: "Should religion be banned?", a: ["Yes. Develops fanaticism.", "No. Religion binds people."], ans: 1 },
+    { s: "Should India become a permanent member of UN Security Council?", a: ["Yes. India loves peace and amity.", "No. Solve problems like poverty first."], ans: 0 },
+    { s: "Should fashionable dresses be banned?", a: ["Yes. Increases cloth consumption.", "No. It is a fundamental right of expression."], ans: 1 },
+    { s: "Should UNO be dissolved?", a: ["Yes. No role after cold war.", "No. There may be a world war without it."], ans: 1 },
+    { s: "Should there be no place for interviews in selection?", a: ["Yes. It is subjective.", "No. Only instrument to judge motives/personality."], ans: 4 },
+    { s: "Should family planning be compulsory in India?", a: ["Yes. No other go given conditions.", "No. Against tenets of some religions."], ans: 0 },
+    { s: "Should income tax be abolished in India?", a: ["Yes. Burden on wage earners.", "No. Good source of revenue."], ans: 1 },
+    { s: "Should there be a ceiling on salary of top MNC executives?", a: ["Yes. Avoids unhealthy competition.", "No. Move would be counter-productive under liberalization."], ans: 1 },
+    { s: "Should school education be free in India?", a: ["Yes. Only way to improve literacy.", "No. Heavy burden on exchequer."], ans: 4 },
+    { s: "Should import duty on electronic goods be dispensed with?", a: ["No. Reduces gov income.", "No. Local manufacturers cannot compete."], ans: 4 }
+];
+
+let cur = 0;
+let sel = null;
+
+function render() {
+    const item = dataset[cur];
+    document.getElementById('progress').innerText = `Pair ${cur + 1} / ${dataset.length}`;
+    document.getElementById('stmt-text').innerText = item.s;
+    document.getElementById('arg1-text').innerText = item.a[0];
+    document.getElementById('arg2-text').innerText = item.a[1];
+    
+    document.querySelectorAll('.opt').forEach(b => {
+        b.classList.remove('selected', 'correct', 'wrong');
+        b.disabled = false;
+    });
+    document.getElementById('checkBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerText = "";
+    sel = null;
+}
+
+function select(idx) {
+    sel = idx;
+    document.querySelectorAll('.opt').forEach((b, i) => b.classList.toggle('selected', i === idx));
+}
+
+function check() {
+    if (sel === null) return alert("Pick the strongest conclusion!");
+    const correct = dataset[cur].ans;
+    const btns = document.querySelectorAll('.opt');
+    
+    btns[correct].classList.add('correct');
+    if (sel !== correct) {
+        btns[sel].classList.add('wrong');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--wrong)'>Weak Logic</span>";
+    } else {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--correct)'>Strong Argument!</span>";
+    }
+    
+    btns.forEach(b => b.disabled = true);
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    if (cur < dataset.length - 1) {
+        cur++;
+        render();
+        window.scrollTo(0,0);
+    } else {
+        alert("Course Complete!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

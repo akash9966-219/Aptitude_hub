@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Statement & Conclusion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --accent: #8e44ad;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .main-quiz {
+            flex: 2;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-width: 0;
+        }
+
+        .statement-area {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 6px solid var(--accent);
+            margin-bottom: 25px;
+        }
+
+        .conclusion-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #fff;
+            word-wrap: break-word;
+        }
+
+        .tag {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .opt {
+            padding: 15px;
+            border: 2px solid #edf2f7;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .opt:hover { border-color: var(--accent); }
+        .opt.selected { border-color: var(--accent); background: #f5f3ff; }
+        .opt.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        @media (max-width: 900px) {
+            .container { flex-direction: column; }
+            .sidebar { position: static; }
+        }
+
+        @media (max-width: 600px) {
+            .footer { flex-direction: column; gap: 15px; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="progress">Statement & Conclusion</span>
+</div>
+
+<div class="container">
+    <div class="sidebar">
+        <h3>Conclusion Rules</h3>
+        <ul style="font-size: 0.85rem; padding-left: 15px; line-height: 1.6;">
+            <li>Do not use external knowledge; stick only to the statement.</li>
+            <li>Conclusions must follow 100% logically.</li>
+            <li>Words like "all", "always", or "only" often make a conclusion invalid unless specified in the text.</li>
+        </ul>
+    </div>
+
+    <div class="main-quiz">
+        <div id="q-label" style="font-weight:bold; color:#64748b; margin-bottom:10px;"></div>
+        <div class="statement-area">
+            <span class="tag">Statement</span>
+            <div id="stmt-text" style="font-weight: 600;"></div>
+        </div>
+
+        <div class="conclusion-box">
+            <span class="tag">Conclusion I</span>
+            <div id="c1-text"></div>
+        </div>
+        <div class="conclusion-box">
+            <span class="tag">Conclusion II</span>
+            <div id="c2-text"></div>
+        </div>
+
+        <div class="options-grid">
+            <button class="opt" onclick="select(0)">Only conclusion I follows</button>
+            <button class="opt" onclick="select(1)">Only conclusion II follows</button>
+            <button class="opt" onclick="select(2)">Either I or II follows</button>
+            <button class="opt" onclick="select(3)">Neither I nor II follows</button>
+            <button class="opt" onclick="select(4)">Both I and II follow</button>
+        </div>
+
+        <div class="footer">
+            <div id="feedback" style="font-weight:bold;"></div>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="check()">Check Logic</button>
+                <button class="btn btn-next" id="nextBtn" onclick="next()">Next Question →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const dataset = [
+    { s: "In a one day cricket match, the total runs made by a team were 200. Out of these 160 runs were made by spinners.", c: ["80% of the team consists of spinners.", "The opening batsmen were spinners."], ans: 3 },
+    { s: "The old order changed yielding place to new.", c: ["Change is the law of nature.", "Discard old ideas because they are old."], ans: 0 },
+    { s: "Government has spoiled many top ranking financial institutions by appointing bureaucrats as Directors.", c: ["Government should appoint Directors considering expertise in finance.", "The Director should have expertise commensurate with the financial work."], ans: 4 },
+    { s: "Population increase coupled with depleting resources is the scenario of many developing countries.", c: ["The population of developing countries will not continue to increase in future.", "It will be difficult for governments to provide decent quality of life."], ans: 1 },
+    { s: "Urban children are now avid TV viewers. As a result, there is an alarming decline in newspaper readership.", c: ["Method of increasing readership should be devised.", "A team of experts should study the impact of TV on readership."], ans: 0 },
+    { s: "Japanese diet in Japan vs Hawaii shows reversed cancer rates; this is related to nutrition.", c: ["The same diet as in Hawaii should be propagated in Japan.", "Bowel cancer is less severe than stomach cancer."], ans: 3 },
+    { s: "Employees strongly resist declaring income and assets; no employee is going to declare.", c: ["Employees don't seem to have undisclosed income.", "The union wants senior officers to declare first."], ans: 3 },
+    { s: "Monitoring is integral to planning. MIS is recommended to give feedback on performance.", c: ["All social development programmes should be evaluated.", "There is a need to monitor the performance of workers."], ans: 1 },
+    { s: "TV and magazines for women are packed with recipes and household hints.", c: ["Women are not interested in other things.", "An average woman's primary interest lies in home/kitchen."], ans: 3 },
+    { s: "Reducing 900km road to 280km sea travel saves 7.92 crores per annum on fuel.", c: ["Transportation by sea is cheaper than by road.", "Fuel must be saved to the greatest extent."], ans: 0 },
+    { s: "The manager humiliated Sachin in the presence of his colleagues.", c: ["The manager did not like Sachin.", "Sachin was not popular with his colleagues."], ans: 3 },
+    { s: "Women's organisations welcomed the amendment to curb sexual harassment at work.", c: ["Harassment is more prevalent in India than developed nations.", "Many organisations will stop recruiting women to avoid problems."], ans: 3 },
+    { s: "Nation X faced international opposition for exploding eight nuclear weapons.", c: ["The citizens of the nation favoured the decision.", "Some powerful countries don't want others to be as powerful."], ans: 3 },
+    { s: "In highly centralised power, ministers act as yesmen to reflect the PM's preferences.", c: ["The Ministers play safe by not giving anti-government views.", "The PM does not encourage colleagues to render their own views."], ans: 4 },
+    { s: "National Aluminium Company has moved India to self-sufficiency in the metal.", c: ["Previously, India had to import aluminium.", "With this speed, it can soon become a foreign exchange earner."], ans: 0 },
+    { s: "Jade plant has thick leaves and requires little water.", c: ["All plants with thick leaves require little water.", "Jade plants may be grown in places where water is not in abundance."], ans: 1 },
+    { s: "Use 'Kraft' colours. They add colour to our life. - An advertisement.", c: ["Catchy slogans do not attract people.", "People like dark colours."], ans: 3 },
+    { s: "Bail granted to political prisoners not involved in dharnas or murders.", c: ["No political prisoner had committed murder.", "Some politicians were not arrested."], ans: 3 },
+    { s: "Modern man influences destiny by choice, unlike in the past.", c: ["Earlier there were fewer options available to man.", "There was no desire in the past to influence destiny."], ans: 0 },
+    { s: "Water supply in wards A/B affected by 50% on Friday due to repair work.", c: ["Residents should economise on water on Friday.", "Residents should store water on the previous day."], ans: 4 },
+    { s: "People who speak too much against dowry are those who had taken it themselves.", c: ["It is easier said than done.", "People have double standards."], ans: 4 },
+    { s: "National norm is 100 beds/1000 pop; this state has 150 beds/1000.", c: ["Our national norm is appropriate.", "The state's health system is taking adequate care."], ans: 1 },
+    { s: "Securities carry market risk. Consult your advisor before investing.", c: ["One should not invest in securities.", "The advisor calculates risk with certainty."], ans: 3 },
+    { s: "Money plays a vital role in politics.", c: ["The poor can never become politicians.", "All rich men take part in politics."], ans: 3 },
+    { s: "Vegetable prices are soaring in the market.", c: ["Vegetables are becoming a rare commodity.", "People cannot eat vegetables."], ans: 3 },
+    { s: "A car accident focused attention on the unsatisfactory state of roads.", c: ["The accident that occurred was fatal.", "Several accidents have taken place due to poor roads."], ans: 1 },
+    { s: "Physical exercise for 30 mins a day makes one less prone to heart ailments.", c: ["Moderate exercise is necessary for a healthy life.", "Desk-bound workers definitely suffer from heart ailments."], ans: 0 },
+    { s: "A bird in hand is worth two in the bush.", c: ["We should be content with what we have.", "We should not crave for what is not."], ans: 4 },
+    { s: "The world is neither good nor evil; each man manufactures a world for himself.", c: ["Some people find this world quite good.", "Some people find this world quite bad."], ans: 4 },
+    { s: "Eligibility: 2nd class Master's. Final year students can also apply.", c: ["All students without a degree yet will be selected.", "All candidates with 2nd class degree will be selected."], ans: 3 },
+    { s: "Students who misbehave bring a bad name to themselves and the school.", c: ["Such student should be removed from the school.", "Stricter discipline does not improve behavior."], ans: 3 },
+    { s: "Manager told 4 managers: Resign tomorrow or be terminated. 3 resigned by evening.", c: ["The next day, the remaining manager would resign.", "The GM would terminate him the next day."], ans: 3 },
+    { s: "Only good singers are invited. No one without a sweet voice is a good singer.", c: ["All invited singers have sweet voices.", "Singers without sweet voices are not invited."], ans: 4 },
+    { s: "Reading is compulsory (2 books/week) to cultivate interest.", c: ["Interest can be created by force.", "Some students will eventually develop interest."], ans: 1 },
+    { s: "Applications not meeting criteria or date are rejected; no written test call.", c: ["Those called for test fulfilled criteria and date.", "Written test held only after scrutiny."], ans: 4 },
+    { s: "Number of child migrants doing odd jobs in cities is increasing.", c: ["Migration to big cities should be checked.", "The plight of poor children should be thoroughly studied."], ans: 1 },
+    { s: "No country is absolutely self-dependent these days.", c: ["It is impossible to grow and produce all that a country needs.", "Countrymen in general have become lazy."], ans: 0 },
+    { s: "Top 10% of households in India share 35% of national income.", c: ["Fast economy leads to wealth concentration.", "National income is unevenly distributed in India."], ans: 1 },
+    { s: "Fair record breakers get prizes. X broke a record but used prohibited drugs.", c: ["X will get the special prize.", "X will not get the special prize."], ans: 1 },
+    { s: "Purchase Product X if price and quality are your considerations.", c: ["The product must be good in quality.", "The price must be reasonable."], ans: 4 },
+    { s: "Quality has a price. India is allocating lots of funds to education.", c: ["Quality of education will improve soon.", "Funding alone can enhance quality."], ans: 0 },
+    { s: "There is demand for a separate rating agency for IT companies.", c: ["IT financial assessment calls for separate skills.", "Investors in IT will now get protection."], ans: 0 },
+    { s: "Private school standards are better than Municipal/Zila schools.", c: ["Municipalities should make efforts to improve.", "Municipal schools should be closed immediately."], ans: 0 },
+    { s: "Organised persons find time for rest. Sunita finds time for rest despite a busy schedule.", c: ["Sunita is an organised person.", "Sunita is an industrious person."], ans: 3 },
+    { s: "Domestic demand is increasing faster than indigenous crude oil production.", c: ["Crude oil must be imported.", "Domestic demand should be reduced."], ans: 3 },
+    { s: "He stressed replacing exams with methods that measure real merit.", c: ["Examinations should be abolished.", "The current system doesn't measure real merit."], ans: 1 },
+    { s: "Fashion is intolerable ugliness altered every six months.", c: ["Designers don't understand the public.", "Public is highly susceptible to novelty."], ans: 1 },
+    { s: "Until economic equality is achieved, democracy is meaningless.", c: ["Political freedom and democracy go hand in hand.", "Economic equality leads to real democracy."], ans: 1 }
+];
+
+let currentIdx = 0;
+let selectedOpt = null;
+
+function render() {
+    const q = dataset[currentIdx];
+    document.getElementById('q-label').innerText = `Question ${currentIdx + 1} / ${dataset.length}`;
+    document.getElementById('stmt-text').innerText = q.s;
+    document.getElementById('c1-text').innerText = q.c[0];
+    document.getElementById('c2-text').innerText = q.c[1];
+    
+    const btns = document.querySelectorAll('.opt');
+    btns.forEach(b => {
+        b.classList.remove('selected', 'correct', 'wrong');
+        b.disabled = false;
+    });
+    document.getElementById('checkBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerText = "";
+    selectedOpt = null;
+}
+
+function select(idx) {
+    selectedOpt = idx;
+    const btns = document.querySelectorAll('.opt');
+    btns.forEach((b, i) => b.classList.toggle('selected', i === idx));
+}
+
+function check() {
+    if (selectedOpt === null) return alert("Select a conclusion!");
+    const correct = dataset[currentIdx].ans;
+    const btns = document.querySelectorAll('.opt');
+    
+    btns[correct].classList.add('correct');
+    if (selectedOpt !== correct) {
+        btns[selectedOpt].classList.add('wrong');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--wrong)'>Incorrect</span>";
+    } else {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--correct)'>Correct!</span>";
+    }
+    
+    btns.forEach(b => b.disabled = true);
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    if (currentIdx < dataset.length - 1) {
+        currentIdx++;
+        render();
+        window.scrollTo(0,0);
+    } else {
+        alert("Completed!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

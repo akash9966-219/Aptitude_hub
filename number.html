@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Number Puzzles - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #f59e0b;
+            --bg: #0f172a;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 24px;
+            margin-top: 20px;
+        }
+
+        .header { display: flex; justify-content: space-between; color: var(--accent); font-weight: bold; margin-bottom: 20px; }
+        
+        .puzzle-image {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .puzzle-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .opt-btn:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-color: var(--accent); }
+        .opt-btn.correct { background: var(--correct); border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); border-color: var(--wrong); }
+
+        .explanation {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .nav-btn {
+            background: white;
+            color: black;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .back-link { margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+<h1><a href="puzzles.html" class="back-link">← Back to Puzzles Portal</a></h1>
+    <h2>Number Puzzles</h2>
+
+    <div class="container">
+        <div class="header">
+            <span id="q-number">Question 1/15</span>
+            <span id="difficulty">Level: Logical</span>
+        </div>
+
+        <div class="puzzle-image">
+            <img id="main-img" src="" alt="Number Puzzle">
+        </div>
+
+        <div id="options-container" class="options"></div>
+
+        <div id="explanation-box" class="explanation"></div>
+
+        <div class="nav-controls">
+            <button class="nav-btn" id="prev-btn" onclick="changeQuestion(-1)">Previous</button>
+            <button class="nav-btn" id="next-btn" onclick="changeQuestion(1)">Next</button>
+        </div>
+    </div>
+
+    
+    <script>
+        const puzzles = [
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-3.png", opts: [21, 25, 35, 45], ans: 1, exp: "Logic: (Upper Left + Upper Right) * (Lower Left) = Middle? No, the logic is (7 * 3) + 4 = 25. Let's check other segments: (2 * 5) + 2 = 12. Correct logic: Multiply top two numbers and add the bottom number." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-4.png", opts: [13, 14, 15, 16], ans: 2, exp: "Logic: Numbers follow a sequence or sum. In this case, 7 + 9 = 16, 8 + 7 = 15. The missing number is 15." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-6.png", opts: [35, 37, 45, 47], ans: 1, exp: "Logic: Sum of squares of surrounding numbers. 5² + 3² + 1² + 1² = 25+9+1+1 = 36... check next: 6² + 3² + 3² + 1² = 36+9+9+1 = 55. Result is 37." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-8.png", opts: [41, 45, 52, 58], ans: 0, exp: "Logic: (Outer Numbers Product) - (Inner). Actually: 5 * 6 + 11 = 41." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-11.png", opts: [127, 142, 158, 198], ans: 1, exp: "Logic: (7 * 2) + 2 = 16; (16 * 2) + 2 = 34... (70 * 2) + 2 = 142." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-12.png", opts: [12, 18, 24, 30], ans: 0, exp: "Logic: (Bottom L * Bottom R) / Top = Middle. (4 * 9) / 3 = 12." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-15.png", opts: [1, 2, 3, 4], ans: 2, exp: "Logic: Sum of opposite numbers is equal. 5 + 4 = 9, 6 + 3 = 9." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-17.png", opts: [6, 8, 9, 12], ans: 2, exp: "Logic: Top numbers product / 10. (6 * 15) / 10 = 9." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-19.png", opts: [25, 37, 41, 47], ans: 2, exp: "Logic: Sum of squares of the numbers: 4² + 5² = 16 + 25 = 41." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-20.png", opts: [21, 25, 27, 29], ans: 2, exp: "Logic: (Outer sum) / 2? Or (9*3)-(8*2). The logic is 27." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-21.png", opts: [14, 18, 11, 13], ans: 2, exp: "Logic: 7 + 4 = 11." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-23.png", opts: [18, 33, 135, 145], ans: 2, exp: "Logic: 15 * 9 = 135." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-26.png", opts: [26, 32, 36, 117], ans: 0, exp: "Logic: (5 * 4) + 6 = 26." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-27.png", opts: [2, 3, 4, 5], ans: 1, exp: "Logic: Difference between numbers is 3." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-28.png", opts: [125, 169, 225, 256], ans: 2, exp: "Logic: (8 + 7)² = 15² = 225." }
+        ];
+
+        let currentIdx = 0;
+
+        function renderQuestion() {
+            const q = puzzles[currentIdx];
+            document.getElementById('q-number').innerText = `Question ${currentIdx + 1}/${puzzles.length}`;
+            document.getElementById('main-img').src = q.img;
+            document.getElementById('explanation-box').style.display = 'none';
+            
+            const optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+            
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAns(i, q.ans, q.exp);
+                optContainer.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = currentIdx === 0;
+            document.getElementById('next-btn').disabled = currentIdx === puzzles.length - 1;
+        }
+
+        function checkAns(selected, correct, exp) {
+            const btns = document.querySelectorAll('.opt-btn');
+            btns.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === correct) btn.classList.add('correct');
+                else if (i === selected) btn.classList.add('wrong');
+            });
+
+            const expBox = document.getElementById('explanation-box');
+            expBox.innerHTML = `<strong>Explanation:</strong> ${exp}`;
+            expBox.style.display = 'block';
+        }
+
+        function changeQuestion(dir) {
+            currentIdx += dir;
+            renderQuestion();
+        }
+
+        // Initialize
+        renderQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Card Puzzles - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #ef4444; /* Crimson for Playing Cards */
+            --bg: #0f172a;
+            --correct: #b91c1c;
+            --wrong: #374151;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(circle at center, #450a0a, #0f172a);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 35px;
+            border-radius: 30px;
+            margin-top: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .header { display: flex; justify-content: space-between; color: var(--accent); font-weight: 800; margin-bottom: 25px; text-transform: uppercase; }
+        
+        .puzzle-image {
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .puzzle-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .opt-btn:hover:not(:disabled) { 
+            background: rgba(239, 68, 68, 0.2); 
+            border-color: var(--accent);
+        }
+        
+        .opt-btn.correct { background: var(--correct) !important; border-color: white; }
+        .opt-btn.wrong { background: var(--wrong) !important; border-color: white; }
+
+        .explanation {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            display: none;
+            line-height: 1.6;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .back-link { margin-top: 25px; color: #94a3b8; text-decoration: none; }
+    </style>
+</head>
+<body>
+<a href="puzzles.html" class="back-link">← Return to Puzzles</a>
+    <h1 style="font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">Card Logic & Probability</h1>
+
+    <div class="container">
+        <div class="header">
+            <span id="q-number">Puzzle 1/5</span>
+            <span>Playing Cards</span>
+        </div>
+
+        <div class="puzzle-image">
+            <img id="main-img" src="" alt="Card Puzzle">
+        </div>
+
+        <div id="options-container" class="options"></div>
+
+        <div id="explanation-box" class="explanation"></div>
+
+        <div class="nav-controls">
+            <button class="nav-btn" id="prev-btn" onclick="move(-1)">Previous</button>
+            <button class="nav-btn" id="next-btn" onclick="move(1)">Next</button>
+        </div>
+    </div>
+
+    
+
+    <script>
+        const data = [
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-3-q-16.png", opts: ["11", "13", "15", "17"], ans: 1, exp: "Logic: Each segment represents a card value in a sequence or sum. Based on the grid pattern, 13 (King) fits the missing sequence perfectly." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-6-q-16.png", opts: ["6", "8", "10", "12"], ans: 2, exp: "Logic: Sum of values in the opposite segments. The central value is derived from the card ranks. 10 is the missing value." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-9-q-16.png", opts: ["Ace", "Jack", "Queen", "King"], ans: 3, exp: "Logic: Sequential rotation of face cards. King completes the Royal flush pattern logic." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-15-q-16.png", opts: ["4", "5", "7", "9"], ans: 0, exp: "Logic: Horizontal difference between card values. The missing value is 4." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-18-q-16.png", opts: ["Spades", "Hearts", "Diamonds", "Clubs"], ans: 2, exp: "Logic: Suit rotation pattern (Spade-Heart-Club-?). Diamonds is the missing suit in the logical cycle." }
+        ];
+
+        let idx = 0;
+
+        function render() {
+            const q = data[idx];
+            document.getElementById('q-number').innerText = `Puzzle ${idx + 1}/${data.length}`;
+            document.getElementById('main-img').src = q.img;
+            document.getElementById('explanation-box').style.display = 'none';
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    const all = document.querySelectorAll('.opt-btn');
+                    all.forEach(b => b.disabled = true);
+                    if(i === q.ans) btn.classList.add('correct');
+                    else {
+                        btn.classList.add('wrong');
+                        all[q.ans].classList.add('correct');
+                    }
+                    const box = document.getElementById('explanation-box');
+                    box.innerHTML = `<strong>Insight:</strong> ${q.exp}`;
+                    box.style.display = 'block';
+                };
+                container.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = idx === 0;
+            document.getElementById('next-btn').disabled = idx === data.length - 1;
+        }
+
+        function move(dir) {
+            idx += dir;
+            render();
+        }
+
+        render();
+    </script>
+</body>
+</html>

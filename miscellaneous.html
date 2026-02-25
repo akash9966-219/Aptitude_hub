@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Miscellaneous Awareness Quiz 2025-26</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e293b; --bg: #f8fafc; --card: #ffffff; --accent: #db2777; --correct: #059669; --wrong: #dc2626; --text: #334155; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: 700; color: var(--accent); font-size: 0.9rem; }
+        .q-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; color: var(--primary); }
+        .options { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt { padding: 16px; border: 2px solid #f1f5f9; border-radius: 8px; background: #fff; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt:hover:not(:disabled) { border-color: var(--accent); background: #fff1f2; }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 20px; padding: 15px; background: #fdf2f8; border-radius: 8px; border-left: 4px solid var(--accent); display: none; font-size: 0.95rem; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 10px; }
+        .btn-nav { padding: 12px 24px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which company introduced a feature to change primary Gmail addresses without data loss?", opts: ["Microsoft", "Google", "Apple", "Yahoo"], ans: 1, exp: "Google announced this major update for Workspace and personal accounts to improve identity flexibility." },
+    { q: "2. Who released the Hindi translation of the Lithuanian novel “The Last Day” (Antim Din)?", opts: ["National Book Trust", "Sahitya Akademi", "ICCR", "Ministry of External Affairs"], ans: 2, exp: "The Indian Council for Cultural Relations (ICCR) released it to foster Indo-Lithuanian literary ties." },
+    { q: "3. In which city was the 20th East Asia Summit held where the Kuala Lumpur Declaration was adopted?", opts: ["Jakarta", "Bangkok", "Manila", "Kuala Lumpur"], ans: 3, exp: "The summit took place in October 2025 in Malaysia, focusing on regional peace and stability." },
+    { q: "4. Which project was jointly inaugurated by PM Modi and Singapore PM Lawrence Wong in Sep 2025?", opts: ["JNPT Expansion", "PSA Mumbai Terminal Phase-II", "Chennai Port", "Mundra Port"], ans: 1, exp: "They inaugurated Phase-2 of the Bharat Mumbai Container Terminal (BMCT) at JNP, Navi Mumbai." },
+    { q: "5. Which state will host the Filmfare Awards 2025 for the second consecutive year?", opts: ["Maharashtra", "Rajasthan", "Uttar Pradesh", "Gujarat"], ans: 3, exp: "Gujarat signed an MoU to host the prestigious awards again after a successful 2024 edition." },
+    { q: "6. How many consecutive Independence Day speeches has PM Modi delivered as of 2025?", opts: ["10", "11", "12", "17"], ans: 2, exp: "PM Modi delivered his 12th consecutive speech on Aug 15, 2025, surpassing Indira Gandhi's record." },
+    { q: "7. Who retained the post of GS (Admin) of the Constitution Club of India in 2024-25?", opts: ["Rajiv Pratap Rudy", "Rajiv Shukla", "Tiruchi Siva", "A P Jithender Reddy"], ans: 1, exp: "Rajiv Shukla was re-elected after defeating Sanjeev Balyan in the club's administrative polls." },
+    { q: "8. Which organisation is NOT involved in launching skill programs with NESTS in 2025?", opts: ["UNICEF", "Ex-Navodayan Foundation", "Tata Motors", "DRDO"], ans: 3, exp: "NESTS partnered with UNICEF, Tata Motors, and Ex-Navodayan Foundation; DRDO was not part of this specific tri-party skill initiative." },
+    { q: "9. Who was conferred with the French honour 'Officier dans l'Ordre des Arts et des Lettres'?", opts: ["Mira Nair", "Zoya Akhtar", "Payal Kapadia", "Deepa Mehta"], ans: 2, exp: "Payal Kapadia received the honor for her cinematic excellence, notably after her Grand Prix win at Cannes." },
+    { q: "10. Which company topped AI-driven Revenue Cycle Management in Black Book 2025?", opts: ["Cerner", "McKesson", "Optum", "IKS Health"], ans: 3, exp: "IKS Health was ranked No. 1 in the newly established AI-driven RCM category." },
+    { q: "11. How long has the Election Commission pledged to resolve duplicate voter ID numbers?", opts: ["1 month", "6 months", "1 year", "3 months"], ans: 3, exp: "The EC plans to eliminate duplicate voter IDs within 90 days using the ERONET 2.0 platform." },
+    { q: "12. Who was recommended by PESB to be the next MD of Chennai Petroleum Corporation (CPCL)?", opts: ["Ramesh Kumar", "Anil Verma", "H Shankar", "Suresh Nair"], ans: 2, exp: "H. Shankar, currently Director (Technical) at CPCL, was selected by the board." },
+    { q: "13. Where was India’s first Generation Beta baby (born 2025-2039) born?", opts: ["Mizoram", "Maharastra", "Assam", "Nagaland"], ans: 0, exp: "The baby, named Frankie Remruatdika Zadeng, was born in Aizawl, Mizoram." },
+    { q: "14. In which country is Hilsa fish recognized as the national fish?", opts: ["Myanmar", "Bangladesh", "Sri Lanka", "Nepal"], ans: 1, exp: "Hilsa is the national fish of Bangladesh and is central to its 'soft power' diplomacy with India." },
+    { q: "15. Which state was significantly affected by Cyclone Remal in mid-2024?", opts: ["Assam", "Tripura", "Mizoram", "West Bengal"], ans: 3, exp: "Cyclone Remal made landfall in West Bengal in May 2024, causing extensive coastal damage." },
+    { q: "16. Which organization celebrated its 65th Raising Day on May 7, 2024?", opts: ["Indian Coast Guard", "RPF", "BRO", "CRPF"], ans: 2, exp: "The Border Roads Organisation (BRO) celebrated 65 years of connecting remote border areas." },
+    { q: "17. Who received the Cannes honorary Palme d'Or at the 77th festival's opening?", opts: ["Meryl Streep", "Nicole Kidman", "Brad Pitt", "Leonardo DiCaprio"], ans: 0, exp: "Legendary actor Meryl Streep was honored with the award in May 2024." },
+    { q: "18. Where were the fossils of the colossal snake 'Vasuki indicus' discovered?", opts: ["Rajasthan", "Maharashtra", "Gujarat", "Madhya Pradesh"], ans: 2, exp: "Fossils of the 47-million-year-old snake were found in a mine in Kutch, Gujarat." },
+    { q: "19. Whose book 'Code-Dependent' was shortlisted for the Women’s Prize for Non-Fiction?", opts: ["Madhumita Murgia", "Laura Cumming", "Naomi Klein", "Noreen Masud"], ans: 0, exp: "FT’s AI editor Madhumita Murgia explored the human impact of AI in this acclaimed work." },
+    { q: "20. Where did the trailer launch of India's first AI-based film 'IRAH' take place?", opts: ["Delhi", "Chennai", "Mumbai", "Kolkata"], ans: 2, exp: "The trailer for Rohit Bose Roy starrer 'IRAH' was launched in Mumbai in early 2024." },
+    { q: "21. Which country conferred the 'Order of the Druk Gyalpo' to PM Modi?", opts: ["Bhutan", "Nepal", "Maldives", "Sri Lanka"], ans: 0, exp: "PM Modi became the first foreign head of state to receive Bhutan’s highest civilian honor." },
+    { q: "22. Which language was Baltassat’s novel translated into for the Romain Rolland Prize 2024?", opts: ["French", "English", "Bengali", "Russian"], ans: 2, exp: "Pankaj Kumar Chatterjee won for his Bengali translation titled 'Staliner Divan'." },
+    { q: "23. On which date did the IAF conduct the Balakot Airstrike?", opts: ["Feb 14", "Feb 24", "Feb 25", "Feb 26"], ans: 3, exp: "The strike took place on Feb 26, 2019, targeting terrorist training camps." },
+    { q: "24. Where was the giant anaconda (northern green anaconda) discovered in 2024?", opts: ["Amazon Rainforest", "African Savanna", "Australian Outback", "Arctic Tundra"], ans: 0, exp: "A new species of giant anaconda was found in the Ecuadorian Amazon." },
+    { q: "25. Which summit agreed to a continental ban on the donkey skin trade?", opts: ["EAC Summit", "SADC Summit", "African Union Summit", "IGAD Summit"], ans: 2, exp: "The 37th African Union Summit in Ethiopia passed this historic ban to protect rural livelihoods." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `MISC_${idx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Insight:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

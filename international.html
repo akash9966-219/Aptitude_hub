@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>International Affairs Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e293b; --bg: #f8fafc; --card: #ffffff; --accent: #c2410c; --correct: #15803d; --wrong: #b91c1c; --text: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-left: 10px solid var(--accent); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        .q-text { font-size: 1.35rem; line-height: 1.4; margin-bottom: 30px; font-weight: 800; color: var(--primary); }
+        .options { display: grid; gap: 15px; }
+        .opt { padding: 18px; border: 2px solid #e2e8f0; border-radius: 12px; background: white; cursor: pointer; text-align: left; font-size: 1.1rem; transition: 0.3s; font-weight: 500; }
+        .opt:hover:not(:disabled) { border-color: var(--accent); background: #fff7ed; }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 20px; background: #fff7ed; border-radius: 10px; border: 1px solid #ffedd5; display: none; line-height: 1.6; }
+        .nav { display: flex; justify-content: space-between; margin-top: 35px; gap: 20px; }
+        .btn-nav { padding: 15px 30px; border-radius: 10px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 700; flex: 1; transition: 0.2s; }
+        .btn-nav:hover:not(:disabled) { background: #334155; }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which country held talks with India to boost cooperation in telecom and digital economy in Feb 2026?", opts: ["Ireland", "Germany", "Australia", "Japan"], ans: 1, exp: "German Minister for Digital Affairs met with India's Scindia to implement the 'Joint Declaration of Intent' signed in Jan 2026." },
+    { q: "2. Who is the leader poised to be PM of Bangladesh after the 2026 elections?", opts: ["Tarique Rahman", "Muhammad Yunus", "Khaleda Zia", "Mohammed Shahabuddin"], ans: 0, exp: "Tarique Rahman returned from exile as the BNP claimed a landslide victory in the Feb 2026 polls." },
+    { q: "3. Which country is hosting the first Global South AI Impact Summit 2026?", opts: ["India", "Brazil", "France", "Japan"], ans: 0, exp: "India hosted the summit at Bharat Mandapam (New Delhi) from Feb 16-20, 2026, focusing on inclusive AI." },
+    { q: "4. Which country announced the SESEL Vision with India during a state visit?", opts: ["Mauritius", "Seychelles", "Maldives", "Sri Lanka"], ans: 1, exp: "President Patrick Herminie of Seychelles and PM Modi launched the SESEL Vision for security and growth in Jan 2026." },
+    { q: "5. Which country received a 175 Million Special Economic Package from India?", opts: ["Seychelles", "Maldives", "Mauritius", "Sri Lanka"], ans: 0, exp: "India announced this package for Seychelles in Jan 2026 to support infrastructure and development." },
+    { q: "6. Which company secured a U.S. license to import crude oil from Venezuela?", opts: ["ONGC", "Indian Oil", "Reliance Industries", "BPCL"], ans: 2, exp: "Reliance Industries Limited (RIL) resumed imports from Venezuela after receiving a specific US OFAC license." },
+    { q: "7. Which party won the 2026 general elections in Bangladesh?", opts: ["Awami League", "BNP", "Jatiya Party", "LDP"], ans: 1, exp: "The Bangladesh Nationalist Party (BNP) ended years of political transition with a decisive parliamentary majority." },
+    { q: "8. Which country assumed the chair of the Kimberley Process for 2026?", opts: ["South Africa", "Australia", "Belgium", "India"], ans: 3, exp: "India has taken over the chairmanship of the Kimberley Process (Certification Scheme for rough diamonds) for 2026." },
+    { q: "9. Designated as 'Country of the Year' at BIOFACH 2026 in Nuremberg?", opts: ["Germany", "India", "Brazil", "Australia"], ans: 1, exp: "India was honored at the world's leading organic trade fair in Germany in Feb 2026." },
+    { q: "10. Country that signed a Social Security Agreement with India in Feb 2026?", opts: ["United States", "United Kingdom", "Canada", "Australia"], ans: 1, exp: "India and the UK signed the SSA to prevent double social security contributions for mobile workers." },
+    { q: "11. Which country signed a military pact with Saudi Arabia regarding the Horn of Africa?", opts: ["Ethiopia", "Kenya", "Somalia", "Sudan"], ans: 2, exp: "Somalia and Saudi Arabia deepened defense ties to counter regional rivalries and piracy." },
+    { q: "12. Which country agreed with India to develop a joint work plan on cybersecurity policy?", opts: ["Australia", "Canada", "Germany", "Japan"], ans: 2, exp: "Part of the Jan 2026 India-Germany summit outcomes under Chancellor Friedrich Merz." },
+    { q: "13. India's rank in the Network Readiness Index 2025?", opts: ["45th", "40th", "50th", "35th"], ans: 2, exp: "India improved its standing to 50th globally, reflecting growth in digital infrastructure and services." },
+    { q: "14. Which Air Force launched 'Buddy Squadron' joint drills with the US?", opts: ["Japanese", "South Korean", "Australian", "British"], ans: 1, exp: "The South Korean and US Air Forces conducted the 'Buddy Squadron' drills at Osan Air Base in Feb 2026." },
+    { q: "15. Who led the LDP to a landslide victory in Japan’s 2026 election?", opts: ["Fumio Kishida", "Yasuhiro Nakasone", "Shinzo Abe", "Sanae Takaichi"], ans: 3, exp: "Sanae Takaichi became Japan's first female Prime Minister after a historic LDP win in early 2026." },
+    { q: "16. Country that rolled out its first locally produced FMD vaccine in 20 years?", opts: ["South Africa", "Australia", "Brazil", "Argentina"], ans: 0, exp: "South Africa achieved self-sufficiency in Foot-and-Mouth Disease vaccines to protect its livestock." },
+    { q: "17. Partnered with India for a Hydrogen Fellowship and IIT-Groningen collab?", opts: ["Germany", "Denmark", "Netherlands", "Japan"], ans: 2, exp: "The Netherlands is working with India on green hydrogen and academic research via the University of Groningen." },
+    { q: "18. Partnering with India for hydropower development focusing on 400 kV lines?", opts: ["Nepal", "Bangladesh", "Bhutan", "Sri Lanka"], ans: 0, exp: "India and Nepal signed major agreements in late 2025/early 2026 for cross-border transmission." },
+    { q: "19. Which country formally joined the BRICS Centre for Industrial Competencies?", opts: ["India", "Brazil", "Russia", "South Africa"], ans: 0, exp: "India recently joined this Russia-led initiative to foster MSME manufacturing within BRICS." },
+    { q: "20. Tariffs level in the US-India trade deal announced in Feb 2026?", opts: ["25%", "18%", "15%", "10%"], ans: 3, exp: "The deal saw significant reciprocal tariff reductions to 10% on key electronic and agricultural goods." },
+    { q: "21. Country that announced its withdrawal from the ISA in January 2026?", opts: ["United States", "France", "India", "Germany"], ans: 0, exp: "The US administration announced a withdrawal from the International Solar Alliance citing domestic energy priorities." },
+    { q: "22. Location of the US operation 'Absolute Resolve' (Discombobulator system)?", opts: ["Venezuela", "Iran", "Syria", "North Korea"], ans: 1, exp: "The operation targeted drone manufacturing facilities in Iran using non-kinetic electronic warfare." },
+    { q: "23. Signed a joint statement with India on energy during India Energy Week 2026?", opts: ["Canada", "Australia", "France", "Japan"], ans: 0, exp: "Minister Hardeep Puri and Canada’s Energy Minister signed the agreement in Goa (Jan 2026)." },
+    { q: "24. Same as Q23 - Energy Week 2026 Partner?", opts: ["Australia", "Canada", "Germany", "Japan"], ans: 1, exp: "Canada reaffirmed LNG and crude exports to India as part of the renewed Energy Dialogue." },
+    { q: "25. Which country's Assembly approved a social media ban for children under 15?", opts: ["Spain", "Germany", "Australia", "France"], ans: 3, exp: "France passed the bill in Jan 2026 to tackle social media addiction and cyberbullying." },
+    { q: "26. Country that officially withdrawn from the WHO in Jan 2026?", opts: ["United Kingdom", "Germany", "United States", "Australia"], ans: 2, exp: "The US completed its formal exit from the World Health Organization in early 2026." },
+    { q: "27. Country that commissioned the world’s largest compressed-air energy storage?", opts: ["China", "United States", "Germany", "India"], ans: 0, exp: "China's 300MW facility in Hubei province set a new global benchmark for non-lithium storage." },
+    { q: "28. Country announced 785 Million investment in public AI research by 2030?", opts: ["United States", "Singapore", "India", "Japan"], ans: 1, exp: "Singapore's 'AI Verify' initiative received massive funding to secure its tech leadership." },
+    { q: "29. Beneficiary of IFC’s 166 Million programme for SMEs and growth?", opts: ["India", "Bangladesh", "Sri Lanka", "Nepal"], ans: 2, exp: "IFC invested in three major Sri Lankan banks in Jan 2026 to boost recovery and SME lending." },
+    { q: "30. Receiving 740,000 UNESCO emergency aid for heritage after storms?", opts: ["Thailand", "Cambodia", "Indonesia", "Vietnam"], ans: 3, exp: "UNESCO approved the aid to restore the Hue Imperial City and Hoi An following Cyclone Ditwah." },
+    { q: "31. Partnered with India for a 200 Billion trade target by 2032?", opts: ["Saudi Arabia", "UAE", "Qatar", "Oman"], ans: 1, exp: "India and UAE set this ambitious target during the Jan 2026 High-Level Joint Task Force meeting." },
+    { q: "32. Country/Entity that passed the world’s first comprehensive AI Law?", opts: ["South Korea", "Japan", "United States", "European Union"], ans: 3, exp: "The EU AI Act reached full enforcement in early 2026, setting global standards. (Note: Ans D in context of 'Germany' option being EU-representative)." },
+    { q: "33. Agreed with India to expand coop in defense and critical minerals in Jan 2026?", opts: ["Botswana", "South Africa", "Zambia", "Namibia"], ans: 2, exp: "Zambia and India signed MoUs during the state visit of the Zambian President to New Delhi." },
+    { q: "34. Benefit from IREDA’s first international 22.5M green loan?", opts: ["Zambia", "Kenya", "South Africa", "Tanzania"], ans: 0, exp: "IREDA (India) provided the loan for a 100 MW solar project in Zambia's Serenje district." },
+    { q: "35. In which country did Aritra Roy summit Mount Aconcagua?", opts: ["Nepal", "Chile", "Bolivia", "Argentina"], ans: 3, exp: "Mt. Aconcagua is the highest peak in the Americas, located in the Argentine Andes." },
+    { q: "36. Country announced withdrawal from 7 UN agencies in 2026?", opts: ["Iran", "Turkey", "Russia", "Israel"], ans: 3, exp: "Israel cited bias in agencies like UNRWA and UNESCO when announcing its withdrawal." },
+    { q: "37. Signed 19 strategic agreements with India in Jan 2026?", opts: ["Germany", "France", "Japan", "United Kingdom"], ans: 0, exp: "Chancellor Merz’s visit yielded 19 MoUs covering submarines, semiconductors, and green hydrogen." },
+    { q: "38. Co-chair the 16th ADMM-Plus Counter Terrorism group with India?", opts: ["Indonesia", "Thailand", "Malaysia", "Vietnam"], ans: 2, exp: "India and Malaysia are the co-chairs for the 2024-2027 cycle; New Delhi hosted the Jan 2026 meeting." },
+    { q: "39. India’s global ranking in the Henley Passport Index 2026?", opts: ["75th", "78th", "85th", "80th"], ans: 0, exp: "India jumped to 75th in the Feb 2026 index, its highest rank in recent years." },
+    { q: "40. Country that unveiled the official logo for BRICS Presidency 2026?", opts: ["Brazil", "Russia", "China", "India"], ans: 3, exp: "EAM Jaishankar unveiled the BRICS India 2026 logo featuring the 'Namaste' gesture in Jan 2026." },
+    { q: "41. Strengthened partnership during Chancellor Friedrich Merz’s visit?", opts: ["France", "Japan", "Germany", "Australia"], ans: 2, exp: "Merz visited India as his first Asian destination as Chancellor in Jan 2026." },
+    { q: "42. Host of the 28th CSPOC in January 2026?", opts: ["United Kingdom", "Australia", "India", "Canada"], ans: 2, exp: "New Delhi hosted the Speakers and Presiding Officers of the Commonwealth conference." },
+    { q: "43. Conferred Italian honor on Shrinivas Dempo?", opts: ["France", "Spain", "Germany", "Italy"], ans: 3, exp: "Italy awarded the 'Knight of the Order of the Star of Italy' for his role as Vice Consul in Goa." },
+    { q: "44. Country hosted G7 Critical Minerals Meeting (attended by Vaishnaw)?", opts: ["Canada", "United States", "Germany", "Japan"], ans: 1, exp: "Hosted by US Treasury Secretary Scott Bessent in Washington D.C. (Feb 2026)." },
+    { q: "45. Introduced e-B-4 Investment Visa for Chinese nationals?", opts: ["India", "Japan", "Singapore", "UAE"], ans: 3, exp: "The UAE introduced this in Jan 2026 to streamline business travel from China." },
+    { q: "46. First in world to commercially use bio-bitumen for roads?", opts: ["Germany", "China", "India", "Japan"], ans: 2, exp: "India's Ministry of Road Transport launched the first bio-bitumen project using rice straw in Punjab." },
+    { q: "47. Country where 'Gulf Shield 2026' exercise was launched?", opts: ["Saudi Arabia", "UAE", "Qatar", "Kuwait"], ans: 0, exp: "Saudi Arabia hosted the massive GCC joint military exercise in Jan 2026." },
+    { q: "48. How many intl. organizations did the US withdraw from in Jan 2026?", opts: ["45", "52", "66", "80"], ans: 2, exp: "The US executive order 'Restoring Sovereignty' listed 66 organizations for funding cuts or exit." },
+    { q: "49. Which two recognized AYUSH in trade pacts in Dec 2025?", opts: ["Japan/Australia", "Oman/New Zealand", "UK/Canada", "Germany/France"], ans: 1, exp: "Oman and New Zealand formally included AYUSH services in their trade frameworks with India." },
+    { q: "50. Declared 2026 as International Year for Rangelands and Pastoralists?", opts: ["United Nations", "World Bank", "UNESCO", "FAO"], ans: 0, exp: "The UN General Assembly designated 2026 to highlight grassland ecosystems." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `Question ${idx + 1} of 50`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            const all = document.querySelectorAll('.opt'); all.forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); all[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Insight:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

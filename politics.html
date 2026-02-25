@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Politics & Governance Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e1b4b; --bg: #fdf2f2; --card: #ffffff; --accent: #ef4444; --correct: #16a34a; --wrong: #dc2626; --text: #1e293b; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-left: 10px solid var(--accent); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: var(--accent); text-transform: uppercase; }
+        .q-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; color: var(--primary); }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        .opt { padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.3s; }
+        .opt:hover:not(:disabled) { background: #fee2e2; border-color: var(--accent); }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 15px; background: #fff1f2; border-radius: 8px; border: 1px dashed var(--accent); display: none; line-height: 1.4; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
+        .btn-nav { padding: 12px 0; border-radius: 6px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; }
+        .btn-nav:disabled { opacity: 0.4; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">PREVIOUS</button>
+            <button class="btn-nav" id="next" onclick="move(1)">NEXT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which country announced Donald Trump will receive its highest civilian honour in the Peace category in 2026?", opts: ["Ukraine", "Israel", "United Kingdom", "France"], ans: 1, exp: "Israel announced that Trump would receive its highest civilian award for his role in securing the release of hostages and regional peace efforts." },
+    { q: "2. Who was sworn in as Chief Minister of Bihar for a historic 10th term in 2025?", opts: ["Tejashwi Yadav", "Nitish Kumar", "Bhupendra Patel", "Devendra Fadnavis"], ans: 1, exp: "Nitish Kumar extended his record by taking the oath for the 10th time after the 2025 assembly elections." },
+    { q: "3. How many seats did the NDA win in the 2025 Bihar Assembly Elections?", opts: ["202", "189", "243", "122"], ans: 0, exp: "The NDA secured 202 seats in the 243-member assembly, a significant landslide victory." },
+    { q: "4. Who was sworn in as the 21st President of South Korea in June 2025?", opts: ["Kim Moon-soo", "Moon Jae-in", "Lee Jae-myung", "Park Geun-hye"], ans: 2, exp: "Liberal leader Lee Jae-myung was sworn in following a snap election after the ousting of the previous leader." },
+    { q: "5. Which country denied allegations of using sonic weapons against anti-government protesters?", opts: ["Serbia", "Russia", "Hungary", "Poland"], ans: 0, exp: "The Serbian government faced and denied these technological crowd-control allegations in early 2026." },
+    { q: "6. Which country’s army took full control of the Presidential Palace in Khartoum?", opts: ["Chad", "Sudan", "Libya", "Ethiopia"], ans: 1, exp: "Sudan's army secured the capital's central palace amid ongoing domestic conflict." },
+    { q: "7. Which region allocated 3 crore annually for each MLA under the CDF scheme?", opts: ["Punjab", "Jammu and Kashmir", "Uttar Pradesh", "Rajasthan"], ans: 1, exp: "The J&K administration approved this significant funding to boost local constituency development." },
+    { q: "8. Who replaced Justin Trudeau as Canada's Liberal Party leader and Prime Minister in 2025?", opts: ["Mark Carney", "Chrystia Freeland", "Karina Gould", "Frank Baylis"], ans: 0, exp: "Former central banker Mark Carney won the leadership vote in a landslide in March 2025." },
+    { q: "9. Who has been appointed as Israel’s new Chief of Staff (taking office March 2025)?", opts: ["Aviv Kochavi", "Eyal Zamir", "Herzi Halevi", "Benjamin Netanyahu"], ans: 1, exp: "Eyal Zamir was appointed to lead the IDF, succeeding Herzi Halevi." },
+    { q: "10. Who became the new Chancellor of Austria following a new coalition in 2025?", opts: ["Sebastian Kurz", "Alexander Van der Bellen", "Christian Stocker", "Heinz-Christian Strache"], ans: 2, exp: "Christian Stocker was sworn in as chancellor by President Van der Bellen in March 2025." },
+    { q: "11. In which state did CM N. Biren Singh resign before a no-confidence motion?", opts: ["Assam", "Meghalaya", "Manipur", "Tripura"], ans: 2, exp: "The Manipur CM resigned amidst prolonged unrest and shifting political alliances." },
+    { q: "12. Who assumed office as the President of Moldova for a second term in Dec 2024?", opts: ["Maia Sandu", "Igor Dodon", "Vladimir Voronin", "Natalia Gavrilița"], ans: 0, exp: "Pro-European leader Maia Sandu secured a second term following a closely watched election." },
+    { q: "13. Town where 'Sushasan Padyatra' was organized for Vajpayee's 100th birth anniversary?", opts: ["Ahmedabad", "Gandhinagar", "Surat", "Vadnagar"], ans: 1, exp: "The Good Governance march was centered in Gandhinagar, Gujarat." },
+    { q: "14. Declared President-elect in Ghana's 2024 presidential election?", opts: ["Nana Akufo-Addo", "Kwame Nkrumah", "Jerry Rawlings", "John Mahama"], ans: 3, exp: "John Mahama won a non-consecutive second term, defeating the incumbent vice president." },
+    { q: "15. Country where the Assad dynasty fell as rebels seized Damascus?", opts: ["Libya", "Syria", "Iraq", "Yemen"], ans: 1, exp: "The fall of Damascus marked the end of decades of rule by the Assad family." },
+    { q: "16. Elected as the Maharashtra Assembly Speaker unopposed?", opts: ["Kashiram Pawara", "Rahul Narwekar", "Savkare Waman", "Sanjay Shriram"], ans: 0, exp: "Kashiram Vechan Pawara was elected to the post unopposed in late 2024." },
+    { q: "17. Namibia’s first female president (elected 2024, sworn in 2025)?", opts: ["Panduleni Itula", "Netumbo Nandi-Ndaitwah", "Saara Kuugongelwa", "Hage Geingob"], ans: 1, exp: "Netumbo Nandi-Ndaitwah made history as the nation's first woman leader." },
+    { q: "18. Elected as Uruguay's next president in Nov 2024?", opts: ["Delgado", "Luis Lacalle Pou", "Tabare Vazquez", "Yamandu Orsi"], ans: 3, exp: "Yamandú Orsi of the Broad Front coalition won the presidential runoff." },
+    { q: "19. Appointed Prime Minister of Mali after Choguel Maiga's dismissal?", opts: ["Amadou Sanogo", "Assimi Goita", "Abdoulaye Maiga", "Mohamed Bazoum"], ans: 2, exp: "Abdoulaye Maiga, previously the government spokesperson, was appointed by the junta." },
+    { q: "20. Prime Minister of Mauritius after the 2024 landslide victory?", opts: ["Navin Ramgoolam", "Pravind Jugnauth", "Anerood Jugnauth", "Paul Bérenger"], ans: 0, exp: "Navin Ramgoolam returned to office for a third time after his coalition swept the polls." },
+    { q: "21. Japan's 103rd Prime Minister?", opts: ["Yoshihide Suga", "Shigeru Ishiba", "Taro Aso", "Taku Eto"], ans: 1, exp: "Shigeru Ishiba was re-elected after a brief political transition." },
+    { q: "22. Sworn in as the Prime Minister of Haiti in late 2024?", opts: ["Alix Didier Fils-Aime", "Garry Conille", "Jean-Henry Ceant", "Claude Joseph"], ans: 0, exp: "Alix Didier Fils-Aime was appointed to address security and organize elections." },
+    { q: "23. Declared Botswana's 6th president?", opts: ["Mokgweetsi Masisi", "Anna Mokgethi", "Duma Boko", "Dumelang Saleshando"], ans: 2, exp: "Duma Boko led the Umbrella for Democratic Change to a historic win." },
+    { q: "24. Elected as the President of Vietnam in late 2024?", opts: ["To Lam", "Luong Cuong", "Nguyen Xuan Phuc", "Pham Minh Chinh"], ans: 1, exp: "General Luong Cuong was elected to the presidency by the National Assembly." },
+    { q: "25. Appointed as the 8th President of Indonesia?", opts: ["Joko Widodo", "S. B. Yudhoyono", "Prabowo Subianto", "Megawati Sukarnoputri"], ans: 2, exp: "Prabowo Subianto assumed office as Indonesia's 8th president." },
+    { q: "26. Chief Minister of Haryana (sworn in for 2nd time)?", opts: ["Nayab Singh Saini", "Anil Vij", "Rao Narbir Singh", "Krishan Lal Panwar"], ans: 0, exp: "Nayab Singh Saini returned as CM following the BJP's electoral victory." },
+    { q: "27. Chief Minister of Jammu and Kashmir (2024 transition)?", opts: ["Manoj Sinha", "Omar Abdullah", "Mehbooba Mufti", "Ghulam Nabi Azad"], ans: 1, exp: "Omar Abdullah returned as CM after the restoration of the assembly." },
+    { q: "28. Mexico’s first female president?", opts: ["Rosario Robles", "Claudia Sheinbaum", "Margarita Zavala", "Beatriz Paredes"], ans: 1, exp: "Claudia Sheinbaum won a landslide victory to become Mexico's first woman head of state." },
+    { q: "29. [Duplicate Removed - See Q21]", opts: ["N/A", "N/A", "N/A", "N/A"], ans: 0, exp: "Duplicate of Shigeru Ishiba question." },
+    { q: "30. Sri Lanka's new Prime Minister (first woman since 2000)?", opts: ["Rajika Wickramasinghe", "Manjula Dissanayake", "Rohini Wijerathna", "Harini Amarasuriya"], ans: 3, exp: "Harini Amarasuriya was appointed following the parliamentary elections." },
+    { q: "31. Sri Lanka’s newly elected president (2024)?", opts: ["Sajith Premadasa", "Anura Kumara Dissanayake", "Ranil Wickremesinghe", "Dinesh Gunawardena"], ans: 1, exp: "Anura Kumara Dissanayake won the mandate on a platform of anti-corruption." },
+    { q: "32. Replaced Arvind Kejriwal as the Chief Minister of Delhi?", opts: ["Raghav Chadha", "Manish Sisodia", "Satyender Jain", "Atishi Marlena"], ans: 3, exp: "Atishi Marlena was chosen to lead the Delhi cabinet after Kejriwal's resignation." },
+    { q: "33. Re-elected President of Algeria with 84.3% of the vote?", opts: ["Abdelkader Bensalah", "Abdelmadjid Tebboune", "Ahmed Gaid Salah", "Lakhdar Brahimi"], ans: 1, exp: "Tebboune secured a second term with a massive majority." },
+    { q: "34. Political party of the late Sitaram Yechury?", opts: ["Congress", "CPI(M)", "BJP", "TMC"], ans: 1, exp: "He was the long-serving General Secretary of the Communist Party of India (Marxist)." },
+    { q: "35. Thailand's youngest prime minister?", opts: ["Srettha Thavisin", "Yingluck Shinawatra", "Paetongtarn Shinawatra", "Prayut Chan-o-cha"], ans: 2, exp: "Paetongtarn Shinawatra, daughter of Thaksin, became the nation's youngest leader." },
+    { q: "36. Which country appointed 3 new Deputy PMs for the 2021-2026 term?", opts: ["Thailand", "Cambodia", "Laos", "Vietnam"], ans: 3, exp: "Vietnam restructured its cabinet with new deputy leadership." },
+    { q: "37. Sworn in for a fourth term as Rwanda's President?", opts: ["Yoweri Museveni", "Uhuru Kenyatta", "Felix Tshisekedi", "Paul Kagame"], ans: 3, exp: "Paul Kagame won over 99% of the vote for his fourth term in 2024." },
+    { q: "38. Head of Bangladesh's interim government after Aug 2024?", opts: ["Khaleda Zia", "Muhammad Yunus", "Ahmad Bin Quasem", "Joynal Abedin"], ans: 1, exp: "Nobel Laureate Muhammad Yunus was sworn in as Chief Adviser." },
+    { q: "39. Country facing crisis after resignation of Sheikh Hasina?", opts: ["Yemen", "Pakistan", "Sri Lanka", "Bangladesh"], ans: 3, exp: "A student-led uprising led to the resignation of the long-standing PM." },
+    { q: "40. Endorsed by Joe Biden after withdrawing from the 2024 race?", opts: ["Bernie Sanders", "Kamala Harris", "Elizabeth Warren", "Pete Buttigieg"], ans: 1, exp: "Biden immediately endorsed Vice President Kamala Harris as the Democratic nominee." },
+    { q: "41. Re-elected President of the European Parliament in 2024?", opts: ["Ursula von der Leyen", "Angela Merkel", "Christine Lagarde", "Roberta Metsola"], ans: 3, exp: "The Maltese politician was re-elected for a second term." },
+    { q: "42. [Duplicate Removed - See Q37]", opts: ["N/A", "N/A", "N/A", "N/A"], ans: 0, exp: "Duplicate of Paul Kagame question." },
+    { q: "43. Nepal's Prime Minister (sworn in for 4th time in 2024)?", opts: ["Prachanda", "KP Sharma Oli", "Sher Bahadur Deuba", "Bidya Devi Bhandari"], ans: 1, exp: "KP Sharma Oli returned to the helm following a shift in the coalition." },
+    { q: "44. Elected as Iran's president (July 2024)?", opts: ["Saeed Jalili", "Ayatollah Khamenei", "Hassan Rouhani", "Masoud Pezeshkian"], ans: 3, exp: "Pezeshkian won the runoff on a platform of social reform and pragmatism." },
+    { q: "45. Elected as President of the European Council?", opts: ["Charles Michel", "Antonio Costa", "Roberta Metsola", "Ursula von der Leyen"], ans: 1, exp: "Former Portuguese PM Antonio Costa was elected to lead the Council." },
+    { q: "46. Leader of the Opposition in the 18th Lok Sabha?", opts: ["Mallikarjun Kharge", "Indira Gandhi", "Akhilesh Yadav", "Rahul Gandhi"], ans: 3, exp: "Rahul Gandhi officially took the constitutional post of LoP." },
+    { q: "47. Leader of the House in Rajya Sabha?", opts: ["J.P. Nadda", "Piyush Goyal", "Jagdeep Dhankhar", "Nirmala Sitharaman"], ans: 0, exp: "BJP President J.P. Nadda was appointed Leader of the House." },
+    { q: "48. Secured a second term as President of South Africa (2024)?", opts: ["Julius Malema", "Mdumiseni Ntuli", "Raymond Zondo", "Cyril Ramaphosa"], ans: 3, exp: "Ramaphosa was re-elected following a coalition agreement with other parties." },
+    { q: "49. CM of Arunachal Pradesh (3rd consecutive time)?", opts: ["Nabam Tuki", "Pema Khandu", "Mukut Mithi", "Dorjee Khandu"], ans: 1, exp: "Pema Khandu led the BJP to another clear mandate in the state." },
+    { q: "50. Chief Minister of Andhra Pradesh (4th term)?", opts: ["YS Jagan Mohan Reddy", "K. Rosaiah", "N. Kiran Kumar Reddy", "N. Chandrababu Naidu"], ans: 3, exp: "Chandrababu Naidu returned to power with a massive mandate in 2024." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `ID: GOV_${idx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Fact:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Non-Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're developing a sharp eye for visual logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Non-Verbal Reasoning Test 11</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 11</button>
+        <a href="test5.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "Select a figure which will continue the same series.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/series/49.png",
+                options: ["1", "2", "3", "4", "5"], ans: 3,
+                logic: "The arrow rotates 90° clockwise, and the dot moves to the next vertex of the hexagon in each step."
+            },
+            {
+                q: "Select a figure which will continue the same series.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/series/84.png",
+                options: ["1", "2", "3", "4", "5"], ans: 1,
+                logic: "Symbols move in a circular motion while changing shading states in a recurring pattern."
+            },
+            {
+                direction: "Series Continuation",
+                q: "Select a figure which will continue the same series.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/series/64.png",
+                options: ["1", "2", "3", "4", "5"], ans: 4,
+                logic: "The number of lines increases by one, and the central arc rotates by 45° anti-clockwise."
+            },
+            {
+                direction: "Analogy",
+                q: "Select a suitable figure from the Answer Figures that would replace the question mark (?).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/analogy/78.png",
+                options: ["1", "2", "3", "4", "5"], ans: 2,
+                logic: "The figure is mirrored horizontally and the internal symbols swap positions."
+            },
+            {
+                direction: "Classification",
+                q: "Choose the figure which is different from the rest.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/classification/18.png",
+                options: ["1", "2", "3", "4", "5"], ans: 0,
+                logic: "Figure 1 is the only one where the line does not divide the shape into equal parts."
+            },
+            {
+                q: "Choose the figure which is different from the rest.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/classification/32.png",
+                options: ["1", "2", "3", "4", "5"], ans: 4,
+                logic: "In all other figures, the two internal elements are of the same type (both dots or both lines)."
+            },
+            {
+                q: "Choose the figure which is different from the rest.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/classification/21.png",
+                options: ["1", "2", "3", "4", "5"], ans: 2,
+                logic: "In all other figures, the arrow points away from the dot. In Figure 3, it points toward it."
+            },
+            {
+                q: "Choose the figure which is different from the rest.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/classification/84.png",
+                options: ["1", "2", "3", "4", "5"], ans: 3,
+                logic: "Figure 4 is the only one where the main axis is horizontal rather than vertical."
+            },
+            {
+                direction: "Analytical Reasoning",
+                q: "Minimum number of different colours required to paint the figure such that no two adjacent regions have the same colour?",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/64.png",
+                options: ["3", "4", "5", "6"], ans: 0,
+                logic: "Based on the map coloring theorem applied to this specific geometry, 3 colors are sufficient."
+            },
+            {
+                direction: "Mirror Image",
+                q: "Choose the correct mirror image of the given figure (X).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/mirror-images/section-2/5.png",
+                options: ["1", "2", "3", "4"], ans: 3,
+                logic: "The vertical mirror flips the image horizontally; the right-pointing arrow now points left."
+            },
+            {
+                direction: "Pattern Completion",
+                q: "Identify the figure that completes the pattern.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/pattern-completion/8.png",
+                options: ["1", "2", "3", "4"], ans: 1,
+                logic: "Option 2 provides the missing quadrant that maintains the diagonal symmetry."
+            },
+            {
+                direction: "Paper Folding",
+                q: "How the pattern would appear when the transparent sheet is folded at the dotted line?",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/paper-folding/37.png",
+                options: ["1", "2", "3", "4"], ans: 3,
+                logic: "The triangle and circle will overlap such that the circle sits inside the triangular base."
+            },
+            {
+                direction: "Paper Cutting",
+                q: "Choose a figure which would most closely resemble the unfolded form of Figure (Z).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/paper-cutting/42.png",
+                options: ["1", "2", "3", "4"], ans: 2,
+                logic: "Unfolding across the vertical and horizontal axes creates a 4-point symmetrical pattern."
+            },
+            {
+                q: "Choose a figure which would most closely resemble the unfolded form of Figure (Z).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/paper-cutting/15.png",
+                options: ["1", "2", "3", "4"], ans: 0,
+                logic: "The circular cut at the corner of the fold results in a large central diamond when fully opened."
+            },
+            {
+                direction: "Dot Situation",
+                q: "Select the figure which satisfies the same conditions of placement of the dots as in Figure-X.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/dot-situation/5.png",
+                options: ["1", "2", "3", "4"], ans: 2,
+                logic: "The dot must be in a region shared by the circle and triangle, but outside the square."
+            },
+            {
+                direction: "Shape Construction",
+                q: "Select three out of five figures which would form a complete square.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/shape-construction/24.png",
+                options: ["124", "345", "123", "135"], ans: 1,
+                logic: "Figures 3, 4, and 5 interlock their serrated edges to form a perfect 4x4 boundary."
+            },
+            {
+                q: "Select a figure from the given four alternatives which fits exactly into Figure-X to form a complete square.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/shape-construction/49.png",
+                options: ["1", "2", "3", "4"], ans: 2,
+                logic: "The negative space of Figure X is perfectly filled by the protrusions in Figure 3."
+            },
+            {
+                direction: "Image Analysis",
+                q: "Find out which of the figures can be formed from the pieces given in figure (X).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/5.png",
+                options: ["1", "2", "3", "4"], ans: 1,
+                logic: "Figure 2 uses the two large triangles and two smaller rectangles provided in X."
+            },
+            {
+                q: "Find out which of the figures can be formed from the pieces given in figure (X).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/12.png",
+                options: ["1", "2", "3", "4"], ans: 3,
+                logic: "The semicircles and central bar from X are rearranged into the composite shape in Figure 4."
+            },
+            {
+                q: "Select the alternative in which the specified components of the key figure (X) are found.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/image-analysis/24.png",
+                options: ["1", "2", "3", "4"], ans: 0,
+                logic: "The distinct star and curve components of X are embedded as sub-elements in Figure 1."
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.img ? `<img src="${item.img}" class="q-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

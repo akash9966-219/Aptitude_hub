@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; background: white; padding: 10px; }
+        
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 10</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 10</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                direction: "Direction (Q.No. 1): Three of the words will be in the same classification, the remaining one will not be. Select the word that does NOT belong.",
+                q: "Which word does NOT belong with the others?",
+                options: ["tulip", "rose", "bud", "daisy"], ans: 2, 
+                logic: "Tulip, rose, and daisy are all specific types of flowers, whereas 'bud' is a stage of development for any flower." 
+            },
+            { 
+                direction: "Direction (Q.No. 2): Choose the word that is a necessary part of the underlined word.",
+                q: "book",
+                options: ["fiction", "pages", "pictures", "learning"], ans: 1, 
+                logic: "A book must have pages. It doesn't necessarily have to be fiction, contain pictures, or be used for learning." 
+            },
+            { 
+                direction: "Direction (Q.No. 3): Choose the picture for the empty box so the relationship is maintained.",
+                img: "https://www.indiabix.com/_files/images/logical-reasoning/5-205-q-1.png",
+                q: "Which picture completes the relationship?",
+                options: ["1", "2", "3", "4"], ans: 1, 
+                logic: "Looking at the patterns, Option 2 maintains the geometric and orientation logic established in the first pair." 
+            },
+            { 
+                direction: "Direction (Q.No. 4): Choose the pair that best represents a similar relationship.",
+                q: "TAILOR : SUIT",
+                options: ["scheme : agent", "edit : manuscript", "revise : writer", "mention : opinion", "implode : building"], ans: 1, 
+                logic: "A tailor produces/finishes a suit; an editor produces/finishes a manuscript." 
+            },
+            { 
+                direction: "Direction (Q.No. 5): Read the budget passage. Remaining budget: 7 million.",
+                passage: "Hurricane: 2.5m | Harbor: 1m | Music: 0.5m | Senate: 1.5m | Agriculture: 2m | Radio: 0.5m | Small Biz: 3m | Airport: 4m",
+                q: "If you fund Ag Subsidy (2m), Radio (0.5m), and Small Business (3m), what is the only other single program that can be funded?",
+                options: ["hurricane preparedness", "harbor improvements", "school music program", "senate office building remodeling", "international airport"], ans: 3, 
+                logic: "Total spent: 2 + 0.5 + 3 = 5.5m. Remaining: 7 - 5.5 = 1.5m. Senate remodeling costs exactly 1.5m." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 6 - 7): Choose the statement best supported by the passage.",
+                passage: "Pollutants like DDT ride the wind to remote Arctic regions despite being banned in many countries.",
+                q: "This paragraph best supports the statement that:",
+                options: ["toxic insecticides such as DDT have not been banned throughout the world.", "more pollutants find their way into polar climates than they do into warmer areas", "studies have proven that many countries have ignored their own antipollution laws.", "DDT and toxaphene are the two most toxic insecticides in the world.", "even a worldwide ban on toxic insecticides would not stop the spread of DDT pollution."], 
+                ans: 0, logic: "The text explicitly states these chemicals ride the wind 'from countries where they remain legal,' implying they are not banned everywhere." 
+            },
+            { 
+                passage: "Obesity leads to diabetes, asthma, and heart disease. Public health campaigns for lifestyle changes are a crucial first step.",
+                q: "This paragraph best supports the statement that:",
+                options: ["public health campaigns that raise consciousness and propose lifestyle changes are a productive way to fight obesity.", "obesity is the leading cause of diabetes in our country.", "people in our country watch too much television and do not exercise enough.", "a decline in obesity would radically decrease the incidence of asthma.", "fast-food restaurants and unhealthy school lunches contribute greatly to obesity."], 
+                ans: 0, logic: "The passage concludes by calling these campaigns a 'crucial first step' in battling the problem." 
+            },
+            { 
+                direction: "Direction (Q.No. 8): Small paragraph question.",
+                passage: "England's prosperity increased after WWII because the income of average workers went up, even though exports were lower than before.",
+                q: "The passage best supports the statement that:",
+                options: ["a country's economic standard can be best adjudged by per capital income.", "a country's balance of trade is the main criteria of determining its economic prosperity.", "a nation's economy strengthens with the increase in exports.", "English trade has continually increased since the Second World War."], 
+                ans: 0, logic: "The passage argues that worker income (per capita) is a better index of prosperity than trade balances or exports." 
+            },
+            { 
+                direction: "Direction (Q.No. 9): Choose the conclusion which logically follows.",
+                q: "Statement: Every library has books.",
+                options: ["Books are only in library.", "Libraries are meant for books only.", "No library is without books.", "Some libraries do not have readers."], 
+                ans: 2, logic: "If every library has books, it is logically impossible for a library to exist without books." 
+            },
+            { 
+                direction: "Direction (Q.No. 10): Statement and Conclusions.",
+                passage: "Statement: Video libraries are flourishing very much these days.",
+                q: "Conclusions: I. People have a video craze. II. It is cheaper than cinema halls.",
+                options: ["Only conclusion I follows", "Only conclusion II follows", "Either I or II follows", "Neither I nor II follows", "Both I and II follow"], 
+                ans: 0, logic: "The growth of libraries implies a craze/demand (I), but the statement says nothing about price comparisons (II)." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 11 - 13): Implicit assumptions.",
+                q: "Statement: 'If you have any problems, bring them to me.'",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], 
+                ans: 3, logic: "The speaker doesn't assume you *have* problems (only 'if'), nor does he claim he can solve *any* problem." 
+            },
+            { 
+                q: "Statement: Vitamin E tablets improve circulation, keep your complexion in a glowing condition.",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], 
+                ans: 0, logic: "Advertising a 'glowing complexion' assumes people want one. The biological link between circulation and glow is not necessarily assumed." 
+            },
+            { 
+                q: "Statement: 'Read this book to get detailed and most comprehensive information on this issue.'",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], 
+                ans: 4, logic: "The advice assumes the recipient can read (I) and the use of 'most comprehensive' implies other books exist to compare it to (II)." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 14 - 15): Implicit assumptions.",
+                q: "Statement: 'I can take you quickly by cab, but you must pay me double charges.'",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], 
+                ans: 0, logic: "To offer a 'quick' route, there must be a standard, slower route (I). The speaker assumes people *will* pay, otherwise he wouldn't offer (II is false)." 
+            },
+            { 
+                q: "Statement: North India was 'powerless' on Dec 19th as the northern grid collapsed 'yet again'.",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], 
+                ans: 0, logic: "The phrase 'yet again' directly implies it has collapsed before (I)." 
+            },
+            { 
+                direction: "Direction (Q.No. 16): Arguments.",
+                passage: "Statement: Should India have no military force at all?",
+                q: "Arguments: I. No (others don't believe in non-violence). II. Yes (Indians believe in non-violence).",
+                options: ["Only argument I is strong", "Only argument II is strong", "Either I or II is strong", "Neither I nor II is strong", "Both I and II are strong"], 
+                ans: 0, logic: "Argument I is strong because national security depends on global reality, not just internal beliefs." 
+            },
+            { 
+                direction: "Direction (Q.No. 17): Logical Conclusions.",
+                passage: "Statements: All terrorists are guilty. All terrorists are criminals.",
+                q: "Conclusions:",
+                options: ["Only I follows", "Only I and III follow", "Only II follows", "Only II and IV follow"], 
+                ans: 2, logic: "Because both 'guilty' and 'criminals' apply to the same set (terrorists), there must be some overlap between guilty persons and criminals." 
+            },
+            { 
+                direction: "Direction (Q.No. 18): Courses of Action.",
+                passage: "Statement: Thousands of eligible students don't get college admission after school.",
+                q: "Which courses follow?",
+                options: ["Only I follows", "Only II and III follow", "Only I and III follow", "All follow", "None of these"], 
+                ans: 2, logic: "Setting up more colleges (I) and providing vocational alternatives (III) are both logical solutions. Reducing schools (II) is counterproductive." 
+            },
+            { 
+                direction: "Direction (Q.No. 19): Courses of Action.",
+                passage: "Statement: Residents complained of contaminated water and municipal inaction.",
+                q: "Which courses follow?",
+                options: ["Only I and II follow", "Only II and III follow", "Only I and III follow", "Only either I or III, and II follow", "None of these"], 
+                ans: 1, logic: "Fact-finding (II) and checking infrastructure (III) are correct. Punishing complainants (I) is inappropriate." 
+            },
+            { 
+                direction: "Direction (Q.No. 20): Arguments.",
+                passage: "Statement: Should the number of holidays of government employees be reduced?",
+                q: "Which arguments are strong?",
+                options: ["Only I and III are strong", "Only III is strong", "Only I, III and IV are strong", "None is strong", "None of these."], 
+                ans: 1, logic: "Increasing productivity (III) is a strong administrative reason. I is a comparison, II is sentimental, and IV is a personal preference." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="q-img" alt="Logic Pattern">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

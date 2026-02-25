@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning Hub - Aptitude Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --dark: #2c3e50;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+        }
+
+        .header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: -30px auto 50px;
+        }
+
+        .back-nav {
+            margin-bottom: 20px;
+        }
+
+        .btn-home {
+            text-decoration: none;
+            color: white;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-home:hover { background: rgba(0,0,0,0.4); }
+
+        .reasoning-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--dark);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(106, 17, 203, 0.2);
+            border-color: var(--primary);
+        }
+
+        .card .icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+            font-size: 1.4rem;
+        }
+
+        .card p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="back-nav">
+        <a href="index.html" class="btn-home">⬅ Back to Home</a>
+    </div>
+    <h1>Reasoning Ability</h1>
+    <p>Master the art of logic and pattern recognition</p>
+</div>
+
+<div class="container">
+    <div class="reasoning-grid">
+        <a href="verbal-ability.html" class="card">
+            <div class="icon">📖</div>
+            <h3>Verbal Ability</h3>
+            <p>Synonyms, Antonyms, and Sentence Correction.</p>
+            <div class="status">10+ Topics</div>
+        </a>
+
+        <a href="logical-reasoning.html" class="card">
+            <div class="icon">🧩</div>
+            <h3>Logical Reasoning</h3>
+            <p>Number Series, Blood Relations, and Coding-Decoding.</p>
+            <div class="status">15+ Topics</div>
+        </a>
+
+        <a href="verbal-reasoning1.html" class="card">
+            <div class="icon">🗣️</div>
+            <h3>Verbal Reasoning</h3>
+            <p>Syllogism, Statements and Assumptions, and Logic.</p>
+            <div class="status">8+ Topics</div>
+        </a>
+
+        <a href="data-intrepretation.html" class="card">
+            <div class="icon">🖼️</div>
+            <h3>Data Intrepretation</h3>
+            <p>bar charts, line graphs, and pie charts</p>
+            <div class="status">2+ Topics</div>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

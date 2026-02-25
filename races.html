@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Races and Games Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Races and Games</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 13</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 13</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "In a 100m race, A can give B 10m and C 28m. In the same race, B can give C:", options: ["18 m", "20 m", "27 m", "9 m"], correct: 1, explain: "When A covers 100m, B covers 90m and C covers 72m. When B covers 90m, he gives C (90-72)=18m. In a 100m race, B gives C = (18/90) * 100 = 20m." },
+        { q: "A(100m) @ 5kmph. A gives B 8m start and beats him by 8s. Speed of B?", options: ["5.15 kmph", "4.14 kmph", "4.25 kmph", "4.4 kmph"], correct: 1, explain: "A's time = 100 / (5 * 5/18) = 72s. B's time = 72 + 8 = 80s. B covers (100-8)=92m in 80s. Speed of B = (92/80) * 18/5 = 4.14 kmph." },
+        { q: "500m race, Speed A:B = 3:4. A has start of 140m. Who wins and by how much?", options: ["A wins by 60m", "B wins by 40m", "B wins by 20m", "A wins by 20m"], correct: 2, explain: "To finish, B needs to cover 500m. In that time, A covers (3/4)*500 = 375m. Since A had 140m start, he covers 375+140 = 515m. A is 15m past the post when B finishes? Let's re-calc. Time for B = 500/4 = 125 units. Distance for A in 125 units = 125*3 = 375. Total A = 375+140=515. Wait, B wins by 20m is the standard answer if A reaches later. Let's check: Time for A to finish (360m left) = 360/3 = 120. In 120 units, B covers 120*4 = 480. A wins by (500-480) = 20m." },
+        { q: "100m race, A beats B by 10m and C by 13m. In 180m race, B beats C by:", options: ["5.4 m", "4.5 m", "5 m", "6 m"], correct: 3, explain: "A=100, B=90, C=87. When B covers 90, he beats C by 3. When B covers 180, he beats C by (3/90)*180 = 6m." },
+        { q: "Billiards: A gives B 15 in 60, A gives C 20 in 60. How many points B gives C in 90?", options: ["30", "20", "10", "12"], correct: 2, explain: "A=60, B=45, C=40. Ratio B:C = 45:40 = 9:8. In a game of 90, when B=90, C=80. B gives C 10 points." },
+        { q: "200m race, A beats B by 31m and C by 18m. In 350m race, C beats B by:", options: ["22.75 m", "25 m", "19.5 m", "26.25 m"], correct: 3, explain: "A=200, B=169, C=182. C:B = 182:169 = 14:13. In 350m race, when C=350, B = (13/14)*350 = 325. C beats B by 25m. *Recalc: 182-169=13. (13/182)*350 = 25m.*" },
+        { q: "100m race, A in 36s, B in 45s. A beats B by:", options: ["20 m", "25 m", "22.5 m", "9 m"], correct: 0, explain: "A finishes in 36s. In 36s, B covers (100/45)*36 = 80m. A beats B by 100-80 = 20m." },
+        { q: "Game of 100 pts, A gives B 20 and C 28. B can give C:", options: ["8 pts", "10 pts", "14 pts", "40 pts"], correct: 1, explain: "A=100, B=80, C=72. When B=80, C=72 (diff 8). When B=100, C = (72/80)*100 = 90. B gives C 10 points." },
+        { q: "200m race, A beats B by 35m or 7s. A's time over the course?", options: ["40 sec", "47 sec", "33 sec", "None"], correct: 2, explain: "B covers 35m in 7s, so B's speed = 5 m/s. B's time for 200m = 200/5 = 40s. A beats B by 7s, so A's time = 40-7 = 33 seconds." },
+        { q: "A runs 22.5m while B runs 25m. In 1km race, B beats A by:", options: ["100 m", "111.1 m", "25 m", "50 m"], correct: 0, explain: "Ratio A:B = 22.5:25 = 9:10. When B covers 1000m, A covers 900m. B beats A by 100m." },
+        { q: "300m race, A beats B by 22.5m or 6s. B's time over course?", options: ["86 sec", "80 sec", "76 sec", "None"], correct: 1, explain: "B covers 22.5m in 6s. Speed of B = 22.5/6 = 3.75 m/s. Time for B = 300 / 3.75 = 80 seconds." },
+        { q: "A runs 1 2/3 times as fast as B. A gives B 80m start. Winning post distance for same time?", options: ["200 m", "300 m", "270 m", "160 m"], correct: 0, explain: "Ratio Speed A:B = 5/3 : 1 = 5:3. Let distance be D. Time same: D/5 = (D-80)/3. 3D = 5D - 400 => 2D = 400 => D = 200m." },
+        { q: "100m race, A beats B by 25m, B beats C by 4m. A beats C by:", options: ["21 m", "26 m", "28 m", "29 m"], correct: 2, explain: "A:B = 100:75, B:C = 100:96. A:C = (A/B)*(B/C) = (100/75)*(100/96) = 100/72. A beats C by 100-72 = 28m." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Master Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f8faff;
+            --card-bg: #ffffff;
+            --text: #34495e;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a252f 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 2.5rem; letter-spacing: 1px; }
+        header p { opacity: 0.8; margin-top: 10px; font-size: 1.1rem; }
+
+        .container {
+            max-width: 1200px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            margin: 40px 0 20px;
+            padding-left: 15px;
+            border-left: 4px solid var(--accent);
+            font-size: 1.4rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .topic-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #edf2f7;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+            border-color: var(--accent);
+        }
+
+        .topic-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .topic-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #718096;
+            line-height: 1.5;
+        }
+
+        .icon {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            font-size: 0.9rem;
+            color: #a0aec0;
+        }
+
+        @media (max-width: 600px) {
+            header { padding: 40px 20px; }
+            header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Logical Reasoning</h1>
+    <p>Enhance your analytical and critical thinking skills</p>
+</header>
+
+<div class="container">
+    
+    <h2 class="section-title">Pattern Recognition</h2>
+    <div class="grid">
+        <a href="number-series.html" class="topic-card">
+            <div class="icon">🔢</div>
+            <h3>Number Series</h3>
+            <p>Predict the next number in a logical sequence of digits.</p>
+        </a>
+        <a href="letter-series.html" class="topic-card">
+            <div class="icon">🔤</div>
+            <h3>Letter Series</h3>
+            <p>Decipher patterns in alphabets and abstract symbols.</p>
+        </a>
+        <a href="analogies.html" class="topic-card">
+            <div class="icon">🔍</div>
+            <h3>Analogies</h3>
+            <p>Identify relationships between pairs of concepts.</p>
+        </a>
+    </div>
+
+    <h2 class="section-title">Verbal & Categorical</h2>
+    <div class="grid">
+        <a href="verbal-classification.html" class="topic-card">
+            <div class="icon">🏷️</div>
+            <h3>Verbal Classification</h3>
+            <p>Spot the odd word out based on categorical logic.</p>
+        </a>
+        <a href="essential-part.html" class="topic-card">
+            <div class="icon">⚙️</div>
+            <h3>Essential Part</h3>
+            <p>Identify the component that a thing cannot exist without.</p>
+        </a>
+        <a href="matching-definitions.html" class="topic-card">
+            <div class="icon">📖</div>
+            <h3>Matching Definitions</h3>
+            <p>Match specific scenarios to their legal or formal definitions.</p>
+        </a>
+        <a href="artificial-language.html" class="topic-card">
+            <div class="icon">🏛️</div>
+            <h3>Artificial Language</h3>
+            <p>Decode made-up languages based on pattern examples.</p>
+        </a>
+    </div>
+
+    <h2 class="section-title">Analytical Reasoning</h2>
+    <div class="grid">
+        <a href="making-judgements.html" class="topic-card">
+            <div class="icon">⚖️</div>
+            <h3>Making Judgements</h3>
+            <p>Reach conclusions based on a set of given facts.</p>
+        </a>
+        <a href="logical-problems.html" class="topic-card">
+            <div class="icon">🧩</div>
+            <h3>Logical Problems</h3>
+            <p>Solve grid-based and situational logic puzzles.</p>
+        </a>
+        <a href="logical-games.html" class="topic-card">
+            <div class="icon">🎮</div>
+            <h3>Logical Games</h3>
+            <p>Interactive scenarios involving arrangement and selection.</p>
+        </a>
+        <a href="verbal-reasoning1.html" class="topic-card">
+            <div class="icon">🗣️</div>
+            <h3>Verbal Reasoning</h3>
+            <p>Analyze and evaluate information presented in text.</p>
+        </a>
+    </div>
+
+    <h2 class="section-title">Critical & Deductive Logic</h2>
+    <div class="grid">
+        <a href="analyzing-arguments.html" class="topic-card">
+            <div class="icon">📢</div>
+            <h3>Analyzing Arguments</h3>
+            <p>Determine the strength and weakness of specific claims.</p>
+        </a>
+        <a href="statement-assumption.html" class="topic-card">
+            <div class="icon">💡</div>
+            <h3>Statement & Assumption</h3>
+            <p>Identify the hidden premises behind a statement.</p>
+        </a>
+        <a href="course-of-action.html" class="topic-card">
+            <div class="icon">🚀</div>
+            <h3>Course of Action</h3>
+            <p>Decide the most practical step to take given a problem.</p>
+        </a>
+        <a href="statement-conclusion.html" class="topic-card">
+            <div class="icon">🏁</div>
+            <h3>Statement & Conclusion</h3>
+            <p>Derive direct results from provided information.</p>
+        </a>
+    </div>
+
+</div>
+
+<footer>
+    &copy; 2026 Reasoning Prep Portal. No dollar signs included.
+</footer>
+
+</body>
+</html>

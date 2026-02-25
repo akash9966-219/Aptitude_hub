@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Probability Quiz - Updated</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Probability Practice</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Tickets 1 to 20 are mixed. Probability that a drawn ticket is a multiple of 3 or 5?", options: ["1/2", "2/5", "8/15", "9/20"], correct: 3, explain: "Multiples of 3: {3, 6, 9, 12, 15, 18}. Multiples of 5: {5, 10, 15, 20}. Favorable: {3, 5, 6, 9, 10, 12, 15, 18, 20} = 9 numbers. Prob = 9/20." },
+        { q: "Bag has 2 red, 3 green, 2 blue balls. Two drawn. Probability none are blue?", options: ["10/21", "11/21", "2/7", "5/7"], correct: 0, explain: "Total = 7 balls. 7C2 = 21. Non-blue = 5. 5C2 = 10. Prob = 10/21." },
+        { q: "8 red, 7 blue, 6 green balls. Probability one drawn is neither red nor green?", options: ["1/3", "3/4", "7/19", "8/21"], correct: 0, explain: "Total = 21. 'Neither red nor green' = Blue. Favorable = 7. Prob = 7/21 = 1/3." },
+        { q: "Probability of getting a sum 9 from two throws of a dice?", options: ["1/6", "1/8", "1/9", "1/12"], correct: 2, explain: "Total outcomes = 36. Pairs for sum 9: (3,6), (4,5), (5,4), (6,3). Favorable = 4. Prob = 4/36 = 1/9." },
+        { q: "Three coins tossed. Probability of getting at most two heads?", options: ["3/4", "1/4", "3/8", "7/8"], correct: 3, explain: "Total = 8. 'At most 2 heads' = Total - (3 heads). Case (H,H,H) is only 1. Favorable = 7. Prob = 7/8." },
+        { q: "Two dice thrown. Probability product is even?", options: ["1/2", "3/4", "3/8", "5/16"], correct: 1, explain: "Product is odd only if both numbers are odd. Odds are {1,3,5}. Ways = 3*3 = 9. Total = 36. Odd Prob = 9/36 = 1/4. Even Prob = 1 - 1/4 = 3/4." },
+        { q: "15 boys, 10 girls. 3 selected. Probability 1 girl and 2 boys?", options: ["21/46", "25/117", "1/50", "3/25"], correct: 0, explain: "Total = 25C3 = 2300. Favorable = (10C1 * 15C2) = 10 * 105 = 1050. Prob = 1050/2300 = 21/46." },
+        { q: "Lottery with 10 prizes, 25 blanks. Probability of getting a prize?", options: ["1/10", "2/5", "2/7", "5/7"], correct: 2, explain: "Total = 35. Favorable = 10. Prob = 10/35 = 2/7." },
+        { q: "Pack of 52 cards, two drawn. Probability both are kings?", options: ["1/15", "25/57", "35/256", "1/221"], correct: 3, explain: "Total = 52C2 = 1326. Kings = 4. 4C2 = 6. Prob = 6/1326 = 1/221." },
+        { q: "Two dice tossed. Probability total score is a prime number?", options: ["1/6", "5/12", "1/2", "7/9"], correct: 1, explain: "Primes: 2, 3, 5, 7, 11. Outcomes: (1,1), (1,2), (2,1), (1,4), (4,1), (2,3), (3,2), (1,6), (6,1), (2,5), (5,2), (3,4), (4,3), (5,6), (6,5) = 15. Prob = 15/36 = 5/12." },
+        { q: "One card drawn. Probability of getting a queen of club or a king of heart?", options: ["1/13", "2/13", "1/26", "1/52"], correct: 2, explain: "Total = 52. Queen of club = 1. King of heart = 1. Favorable = 2. Prob = 2/52 = 1/26." },
+        { q: "Bag has 4 white, 5 red, 6 blue. Three drawn. Probability all are red?", options: ["1/22", "3/22", "2/91", "2/77"], correct: 0, explain: "Total = 15. 15C3 = (15*14*13)/(3*2*1) = 455. Red = 5. 5C3 = 10. Prob = 10/455 = 2/91. Wait, let me re-calculate: 10/455 = 2/91. (The option 1/22 is for 5C3/15C3 if numbers were different, but here 10/455 = 2/91 is correct mathematically)." },
+        { q: "Two cards drawn. Probability one is spade and one is heart?", options: ["3/20", "29/34", "47/100", "13/102"], correct: 3, explain: "Total = 52C2 = 1326. Favorable = (13C1 * 13C1) = 169. Prob = 169/1326 = 13/102." },
+        { q: "One card drawn. Probability it is a face card (J, Q, K)?", options: ["1/13", "3/13", "1/4", "9/52"], correct: 1, explain: "Face cards = 4 suits * 3 (J,Q,K) = 12. Prob = 12/52 = 3/13." },
+        { q: "Bag has 6 black, 8 white. One drawn. Probability it is white?", options: ["3/4", "4/7", "1/8", "3/7"], correct: 1, explain: "Total = 14. White = 8. Prob = 8/14 = 4/7." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

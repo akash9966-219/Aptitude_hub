@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Science & Technology Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #0f172a; --bg: #f1f5f9; --card: #ffffff; --accent: #3b82f6; --correct: #22c55e; --wrong: #ef4444; --text: #334155; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: var(--accent); font-size: 0.85rem; text-transform: uppercase; }
+        .q-text { font-size: 1.2rem; line-height: 1.5; margin-bottom: 25px; color: var(--primary); }
+        .options { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .opt { padding: 14px 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; text-align: left; transition: 0.2s; font-size: 1rem; }
+        .opt:hover:not(:disabled) { background: #f8fafc; border-color: var(--accent); }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 20px; padding: 15px; background: #eff6ff; border-radius: 8px; border-left: 4px solid var(--accent); display: none; font-size: 0.95rem; line-height: 1.4; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 10px; }
+        .btn-nav { padding: 12px 24px; border-radius: 6px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which organisation partnered with GalaxEye to globally promote SyncFused OptoSAR satellite imagery?", opts: ["ISRO", "NSIL", "DRDO", "IN-SPACe"], ans: 1, exp: "NewSpace India Limited (NSIL) partnered with GalaxEye to commercialize high-resolution multi-sensor satellite data." },
+    { q: "2. Which private aerospace company signed an agreement with NASA for its first private astronaut mission to the ISS?", opts: ["Blue Origin", "Boeing", "SpaceX", "Vast Space"], ans: 3, exp: "Vast Space's Vast-1 mission is set to be the first private mission to the ISS using a SpaceX Crew Dragon." },
+    { q: "3. Which institution partnered with IHMCL to strengthen cyber security in national highway operations?", opts: ["IIT Delhi", "CFSL", "National Cyber Security Centre", "NFSU"], ans: 3, exp: "National Forensic Sciences University (NFSU) provides forensic and digital security expertise for FASTag and highway systems." },
+    { q: "4. Which institution signed a tripartite agreement with BEML and FSID for next-gen engineering research?", opts: ["IISc Bengaluru", "IIT Delhi", "IIT Madras", "DRDO"], ans: 0, exp: "IISc Bengaluru, along with its innovation arm FSID, partnered with BEML to focus on aerospace and green technologies." },
+    { q: "5. Which company inaugurated a Centre of Excellence for Sustainable Aviation at Gati Shakti Vishwavidyalaya?", opts: ["Boeing", "Lockheed Martin", "Airbus", "Embraer"], ans: 2, exp: "Airbus established this centre in Gujarat to train professionals in sustainable aviation technologies." },
+    { q: "6. Which institution hosted the D’Future – India Digital Conclave 2026?", opts: ["IIM Udaipur", "IIM Ahmedabad", "IIT Hyderabad", "NIT Warangal"], ans: 0, exp: "IIM Udaipur hosted the conclave to discuss resilience and inclusive nation-building through technology." },
+    { q: "7. Why was the upgraded NYPS 2.0 portal launched?", opts: ["Promote tourism", "Train officials", "Wider youth participation", "Digitise records"], ans: 2, exp: "The National Youth Parliament Scheme 2.0 aims to bring parliamentary proceedings and democratic values to schools and colleges." },
+    { q: "8. In which city was the IndiaAI–Digital India Workshop on AI held?", opts: ["Shillong", "Imphal", "Gangtok", "Kohima"], ans: 3, exp: "Kohima, Nagaland hosted the workshop to boost AI adoption in the Northeast." },
+    { q: "9. Which state launched the 872-acre Knowledge City project?", opts: ["Karnataka", "Andhra Pradesh", "Tamil Nadu", "Telangana"], ans: 1, exp: "Andhra Pradesh is developing this near Amaravati as a global education and innovation hub." },
+    { q: "10. Which company partnered with BISAG-N to integrate 'Vedic Kavach' for quantum-safe cybersecurity?", opts: ["QNu Labs", "TCS", "Tech Mahindra", "Infosys"], ans: 0, exp: "QNu Labs integrated its quantum hardware with the national GIS platform to ensure future-proof data security." },
+    { q: "11. Which institution developed a technique to predict glacial hazards in the Eastern Himalayas?", opts: ["IIT Roorkee", "IIT Guwahati", "IIT Mandi", "IIT Kharagpur"], ans: 1, exp: "IIT Guwahati’s model uses satellite data to identify vulnerable glacial lakes." },
+    { q: "12. At which station did Indian Railways deploy the humanoid robot ASC ARJUN?", opts: ["Visakhapatnam", "Chennai", "Mumbai", "Kolkata"], ans: 0, exp: "ASC ARJUN was deployed at Visakhapatnam to assist RPF in crowd monitoring and security." },
+    { q: "13. Which state government signed an MoU with Starlink for disaster preparedness?", opts: ["Kerala", "Maharashtra", "Goa", "Karnataka"], ans: 2, exp: "Goa partnered with Starlink to ensure satellite-based communication during emergencies." },
+    { q: "14. Which organisation partnered with Gates Foundation for the Horizon1000 AI health initiative?", opts: ["OpenAI", "Microsoft", "IBM", "Google"], ans: 1, exp: "Microsoft and the Gates Foundation launched this to use AI for better health outcomes in Africa." },
+    { q: "15. Which city will host the first International Conference on Green AI?", opts: ["Abu Dhabi", "Dubai", "Riyadh", "Doha"], ans: 1, exp: "Dubai will host the event focused on reducing the carbon footprint of large AI models." },
+    { q: "16. In which state are 65 Data and AI Labs planned under IndiaAI and UPDESCO?", opts: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Bihar"], ans: 1, exp: "Uttar Pradesh is setting up these labs to train students in advanced AI applications." },
+    { q: "17. Which telescope confirmed the discovery of ‘Cloud-9’, a starless dark matter galaxy?", opts: ["James Webb", "Spitzer", "Hubble", "Chandra"], ans: 2, exp: "The Hubble Space Telescope confirmed this 'failed galaxy' which consists of gas and dark matter without stars." },
+    { q: "18. Where was the PARAM SHAKTI supercomputing facility (PARAM RUDRA) launched?", opts: ["IIT Bombay", "IISc Bangalore", "IIT Kanpur", "IIT Madras"], ans: 2, exp: "IIT Kanpur received the PARAM RUDRA system under the National Supercomputing Mission." },
+    { q: "19. Which institution inaugurated apex calibration facilities for national measurement?", opts: ["ISRO", "National Physical Laboratory", "BIS", "CSIR"], ans: 1, exp: "CSIR-NPL in New Delhi inaugurated facilities to ensure precision in Indian standards." },
+    { q: "20. Which institution is home to India’s first government hospital–based AI clinic?", opts: ["GIMS Noida", "AIIMS New Delhi", "PGIMER Chandigarh", "KGMU"], ans: 1, exp: "AIIMS New Delhi launched the AI clinic to assist in complex diagnostics and patient safety." },
+    { q: "21. Which city is home to startups that built the 14-kg mini satellite for ISRO?", opts: ["Bengaluru", "Ahmedabad", "Hyderabad", "Mumbai"], ans: 2, exp: "Hyderabad-based startups TakeMe2Space and EON Space Labs integrated the satellite for PSLV." },
+    { q: "22. Where was the world’s first ITVISMA gene therapy for SMA administered?", opts: ["Abu Dhabi", "Dubai", "New York", "Geneva"], ans: 1, exp: "Dubai Healthcare City saw the first successful administration of this advanced gene therapy." },
+    { q: "23. Which country launched its first national weapon database?", opts: ["USA", "India", "UK", "Australia"], ans: 1, exp: "India's NDW will help track firearms to curb organized crime and terrorism." },
+    { q: "24. Which institution inaugurated Bihar’s first Param Rudra supercomputer?", opts: ["IIT Delhi", "IIT Bombay", "IIT Patna", "NIT Patna"], ans: 2, exp: "IIT Patna launched the state-of-the-art system for high-performance computing research." },
+    { q: "25. Which institution developed AILA, the AI-powered lab assistant?", opts: ["IIT Bombay", "IISc Bengaluru", "IIT Madras", "IIT Delhi"], ans: 3, exp: "IIT Delhi researchers created AILA to autonomously design and analyze experiments." },
+    { q: "26. The MAVEN mission has been studying the atmosphere of which planet?", opts: ["Venus", "Jupiter", "Mars", "Saturn"], ans: 2, exp: "NASA's MAVEN (Mars Atmosphere and Volatile EvolutioN) studies the loss of Mars' atmosphere to space." },
+    { q: "27. Which telescope discovered the lemon-shaped exoplanet PSR J2322-2650b?", opts: ["Hubble", "Kepler", "Chandra", "James Webb"], ans: 3, exp: "JWST provided detailed data on this uniquely shaped exoplanet." },
+    { q: "28. Which organization is responsible for launching the BlueBird Block-2 satellite?", opts: ["NASA", "SpaceX", "ISRO", "ESA"], ans: 2, exp: "ISRO's commercial arm NSIL launched this for AST SpaceMobile." },
+    { q: "29. What is the expected completion year for Maitri II?", opts: ["2032", "2029", "2025", "2040"], ans: 1, exp: "India plans to operationalize its next-gen Antarctic station Maitri II by 2029." },
+    { q: "30. Which country tested the world’s first wireless rail convoy system?", opts: ["Japan", "China", "Germany", "USA"], ans: 1, exp: "China tested coordinated heavy freight trains using wireless communication instead of physical coupling." },
+    { q: "31. Which company is sending the first wheelchair user to space on NS-37?", opts: ["SpaceX", "NASA", "Blue Origin", "Virgin Galactic"], ans: 2, exp: "Blue Origin's New Shepard mission includes Michaela Benthaus to promote accessibility in space." },
+    { q: "32. By which year does Google plan to deploy Project Suncatcher satellites?", opts: ["2027", "2025", "2030", "2024"], ans: 1, exp: "Google's prototype solar-powered data center satellites are aimed for 2025-26." },
+    { q: "33. Which institution conducted the first clinical trial of a brain stent (GRASSROOT)?", opts: ["PGIMER Chandigarh", "AIIMS Delhi", "CMC Vellore", "NIMHANS"], ans: 1, exp: "AIIMS Delhi led this trial for treating intracranial atherosclerosis." },
+    { q: "34. Where did India launch its first indigenous hydrogen fuel cell vessel?", opts: ["Kochi", "Mumbai", "Kolkata", "Varanasi"], ans: 0, exp: "The vessel was launched in Kochi, marking a leap in green maritime transport." },
+    { q: "35. Which institute is hosting the Global AI Conclave in Chennai?", opts: ["IIT Delhi", "IIT Bombay", "IIT Madras", "IISc Bengaluru"], ans: 2, exp: "IIT Madras is the primary academic partner for this global summit." },
+    { q: "36. What is the name of Maharashtra’s AI platform for cybercrime investigation?", opts: ["CyberRakshak AI", "MahaCrimeOS AI", "CrimeNet India", "Digital Suraksha Platform"], ans: 1, exp: "MahaCrimeOS AI helps police map and predict cybercriminal activities." },
+    { q: "37. What is the AI framework developed to decode cancer-cell processes?", opts: ["BioPredict", "CancerScope", "OncoMark", "TumourSense"], ans: 2, exp: "Developed by S.N. Bose National Centre and Ashoka University to predict tumor behavior." },
+    { q: "38. Which institution runs the ATMAN 3.0 HealthTech accelerator?", opts: ["IIT Delhi", "IISc Bengaluru", "IIT Madras", "IIT Bombay"], ans: 3, exp: "IIT Bombay's TIH foundation hosts this for early-stage HealthTech startups." },
+    { q: "39. Which institution runs the ATMAN 3.0 accelerator? (Repeated/Re-verified)", opts: ["IIT Delhi", "IISc Bengaluru", "IIT Madras", "IIT Bombay"], ans: 3, exp: "Focus remains on IoT and IoE applications in healthcare at IIT Bombay." },
+    { q: "40. Which institution launched a ₹250-crore deep tech VC fund?", opts: ["IISc Bengaluru", "IIT Delhi", "IIT Bombay", "NIT Trichy"], ans: 0, exp: "IISc Bengaluru's fund supports incubator-linked deep tech ventures." },
+    { q: "41. What is the name of the spiral galaxy discovered using JWST?", opts: ["Alaknanda", "Milky Way", "Andromeda", "Somnath"], ans: 3, exp: "Indian scientists named the distant spiral galaxy 'Somnath'." },
+    { q: "42. Where is the 11th IISF 2025-26 being held?", opts: ["New Delhi", "Panchkula", "Bengaluru", "Hyderabad"], ans: 1, exp: "Panchkula, Haryana is the host city for the 11th India International Science Festival." },
+    { q: "43. Which company collaborated with NITI Aayog for the 2047 Quantum Roadmap?", opts: ["Google", "Microsoft", "IBM", "Intel"], ans: 2, exp: "IBM is helping develop India's quantum computing skills and infrastructure." },
+    { q: "44. Which international agency partnered with ISRO for the NISAR satellite?", opts: ["ESA", "NASA", "JAXA", "ROSCOSMOS"], ans: 1, exp: "NASA and ISRO are launching the dual-frequency Synthetic Aperture Radar (NISAR) satellite." },
+    { q: "45. Which institute’s Quantum labs were visited for the Liquid Helium Facility inauguration?", opts: ["IIT Bombay", "IIT Delhi", "IISc Bengaluru", "IIT Madras"], ans: 2, exp: "The Union Minister visited IISc Bengaluru to boost low-temperature physics research." },
+    { q: "46. Which tool analyses cancer at molecular level for personalized treatment?", opts: ["DeepCancer", "OncoMark", "BioScan", "TumorAI"], ans: 1, exp: "OncoMark provides detailed genetic profiles for precision oncology." },
+    { q: "47. Which institution launched the Impact RISE initiative for skilling?", opts: ["IIT Bombay", "IIT Kharagpur", "IIT Delhi", "IIT Madras"], ans: 3, exp: "IIT Madras focuses on sustainable tech and entrepreneurship skilling." },
+    { q: "48. What is the name of India’s first CRISPR gene therapy for Sickle Cell?", opts: ["GenomeX", "CRISPR-One", "HealGene", "BIRSA 101"], ans: 3, exp: "BIRSA 101, developed by CSIR-IGIB, is dedicated to Bhagwan Birsa Munda." },
+    { q: "49. Name India’s first nitric-oxide wound dressing for ulcers?", opts: ["DermOx", "ColoNoX", "NitroHeal", "UlcerX"], ans: 1, exp: "ColoNoX uses nitric oxide to speed up healing in diabetic patients." },
+    { q: "50. In which year is Chandrayaan-4 scheduled to launch?", opts: ["2026", "2027", "2028", "2029"], ans: 2, exp: "ISRO aims for 2028 for this lunar sample-return mission." },
+    { q: "51. What is India’s global position as a patent filer?", opts: ["4th", "6th", "8th", "10th"], ans: 1, exp: "India has climbed to the 6th position globally in terms of patent filings." },
+    { q: "52. What is the AI system for monitoring wagon door locking?", opts: ["SURAKSHA", "DRISHTI", "NETRA", "TRINETRA"], ans: 3, exp: "TRINETRA uses computer vision to ensure freight safety." },
+    { q: "53. Which missions contributed to the Rare Earth Hypothesis?", opts: ["Voyager", "Hubble/Chandra", "Kepler/JWST", "Cassini"], ans: 2, exp: "Kepler and JWST findings suggest Earth-like planets are rarer than previously thought." },
+    { q: "54. Which institution developed the Quantum Diamond Microscope?", opts: ["IISc Bengaluru", "IIT Delhi", "IIT Bombay", "ISRO"], ans: 2, exp: "IIT Bombay developed this for high-sensitivity magnetic field mapping." },
+    { q: "55. What battery system was inaugurated at NTPC NETRA?", opts: ["Lithium-Ion", "Sodium-Sulfur", "Vanadium Flow", "Zinc-Air"], ans: 2, exp: "Vanadium Flow batteries are ideal for large-scale long-duration storage." },
+    { q: "56. Which company launched the 7th-gen Ironwood TPU?", opts: ["Google", "Microsoft", "Amazon", "Intel"], ans: 0, exp: "Google's Ironwood TPU is designed for massive AI training and inference." },
+    { q: "57. Which institute partnered with C-DOT for a Telecom CoE?", opts: ["IIT Delhi", "IIT Bombay", "IIT Gandhinagar", "IIT Madras"], ans: 2, exp: "IIT Gandhinagar and C-DOT will focus on quantum-safe communication." },
+    { q: "58. Which Indian AI platform ensures data sovereignty?", opts: ["Atomesus", "BharatGPT", "VyomAI", "NeuralVista"], ans: 0, exp: "Atomesus is developed by the Indus Valley Group for affordable, sovereign AI." },
+    { q: "59. Which institution patented AI to decode rainfall from radar?", opts: ["IIT Madras", "IISc Bengaluru", "CUSAT", "Anna University"], ans: 2, exp: "Cochin University of Science and Technology (CUSAT) developed this ML model." },
+    { q: "60. What is Google’s project for solar-powered space data centres?", opts: ["Suncatcher", "SolNet", "SkyCompute", "OrbitalMind"], ans: 0, exp: "Project Suncatcher aims to move compute to space for efficiency and sustainability." },
+    { q: "61. Which company partnered with AICTE for an AI lab?", opts: ["IBM", "Microsoft", "Google", "Intel"], ans: 0, exp: "IBM is setting up a National AI lab at AICTE headquarters." },
+    { q: "62. Which ISRO satellite enhances Navy communication?", opts: ["GSAT-6A", "GSAT-11", "GSAT-7A", "GSAT-7R"], ans: 3, exp: "GSAT-7R (Rukmini successor) provides dedicated naval communication." },
+    { q: "63. Which company partnered with Reliance for AI infrastructure?", opts: ["Microsoft", "Amazon", "IBM", "Google"], ans: 0, exp: "Microsoft and Reliance are expanding AI access via Jio platforms." },
+    { q: "64. Which country launched the Digital Marine Fisheries Census 2025?", opts: ["Indonesia", "Sri Lanka", "India", "Thailand"], ans: 2, exp: "India used the ICAR-CMFRI app for this exhaustive digital survey." },
+    { q: "65. Which startup is launching the Feilian wind data constellation?", opts: ["SkyMatrix", "AeroLink", "WindSphere", "Stellerus"], ans: 3, exp: "Stellerus (Hong Kong) is deploying this for precision weather data." },
+    { q: "66. Which country’s CR450 reached 453 km/h?", opts: ["Japan", "China", "France", "Germany"], ans: 1, exp: "China's CR450 is currently the fastest high-speed rail prototype." },
+    { q: "67. Which conglomerate partnered with Meta for REIL?", opts: ["Tata Group", "Adani Enterprises", "Reliance", "Infosys"], ans: 2, exp: "Reliance and Meta's joint venture focuses on enterprise AI solutions." },
+    { q: "68. Which mission is set for Nov 2 using LVM3?", opts: ["Chandrayaan-3", "Aditya-L1", "CMS-03", "Gaganyaan"], ans: 2, exp: "CMS-03 is a heavy-duty communication satellite." },
+    { q: "69. What is the NPCI AI assistant for UPI?", opts: ["UPI Connect", "UPI Support", "UPI Assist", "UPI Help"], ans: 3, exp: "UPI Help provides real-time grievance redressal for digital payments." },
+    { q: "70. Name the asteroid confirmed as Earth’s new quasi-moon?", opts: ["Apollo 11", "Artemis X", "PN7", "Orion 3"], ans: 2, exp: "Asteroid 2024 PN7 (and similar ones) act as temporary moons for Earth." },
+    { q: "71. What is the OpenAI AI browser for macOS?", opts: ["Nova", "Fusion", "Atlas", "Orion"], ans: 3, exp: "Orion is OpenAI’s attempt at a native, AI-integrated browsing experience." },
+    { q: "72. Which country developed the antibiotic Nafithromycin?", opts: ["USA", "Germany", "Japan", "India"], ans: 3, exp: "India achieved a major milestone in fighting antimicrobial resistance." },
+    { q: "73. Which spacecraft observed solar activity affecting Moon’s exosphere?", opts: ["Chandrayaan-2", "Mangalyaan", "Astrosat", "Chandrayaan-1"], ans: 0, exp: "Chandrayaan-2’s CHACE-2 payload made this direct observation." },
+    { q: "74. Which company developed the Cell2Sentence-Scale 27B model?", opts: ["Google", "Microsoft", "IBM", "OpenAI"], ans: 0, exp: "Google Research developed C2S-Scale for advanced single-cell analysis." },
+    { q: "75. Where will FM inaugurate the dhaRti BioNest Incubation Centre?", opts: ["IISc Bengaluru", "IIT Madras", "IIT Dharwad", "NIT Surathkal"], ans: 2, exp: "IIT Dharwad is hosting this to support green technology startups." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `ST_${idx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Answer Detail:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

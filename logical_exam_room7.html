@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+        }
+        
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the detailed explanations below to master these concepts.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 7</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 7</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Which word does NOT belong with the others?", options: ["leopard", "cougar", "elephant", "lion"], ans: 2, logic: "Leopard, cougar, and lion are all large cats (felines). An elephant is a pachyderm." },
+            { q: "Reptile is to lizard as flower is to:", options: ["petal", "stem", "daisy", "alligator"], ans: 2, logic: "This is a genus-species relationship. A lizard is a type of reptile; a daisy is a type of flower." },
+            { passage: "Definition: Erratic Behavior occurs when an individual acts in a manner that lacks consistency, regularity, and uniformity.", q: "Which situation below is the best example of Erratic Behavior?", options: ["Julia's anger at local politics", "Martin punching a hole in a door once", "Rhonda's indecision at a dealership", "Jeffrey, a model employee for 3 years, suddenly calls in sick and is abusive."], ans: 3, logic: "Jeffrey's behavior is erratic because it shows a sudden, irregular lack of consistency with his 3-year history as a model employee." },
+            { passage: "Passage: High school students focus too much on fashion. Mandatory uniforms would increase community, harmony, and discipline while freeing teachers from 'clothing police' duties.", q: "This paragraph best supports the statement that:", options: ["Clothing leads to failing grades.", "Uniforms help college admissions.", "Teachers spend 25% of time on dress code.", "Students hate community.", "School uniforms should be compulsory for high school students."], ans: 4, logic: "The author's main point and conclusion is that uniforms should be made mandatory to solve the listed issues." },
+            { passage: "Passage: Miranda v. Arizona (1966) held that police must give a warning (right to remain silent) before interrogation. Violation makes statements inadmissible.", q: "This paragraph best supports the statement that:", options: ["Police are criminals if they fail to warn.", "A Miranda warning must be given before a police interrogation can begin.", "Lawyers must always be present.", "The decision should be reversed.", "Persons should always remain silent."], ans: 1, logic: "The passage explicitly states the warning must occur 'before' police can obtain statements during an interrogation." },
+            { passage: "Argument: Grade school computers are a waste. Children need basics like reading/arithmetic first. A baby has to crawl before she can walk.", q: "Which of the following would WEAKEN the speaker's argument?", options: ["Showing computers can teach reading and arithmetic.", "Cost-effectiveness analysis.", "Examples of computer-illiterate adults.", "Recent grade reports.", "A visit to a classroom."], ans: 0, logic: "If computers are proven to be tools that teach the 'basics,' the argument that they are a 'waste' of time compared to basics is invalidated." },
+            { passage: "Statement: Modern man influences his destiny by the choice he makes unlike in the past.", q: "Conclusion Check:", options: ["Only conclusion I follows (Fewer past options)", "Only conclusion II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "If man influences destiny via choice 'unlike the past', it logically implies that options for choice were more limited previously." },
+            { passage: "Statements: (I) Vegetable prices increased. (II) High temperatures damaged crops.", q: "Relationship:", options: ["I is cause, II is effect", "II is cause, I is effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 1, logic: "Natural crop damage (Cause) creates a shortage, leading to increased market prices (Effect)." },
+            { passage: "Statement: A review committee was set up to find reasons for unstable stock prices.", q: "Assumption Check:", options: ["Only I implicit (Regain confidence)", "Only II implicit (Expertise exists)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Setting up a committee assumes the committee is capable (II) and that the action will help stabilize the situation/confidence (I)." },
+            { passage: "Statement: The present examination system needs overhauling thoroughly.", q: "Assumption Check:", options: ["Only I implicit (System is obsolete)", "Only II implicit (Overhaul = Improvement)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "The call for an 'overhaul' assumes the current version is no longer useful (I) and that the change will result in a better system (II)." },
+            { passage: "Statement: I wrote several letters to the manager but received no reply.", q: "Assumption Check:", options: ["Only I implicit (Manager should read)", "Only II implicit (Manager should reply)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "The grievance assumes that the recipient has a duty to both read and respond to formal correspondence." },
+            { passage: "Statement: The end of a financial year is the ideal time to look at company performance.", q: "Assumption Check:", options: ["Only I implicit (All companies do this)", "Only II implicit (Data is available)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "Calling it the 'ideal time' assumes the necessary performance data is actually accessible for review." },
+            { passage: "Statement: Children who get encouragement perform better. - Principal's note.", q: "Assumption Check:", options: ["Only I implicit (Some lack encouragement)", "Only II implicit (Parents may listen)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "The note assumes a current deficiency (I) and that providing the advice will lead to parents following it (II)." },
+            { passage: "Statement: Exporters allege banks are violating RBI directives.", q: "Action Plan:", options: ["Only I (Suspend officers)", "Only II (Stop RBI directives)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "Suspension requires a prior inquiry, and stopping directives doesn't address the violation of existing rules." },
+            { passage: "Statement: Premier engineering students migrate abroad for better prospects.", q: "Action Plan:", options: ["Only I (10-year bond)", "Only II (Pay full cost if leaving)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "Recovering the cost of subsidized education is a logical economic action compared to a restrictive 10-year bond." },
+            { passage: "Statement: Tourism target is 10,000 crores by the end of the decade.", q: "Action Plan:", options: ["Only I (No new spots)", "Only II (Attractive packages)", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "To meet a high financial target, promotional packages (II) are a standard and logical business strategy." },
+            { passage: "Statement: XII Std. students can't get college seats as they are inadequate.", q: "Action Plan:", options: ["Only I (Tougher exams)", "Only II (Encourage private colleges)", "Only I and II", "Only II and III", "None of these"], ans: 1, logic: "Addressing the shortage of seats by building more colleges (II) is the only constructive solution listed." },
+            { passage: "Statement: 'A rare opportunity to be a professional while you are at home' - Ad.", q: "Assumption Check:", options: ["Only I and II", "Only II and III", "Only I and III", "Only II", "None of these"], ans: 2, logic: "The ad assumes housewives want professional status (I) and that the role is actually possible from home (III)." },
+            { passage: "Statements: All pencils are birds. All birds are skies. All skies are hills.", q: "Conclusion Check:", options: ["All pencils are hills.", "All hills are birds.", "All skies are pencils.", "All birds are hills."], ans: 0, logic: "Using the rule of nested sets: Pencils ⊂ Birds ⊂ Skies ⊂ Hills. Therefore, Pencils ⊂ Hills." },
+            { passage: "Statements: All myths are fictions. No fiction is novel. All novels are stories.", q: "Conclusion Check:", options: ["No myth is novel.", "Some fictions are novels.", "Some fictions are myths.", "Some myths are novels."], ans: 0, logic: "If Myths are inside Fictions, and Fictions have zero overlap with Novels, then Myths can have zero overlap with Novels." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Q${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                <div class="q-text">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+
+                if (selectedVal === item.ans) {
+                    score++;
+                } else if (selectedVal !== -1) {
+                    document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

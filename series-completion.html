@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Series Completion - Full Set</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --accent: #6366f1;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .series-box {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 30px;
+            background: #eef2ff;
+            border-radius: 12px;
+            border: 2px dashed #c7d2fe;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: #f5f3ff;
+            transform: translateY(-2px);
+        }
+
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .sidebar {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 16px;
+            height: fit-content;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .logic-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0fdf4;
+            border-radius: 10px;
+            border-left: 5px solid var(--correct);
+            display: none;
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s;
+        }
+
+        .btn-next:hover { background: #1e293b; }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="counter">Loading...</span>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <p style="font-weight:600; color:#64748b; margin-bottom: 10px;">IDENTIFY THE NEXT TERM:</p>
+        <div id="series-text" class="series-box"></div>
+        <div id="options" class="options-grid"></div>
+        <button class="btn-next" id="nextBtn" onclick="nextQuestion()">Next Question &rarr;</button>
+    </div>
+
+    <div class="sidebar">
+        <h3 style="margin-top:0">Pattern Decoder</h3>
+        <p style="font-size: 0.95rem; color: #475569;">Study the relationship between adjacent numbers. They often follow arithmetic, geometric, or square-based logic.</p>
+        <div id="logicBox" class="logic-box">
+            <strong>Logic:</strong><br>
+            <span id="logicText"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { s: "120, 99, 80, 63, 48, ?", opts: ["35", "38", "39", "40"], ans: 0, logic: "Pattern: (11^2-1), (10^2-1), (9^2-1), (8^2-1), (7^2-1). Next is (6^2-1) = 35." },
+        { s: "589654237, 89654237, 8965423, 965423, ?", opts: ["58965", "65423", "89654", "96542"], ans: 3, logic: "First digit is removed, then last digit, then first, then last. 965423 becomes 96542." },
+        { s: "3, 10, 101, ?", opts: ["10101", "10201", "10202", "11012"], ans: 2, logic: "Next term = (previous term)^2 + 1. (101^2) + 1 = 10201 + 1 = 10202." },
+        { s: "2, 6, 18, 54, ... 8th term?", opts: ["4370", "4374", "7443", "7434"], ans: 1, logic: "Geometric Progression: Multiply by 3. 8th term = 2 * (3^7) = 4374." },
+        { s: "125, 80, 45, 20, ?", opts: ["5", "8", "10", "12"], ans: 0, logic: "Differences: -45, -35, -25. Next is -15. 20 - 15 = 5." },
+        { s: "1, 1, 4, 8, 9, 27, 16, ?", opts: ["32", "64", "81", "256"], ans: 1, logic: "Alternating sequence: (1^2, 1^3), (2^2, 2^3), (3^2, 3^3), (4^2, 4^3). Next is 64." },
+        { s: "1, 2, 3, 6, 9, 18, ?, 54", opts: ["18", "27", "36", "81"], ans: 1, logic: "Pattern: Multiply by 2, then by 1.5. 18 * 1.5 = 27." },
+        { s: "6, 13, 25, 51, 101, ?", opts: ["201", "202", "203", "205"], ans: 2, logic: "Pattern: (n*2 + 1) then (n*2 - 1). 101 * 2 + 1 = 203." },
+        { s: "5, 6, 9, 15, ?, 40", opts: ["21", "25", "27", "33"], ans: 1, logic: "Differences are +1, +3, +6. The increment of the difference is +2, +3, +4. 15 + 10 = 25." },
+        { s: "1, 3, 4, 8, 15, 27, ?", opts: ["37", "44", "50", "55"], ans: 2, logic: "Sum of the three preceding numbers. 8 + 15 + 27 = 50." },
+        { s: "3, 4, 7, 7, 13, 13, 21, 22, 31, 34, ?", opts: ["42", "43", "51", "52"], ans: 1, logic: "Two interleaved series. Series 1: 3, 7, 13, 21, 31, (+4, +6, +8, +10, +12). 31 + 12 = 43." },
+        { s: "198, 194, 185, 169, ?", opts: ["92", "112", "136", "144"], ans: 3, logic: "Subtracting squares: -4 (-2^2), -9 (-3^2), -16 (-4^2), -25 (-5^2). 169 - 25 = 144." },
+        { s: "2, 3, 5, 7, 11, ?, 17", opts: ["12", "13", "14", "15"], ans: 1, logic: "The series consists of consecutive prime numbers." },
+        { s: "6, 12, 21, ?, 48", opts: ["33", "38", "40", "45"], ans: 0, logic: "Differences are +6, +9, +12, +15. 21 + 12 = 33." },
+        { s: "5, 10, 20, 40, ... is 1280?", opts: ["10th", "9th", "8th", "None"], ans: 1, logic: "Double each time. 5*(2^8) = 1280. This is the 9th term." },
+        { s: "2, 3, 3, 5, 10, 13, ?, 43, 172, 177", opts: ["23", "38", "39", "40"], ans: 2, logic: "Pattern: +1, *1, +2, *2, +3, *3. 13 * 3 = 39." },
+        { s: "9, 27, 31, 155, 161, 1127, ?", opts: ["316", "1135", "1288", "2254"], ans: 1, logic: "Pattern: *3, +4, *5, +6, *7, +8. 1127 + 8 = 1135." },
+        { s: "1, 8, 27, 64, 125, ... (Which is NOT in series?)", opts: ["256", "512", "729", "1000"], ans: 0, logic: "All are perfect cubes (n^3). 256 is 16^2 or 4^4, not a cube." },
+        { s: "13, 32, 24, 43, 35, ?, 46, 65, 57, 76", opts: ["45", "52", "54", "55"], ans: 2, logic: "Two interleaved series. Series 1: 13, 24, 35, 46, 57. Series 2: 32, 43, 54, 65, 76. 43+11 = 54." },
+        { s: "22, 24, 28, ?, 52, 84", opts: ["36", "38", "42", "46"], ans: 0, logic: "Differences are +2, +4, +8, +16, +32. 28 + 8 = 36." },
+        { s: "3, 15, ?, 63, 99, 143", opts: ["27", "35", "45", "56"], ans: 1, logic: "Pattern: (2^2-1), (4^2-1), (6^2-1), (8^2-1). Next is 35." },
+        { s: "90, 180, 12, 50, 100, 200, ?, 3, 50, 4, 25, 2", opts: ["150", "175", "225", "250"], ans: 0, logic: "Complex group pattern: (50, 100, 200) and (3, 50, 4, 25, 2). The missing term is 150." },
+        { s: "48, 24, 96, 48, 192, ?", opts: ["76", "90", "96", "98"], ans: 2, logic: "Pattern: divide by 2, then multiply by 4. 192 / 2 = 96." },
+        { s: "2, 15, 41, 80, ?", opts: ["111", "120", "121", "132"], ans: 3, logic: "Differences are +13, +26, +39, +52. 80 + 52 = 132." },
+        { s: "563, 647, 479, 815, ?", opts: ["672", "386", "279", "143"], ans: 3, logic: "Differences: +84, -168, +336, -672. 815 - 672 = 143." },
+        { s: "1, 4, 10, 22, 46, ?", opts: ["64", "86", "94", "122"], ans: 2, logic: "Pattern: n*2 + 2. 46 * 2 + 2 = 94." },
+        { s: "66, 36, 18, ?", opts: ["3", "6", "8", "9"], ans: 2, logic: "Multiply digits: 6*6=36, 3*6=18, 1*8=8." },
+        { s: "3, 9, 15, ... 21st term?", opts: ["117", "121", "123", "129"], ans: 2, logic: "Arithmetic progression: a + (n-1)d. 3 + (20 * 6) = 123." },
+        { s: "1, 9, 25, 49, 81, ?", opts: ["100", "112", "121", "144"], ans: 2, logic: "Squares of odd numbers: 1^2, 3^2, 5^2, 7^2, 9^2, 11^2 = 121." },
+        { s: "0, 2, 8, 14, ?, 34", opts: ["20", "23", "24", "25"], ans: 2, logic: "Differences: +2, +6, +6, +10, +10. 14 + 10 = 24." },
+        { s: "1, 5, 14, 30, 55, 91, ?", opts: ["130", "140", "150", "160"], ans: 1, logic: "Sum of squares: 1^2, 2^2, 3^2, 4^2, 5^2, 6^2. Next add 7^2 (49). 91+49 = 140." },
+        { s: "10, 17, 24, 31, 38, ... (Which is in series?)", opts: ["48", "346", "574", "1003"], ans: 1, logic: "All terms leave remainder 3 when divided by 7. 346 / 7 = 49 remainder 3." },
+        { s: "240, ?, 120, 40, 10, 2", opts: ["180", "240", "420", "480"], ans: 1, logic: "Divide by 1, 2, 3, 4, 5. 240 / 1 = 240." },
+        { s: "2, 3, 8, 27, 112, ?", opts: ["226", "339", "452", "565"], ans: 3, logic: "Pattern: (n*1+1), (n*2+2), (n*3+3), (n*4+4), (n*5+5). 112*5+5 = 565." },
+        { s: "24, 60, 120, 210, ?", opts: ["300", "336", "420", "525"], ans: 1, logic: "Pattern: n^3 - n. (3^3-3), (4^3-4), (5^3-5), (6^3-6), (7^3-7) = 336." },
+        { s: "10, 100, 200, 310, ?", opts: ["400", "410", "420", "430"], ans: 3, logic: "Differences: +90, +100, +110. Next is +120. 310 + 120 = 430." },
+        { s: "2, 7, 27, 107, 427, ?", opts: ["1262", "1707", "4027", "4207"], ans: 1, logic: "Pattern: n*4 - 1. 427 * 4 - 1 = 1707." },
+        { s: "1, 1, 2, 6, 24, ?, 720", opts: ["100", "104", "108", "120"], ans: 3, logic: "Multiplying by 1, 2, 3, 4, 5. 24 * 5 = 120." },
+        { s: "4832, 5840, 6848, ?", opts: ["7815", "7846", "7856", "7887"], ans: 2, logic: "Each term increases by 1008." },
+        { s: "0.5, 0.55, 0.65, 0.8, ?", opts: ["0.9", "0.82", "1", "0.95"], ans: 2, logic: "Differences are +0.05, +0.10, +0.15, +0.20. 0.8 + 0.2 = 1." },
+        { s: "7, 26, 63, 124, 215, 342, ?", opts: ["391", "421", "481", "511"], ans: 3, logic: "Pattern: n^3 - 1. 2^3-1, 3^3-1... 8^3-1 = 511." },
+        { s: "3, 12, 27, 48, 75, 108, ?", opts: ["147", "162", "183", "192"], ans: 0, logic: "Pattern: 3 * n^2. 3*1, 3*4, 3*9... 3*49 = 147." },
+        { s: "4, 9, 25, ?, 121, 169, 289, 361", opts: ["49", "64", "81", "87"], ans: 0, logic: "Squares of prime numbers: 2^2, 3^2, 5^2, 7^2, 11^2. Next is 49." },
+        { s: "325, 259, 204, 160, 127, 105, ?", opts: ["94", "96", "98", "100"], ans: 0, logic: "Differences: -66, -55, -44, -33, -22, -11. 105 - 11 = 94." },
+        { s: "8, 28, 116, 584, ?", opts: ["1752", "3502", "3504", "3508"], ans: 3, logic: "Pattern: *3+4, *4+4, *5+4, *6+4. 584 * 6 + 4 = 3508." }
+    ];
+
+    let currentIdx = 0;
+
+    function renderQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('counter').innerText = `Question ${currentIdx + 1} / ${questions.length}`;
+        document.getElementById('series-text').innerText = q.s;
+        
+        const container = document.getElementById('options');
+        container.innerHTML = '';
+        
+        q.opts.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => check(i, btn);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('logicBox').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+    }
+
+    function check(idx, btn) {
+        const q = questions[currentIdx];
+        const btns = document.querySelectorAll('.opt-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(idx === q.ans) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            btns[q.ans].classList.add('correct');
+        }
+        
+        document.getElementById('logicText').innerText = q.logic;
+        document.getElementById('logicBox').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        if(currentIdx < questions.length - 1) {
+            currentIdx++;
+            renderQuestion();
+        } else {
+            alert("Excellent! You've completed the entire series question bank.");
+        }
+    }
+
+    renderQuestion();
+</script>
+
+</body>
+</html>

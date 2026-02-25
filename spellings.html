@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spellings Quiz - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #6610f2;
+            --secondary: #6f42c1;
+            --dark: #2e3759;
+            --bg: #f8f9fc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .instructions {
+            background: #f3e5f5;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta { color: #888; font-size: 0.9rem; margin-bottom: 15px; font-weight: bold; }
+        
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .option:hover { border-color: var(--primary); background: #fdfbff; }
+        .option.selected { border-color: var(--primary); background: #f3eaff; }
+
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Spelling Test</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='verbal-ability.html'">⬅ Back to Topics</button>
+
+    <div class="instructions">
+        <strong>Direction:</strong> In each of the following questions, find the <strong>correctly spelled word</strong> among the options.
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="q-count" class="question-meta">Question 1 of 49</div>
+        
+        <div id="options-container" class="options-list">
+            </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div id="explanation-content" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { opts: ["Efficient", "Treatmeant", "Beterment", "Employd"], correct: 0 },
+        { opts: ["Foreign", "Foreine", "Fariegn", "Forein"], correct: 0 },
+        { opts: ["Ommineous", "Omineous", "Ominous", "Omenous"], correct: 2 },
+        { opts: ["Pessenger", "Passenger", "Pasanger", "Pesanger"], correct: 1 },
+        { opts: ["Benefitted", "Benifited", "Benefited", "Benefeted"], correct: 0 },
+        { opts: ["Treachrous", "Trecherous", "Trechearous", "Treacherous"], correct: 3 },
+        { opts: ["Forcast", "Forecaste", "Forcaust", "Forecast"], correct: 3 },
+        { opts: ["Rigerous", "Rigourous", "Regerous", "Rigorous"], correct: 3 },
+        { opts: ["Palete", "Palet", "Palate", "Pelate"], correct: 2 },
+        { opts: ["Bouquete", "Bouquette", "Bouquet", "Boqquet"], correct: 2 },
+        { opts: ["Vetarinary", "Veteninary", "Vetinary", "Veterinary"], correct: 3 },
+        { opts: ["Chancelary", "Chancellery", "Chancelery", "Chancellary"], correct: 1 },
+        { opts: ["Excessive", "Exccessive", "Exxcesive", "Excesive"], correct: 0 },
+        { opts: ["Indipensable", "Indipenseble", "Indispansible", "Indispensable"], correct: 3 },
+        { opts: ["Humorous", "Ganerous", "Pupolous", "Maretorious"], correct: 0 },
+        { opts: ["Itinarery", "Itinerary", "Itenary", "Itinarary"], correct: 1 },
+        { opts: ["Survaillance", "Surveillance", "Survellance", "Surveilance"], correct: 1 },
+        { opts: ["Sepulchral", "Sepilchrle", "Sepalchrul", "Sepalchrl"], correct: 0 },
+        { opts: ["Acommodation", "Accomodaton", "Accommodation", "Acomodation"], correct: 2 },
+        { opts: ["Faithfuly", "Sincerely", "Truely", "Affectionatly"], correct: 1 },
+        { opts: ["Klaptomania", "Klepptomania", "Kleptemania", "Kleptomania"], correct: 3 },
+        { opts: ["Schedulle", "Schedeule", "Schdule", "Schedule"], correct: 3 },
+        { opts: ["Skillful", "Skillfull", "Skilfull", "Skilpull"], correct: 0 },
+        { opts: ["Judicious", "Cancious", "Dilicous", "Gracous"], correct: 0 },
+        { opts: ["Gaurantee", "Guarantee", "Garuntee", "Guaruntee"], correct: 1 },
+        { opts: ["Friming", "Burnning", "Running", "Fryng"], correct: 2 },
+        { opts: ["Dammage", "Damaige", "Dammege", "Damage"], correct: 3 },
+        { opts: ["Accomplish", "Acomplush", "Ackmplesh", "Accompalish"], correct: 0 },
+        { opts: ["Puerrile", "Puerrille", "Purrile", "Puerile"], correct: 3 },
+        { opts: ["Satelite", "Sattelite", "Satellite", "Sattellite"], correct: 2 },
+        { opts: ["Inoculation", "Innoculation", "Inocculation", "Inocullation"], correct: 0 },
+        { opts: ["Velnerable", "Vulnarable", "Vulnerable", "Valnerable"], correct: 2 },
+        { opts: ["Simpal", "Bannar", "Pattren", "Modern"], correct: 3 },
+        { opts: ["Scripher", "Scripture", "Skripture", "Scriptur"], correct: 1 },
+        { opts: ["Comitte", "Commitee", "Committee", "Comiittee"], correct: 2 },
+        { opts: ["Exaggerate", "Exeggrate", "Exagerate", "Exadgerate"], correct: 0 },
+        { opts: ["Asspersion", "Voluptuous", "Voguei", "Equestrain"], correct: 1 },
+        { opts: ["Hindrance", "Hinderrance", "Hindrence", "Hinderence"], correct: 0 },
+        { opts: ["Parallelled", "Parralleled", "Paralleled", "Paraleled"], correct: 2 },
+        { opts: ["Lckadaisicle", "Lackdaisical", "Lackadisical", "Lackadaisical"], correct: 3 },
+        { opts: ["Equanimity", "Equannimity", "Equanimmity", "Equinimity"], correct: 0 },
+        { opts: ["Occured", "Occurad", "Ocurred", "Occurred"], correct: 3 },
+        { opts: ["Swelte", "Filpant", "Licentious", "Puessile"], correct: 2 },
+        { opts: ["Grief", "Breif", "Recieve", "Diceive"], correct: 0 },
+        { opts: ["Furnituer", "Exampel", "Medicine", "Sampal"], correct: 2 },
+        { opts: ["Eflorescence", "Efllorescence", "Efflorescence", "Efflorascence"], correct: 2 },
+        { opts: ["Exterminatte", "Inexpliccable", "Offspring", "Reffere"], correct: 2 },
+        { opts: ["Occasion", "Occassion", "Ocasion", "Ocassion"], correct: 0 },
+        { opts: ["Entrepreneur", "Entrapreneur", "Entrepraneur", "Enterprenuer"], correct: 0 }
+    ];
+
+    let currentIdx = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.opts.forEach((opt, i) => {
+            const btn = document.createElement('div');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                btn.classList.add('selected');
+            };
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        selectedIdx = null;
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select a word!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        feedback.style.display = 'block';
+
+        if (selectedIdx === q.correct) {
+            document.getElementById('result-title').innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            document.getElementById('result-title').innerText = `Incorrect. The correct spelling is: ${q.opts[q.correct]}`;
+            feedback.className = "feedback wrong";
+        }
+
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `<h2>Complete!</h2><p>You have finished the Spellings topic.</p><button class="btn btn-check" onclick="location.reload()">Restart Quiz</button>`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

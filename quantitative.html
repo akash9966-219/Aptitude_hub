@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantitative Aptitude</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding-top: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #f1f1f1;
+            transform: scale(1.05);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+            color: #333;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: #f8f9fc;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+            color: #4e73df;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <button class="back-btn" onclick="goHome()">⬅ Back to Home</button>
+
+        <h1>Quantitative Aptitude Topics</h1>
+
+        <div class="card-grid">
+            <div class="card" onclick="openTopic('numbersystem')">Number System</div>
+            <div class="card" onclick="openTopic('hcf-lcm')">HCF and LCM</div>
+            <div class="card" onclick="openTopic('decimal-fractions')">Decimal Fractions</div>
+            <div class="card" onclick="openTopic('simplification')">Simplification</div>
+            <div class="card" onclick="openTopic('square-roots')">Square Roots & Cube Roots</div>
+            <div class="card" onclick="openTopic('surds-indices')">Surds and Indices</div>
+
+            <div class="card" onclick="openTopic('problems-numbers')">Problems on Numbers</div>
+            <div class="card" onclick="openTopic('problems-ages')">Problems on Ages</div>
+            <div class="card" onclick="openTopic('percentage')">Percentage</div>
+            <div class="card" onclick="openTopic('profit-loss')">Profit and Loss</div>
+            <div class="card" onclick="openTopic('ratio-proportion')">Ratio and Proportion</div>
+            <div class="card" onclick="openTopic('partnership')">Partnership</div>
+            <div class="card" onclick="openTopic('chain-rule')">Chain Rule</div>
+            <div class="card" onclick="openTopic('average')">Average</div>
+
+            <div class="card" onclick="openTopic('timework')">Time & Work</div>
+            <div class="card" onclick="openTopic('pipes')">Pipes & Cistern</div>
+            <div class="card" onclick="openTopic('timedistance')">Time & Distance</div>
+            <div class="card" onclick="openTopic('trains')">Problems on Trains</div>
+            <div class="card" onclick="openTopic('boats')">Boats & Streams</div>
+            <div class="card" onclick="openTopic('races')">Races & Games of Skill</div>
+
+            <div class="card" onclick="openTopic('mixture')">Alligation & Mixture</div>
+            <div class="card" onclick="openTopic('simple-interest')">Simple Interest</div>
+            <div class="card" onclick="openTopic('compound-interest')">Compound Interest</div>
+            <div class="card" onclick="openTopic('logarithm')">Logarithm</div>
+            <div class="card" onclick="openTopic('stocks-shares')">Stocks and Shares</div>
+            <div class="card" onclick="openTopic('true-discount')">True Discount</div>
+            <div class="card" onclick="openTopic('bankers-discount')">Banker's Discount</div>
+
+            <div class="card" onclick="openTopic('area')">Area</div>
+            <div class="card" onclick="openTopic('volume')">Volume & Surface Area</div>
+            <div class="card" onclick="openTopic('height-distance')">Height and Distance</div>
+
+            <div class="card" onclick="openTopic('calendar')">Calendar</div>
+            <div class="card" onclick="openTopic('clocks')">Clocks</div>
+            <div class="card" onclick="openTopic('permutation-combination')">Permutations & Combinations</div>
+            <div class="card" onclick="openTopic('probability')">Probability</div>
+            <div class="card" onclick="openTopic('odd-man-series')">Odd Man Out & Series</div>
+        </div>
+    </div>
+
+    <script>
+        function goHome(){
+            window.location.href = "index.html";
+        }
+
+        function openTopic(topic){
+            window.location.href = topic + ".html";
+        }
+    </script>
+
+</body>
+</html>

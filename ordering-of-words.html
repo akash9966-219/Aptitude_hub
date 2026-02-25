@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ordering of Words - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #224abe;
+            --success: #1cc88a;
+            --dark: #2e3759;
+            --bg: #f8f9fc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .instructions {
+            background: #ebf0ff;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta { color: #888; font-size: 0.9rem; margin-bottom: 15px; font-weight: bold; }
+        
+        .intro-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        /* Jumbled Parts Styling */
+        .jumbled-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .part-card {
+            background: #fff;
+            border: 1px solid #e3e6f0;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .part-label {
+            font-weight: bold;
+            color: var(--primary);
+            min-width: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 12px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .option:hover { border-color: var(--primary); background: #f8faff; }
+        .option.selected { border-color: var(--primary); background: #ebf0ff; color: var(--primary); }
+
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 600px) {
+            .jumbled-container, .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Ordering of Words</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='verbal-ability.html'">⬅ Back to Topics</button>
+
+    <div class="instructions">
+        <strong>Direction:</strong> The following sentences are split into four parts (P, Q, R, S). Find the proper sequence to form a meaningful sentence.
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="q-count" class="question-meta">Question 1 of 48</div>
+        
+        <div class="intro-text" id="intro-part">When he</div>
+        
+        <div class="jumbled-container" id="parts-box">
+            </div>
+        
+        <div id="options-container" class="options-grid">
+            </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div id="explanation-content" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { intro: "When he", p: "did not know", q: "he was nervous and", r: "heard the hue and cry at midnight", s: "what to do", opts: ["RQPS", "QSPR", "SQPR", "PQRS"], correct: 0, full: "When he heard the hue and cry at midnight, he was nervous and did not know what to do." },
+        { intro: "It has been established that", p: "Einstein was", q: "although a great scientist", r: "weak in arithmetic", s: "right from his school days", opts: ["SRPQ", "QPRS", "QPSR", "RQPS"], correct: 2, full: "It has been established that although a great scientist, Einstein was weak in arithmetic right from his school days." },
+        { intro: "Then", p: "it struck me", q: "of course", r: "suitable it was", s: "how eminently", opts: ["SPQR", "QSRP", "PSRQ", "QPSR"], correct: 3, full: "Then of course it struck me how eminently suitable it was." },
+        { intro: "I read an advertisement that said", p: "posh, air-conditioned", q: "gentleman of taste", r: "are available for", s: "fully furnished rooms", opts: ["PQRS", "PSRQ", "PSQR", "SRPQ"], correct: 1, full: "I read an advertisement that said posh, air-conditioned, fully furnished rooms are available for gentleman of taste." },
+        { intro: "Since the beginning of history", p: "have managed to catch", q: "the Eskimos and Red Indians", r: "by a very difficulty method", s: "a few specimens of this aquatic animal", opts: ["QRPS", "SQPR", "SQRP", "QPSR"], correct: 3, full: "Since the beginning of history the Eskimos and Red Indians have managed to catch a few specimens of this aquatic animal by a very difficulty method." },
+        { intro: "A French woman", p: "committed suicide", q: "where she had put up", r: "who had come to Calcutta", s: "by jumping from the first floor balcony of the hotel", opts: ["PRQS", "QSRP", "RPSQ", "SRQP"], correct: 2, full: "A French woman who had come to Calcutta committed suicide by jumping from the first floor balcony of the hotel where she had put up." },
+        { intro: "The national unity of a free people", p: "to make it impracticable", q: "for there to be an arbitrary administration", r: "depends upon a sufficiently even balance of political power", s: "against a revolutionary opposition that is irreconcilably opposed to it", opts: ["QRPS", "QRSP", "RPQS", "RSPQ"], correct: 2, full: "The national unity of a free people depends upon a sufficiently even balance of political power to make it impracticable for there to be an arbitrary administration against a revolutionary opposition." },
+        { intro: "The grocer", p: "did not listen to the protests of customer", q: "who was in the habit of weighing less", r: "whom he had cheated", s: "with great audacity", opts: ["PRSQ", "QSPR", "QPRS", "PQSR"], correct: 1, full: "The grocer who was in the habit of weighing less did not listen to the protests of customer whom he had cheated with great audacity." },
+        { intro: "They felt safer", p: "to watch the mountain", q: "of more than five miles", r: "as they settled down", s: "from a distance", opts: ["RPSQ", "RSQP", "PQSR", "PRSQ"], correct: 0, full: "They felt safer as they settled down to watch the mountain from a distance of more than five miles." },
+        { intro: "People", p: "at his dispensary", q: "went to him", r: "of all professions", s: "for medicine and treatment", opts: ["QPRS", "RPQS", "RQSP", "QRPS"], correct: 1, full: "People of all professions went to him at his dispensary for medicine and treatment." },
+        { intro: "If you need help", p: "promptly and politely", q: "ask for attendants", r: "to help our customers", s: "who have instructions", opts: ["SQPR", "QPSR", "QSRP", "SQRP"], correct: 1, full: "If you need help ask for attendants who have instructions to help our customers promptly and politely." },
+        { intro: "It is easier", p: "to venture into space", q: "for men", r: "beneath their feet", s: "than to explore", opts: ["QRPS", "QPSR", "PSRQ", "PQSR"], correct: 3, full: "It is easier for men to venture into space than to explore beneath their feet." },
+        { intro: "It was to be", p: "before their school examination", q: "which was due to start", r: "the last expedition", s: "in a month's", opts: ["SRQP", "RQSP", "RPQS", "SPRQ"], correct: 2, full: "It was to be the last expedition before their school examination which was due to start in a month's time." },
+        { intro: "This time", p: "exactly what he had been told", q: "the young man did", r: "beyond his dreams", s: "and the plan succeeded", opts: ["QPRS", "QPSR", "PQSR", "QSRP"], correct: 1, full: "This time the young man did exactly what he had been told and the plan succeeded beyond his dreams." },
+        { intro: "In the darkness", p: "the long, narrow beard", q: "was clearly visible with", r: "the tall stooping figure of the doctor", s: "and the aquiline nose", opts: ["RQPS", "PSQR", "RSQP", "QPRS"], correct: 2, full: "In the darkness the tall stooping figure of the doctor was clearly visible with the long, narrow beard and the aquiline nose." },
+        { intro: "We have to", p: "as we see it", q: "speak the truth", r: "there is falsehood and weakness", s: "even if all around us", opts: ["RQSP", "QRPS", "RSQP", "QPSR"], correct: 1, full: "We have to speak the truth as we see it even if all around us there is falsehood and weakness." },
+        { intro: "When it began to rain suddenly", p: "to celebrate the new year", q: "we ran for shelter", r: "to the neighbouring house", s: "where many people had gathered", opts: ["QRPS", "PSQR", "PRSQ", "QRSP"], correct: 0, full: "When it began to rain suddenly, we ran for shelter to the neighbouring house where many people had gathered to celebrate the new year." },
+        { intro: "He told us that", p: "and enjoyed it immensely", q: "in a prose translation", r: "he had read Milton", s: "which he had borrowed from his teacher", opts: ["RSQP", "QRPS", "RQSP", "RQPS"], correct: 2, full: "He told us that he had read Milton in a prose translation which he had borrowed from his teacher and enjoyed it immensely." },
+        { intro: "He knew that", p: "and then to save himself", q: "was to save all the lives", r: "entrusted to his care", s: "the duty of a captain", opts: ["PQRS", "SQRP", "SPRQ", "QSRP"], correct: 1, full: "He knew that the duty of a captain was to save all the lives entrusted to his care and then to save himself." },
+        { intro: "It is not, therefore", p: "that I pay a tribute", q: "to conductors as a class", r: "with any feeling of unfriendliness", s: "to a particular member of that class", opts: ["PQRS", "RQPS", "RSPQ", "PSRQ"], correct: 1, full: "It is not, therefore, with any feeling of unfriendliness that I pay a tribute to conductors as a class." },
+        { intro: "Of many artists", p: "those who impressed me the most", q: "I was a child", r: "but those with unique personalities off stage", s: "were not always the successful ones", opts: ["SRQP", "QRSP", "RSPQ", "QPSR"], correct: 3, full: "Of many artists I was a child, those who impressed me the most were not always the successful ones." },
+        { intro: "As a disease", p: "and breaks up marriages", q: "accidents and suicides", r: "alcoholism leads to", s: "affecting all ages", opts: ["SRPQ", "RPSQ", "SRQP", "RQPS"], correct: 0, full: "As a disease affecting all ages, alcoholism leads to accidents and suicides and breaks up marriages." },
+        { intro: "It is easy to excuse", p: "but it is hard", q: "in a boy of fourteen", r: "the mischief of early childhood", s: "to tolerate even unavoidable faults", opts: ["RPQS", "QRSP", "QRPS", "RPSQ"], correct: 0, full: "It is easy to excuse the mischief of early childhood in a boy of fourteen but it is hard to tolerate even unavoidable faults." },
+        { intro: "The majestic mahogany table", p: "belongs to an old prince", q: "which has one leg missing", r: "who is now impoverished", s: "but not without some pride", opts: ["PQSR", "QRSP", "PRSQ", "QPRS"], correct: 3, full: "The majestic mahogany table which has one leg missing belongs to an old prince who is now impoverished." },
+        { intro: "Education is", p: "of the proper sense of responsibilities", q: "the first need", r: "in a citizen", s: "for the development", opts: ["SQPR", "QSRP", "QSPR", "PQRS"], correct: 2, full: "Education is the first need for the development of the proper sense of responsibilities in a citizen." },
+        { intro: "It would", p: "appear from his statement", q: "about the policy of management", r: "in dealing with the strike", s: "that he was quite in the dark", opts: ["RPSQ", "PSQR", "RQPS", "PRQS"], correct: 1, full: "It would appear from his statement that he was quite in the dark about the policy of management in dealing with the strike." },
+        { intro: "He was so kind and generous that", p: "he not only", q: "made others do so", r: "but also", s: "helped them himself", opts: ["PSRQ", "SPQR", "PRSQ", "QPRS"], correct: 0, full: "He was so kind and generous that he not only helped them himself but also made others do so." },
+        { intro: "We went", p: "along the railway line", q: "and had a right to", r: "where other people not allowed to go", s: "but daddy belonged to the railway", opts: ["RPQS", "PRSQ", "RSQP", "PRQS"], correct: 1, full: "We went along the railway line where other people not allowed to go but daddy belonged to the railway and had a right to." },
+        { intro: "There was", p: "needed for it everyday life", q: "a time when each family", r: "for itself most of the things it", s: "actually produced", opts: ["QRSP", "RQPS", "RSPQ", "QSRP"], correct: 0, full: "There was a time when each family actually produced for itself most of the things it needed for its everyday life." },
+        { intro: "Little", p: "that he had been let down", q: "stood by all these years", r: "did he realise", s: "by a colleague whom he had", opts: ["RPSQ", "RSQP", "QSRP", "QSPR"], correct: 1, full: "Little did he realise that he had been let down by a colleague whom he had stood by all these years." },
+        { intro: "I saw that", p: "but seeing my host in this mood", q: "I deemed it proper to take leave", r: "as I had frequently done before", s: "it had been my intention to pass the night there", opts: ["QPSR", "QRPS", "SPQR", "SRPQ"], correct: 2, full: "I saw that it had been my intention to pass the night there, as I had frequently done before, but seeing my host in this mood I deemed it proper to take leave." },
+        { intro: "It is very easy", p: "a great deal more than one realises", q: "may mean", r: "that a phrase that one does not quite understand", s: "to persuade oneself", opts: ["RSQP", "SPQR", "SRQP", "RQPS"], correct: 1, full: "It is very easy to persuade oneself that a phrase that one does not quite understand may mean a great deal more than one realises." },
+        { intro: "I was", p: "and stay for a few days in Delhi", q: "when my father told me", r: "very excited", s: "that I could go with him", opts: ["PQRS", "RQSP", "QRSP", "SPQR"], correct: 1, full: "I was very excited when my father told me that I could go with him and stay for few days in Delhi." },
+        { intro: "Work is the one thing", p: "and without it", q: "that is necessary", r: "to keep the world going", s: "we should all die", opts: ["QPSR", "RPQS", "SRPQ", "QRPS"], correct: 3, full: "Work is the one thing that is necessary to keep the world going and without it we should all die." },
+        { intro: "The appearance", p: "this dinosaurs were at their peak", q: "of the first mammals on the earth", r: "at the time when", s: "went almost unnoticed", opts: ["SRPQ", "QSRP", "QRPS", "RPQS"], correct: 1, full: "The appearance of the first mammals on the earth at the time when this dinosaurs were at their peak went almost unnoticed." },
+        { intro: "By this time", p: "at the railway station", q: "reported mass looting", r: "reports of violence were flooding in", s: "which police dispatches", opts: ["RSPQ", "SPRQ", "SQRP", "RSQP"], correct: 0, full: "By this time reports of violence were flooding in which police dispatches reported mass looting at the railway station." },
+        { intro: "Then the women", p: "lamenting their evil desire", q: "that had brought", r: "wept loudly", s: "this sorrow upon them", opts: ["RPQS", "RQPS", "PQSR", "PRQS"], correct: 0, full: "Then the women wept loudly lamenting their evil desire that had brought this sorrow upon them." },
+        { intro: "Women", p: "till the other day", q: "who were content being housewives", r: "about spending their time cooking", s: "now sound apologetic", opts: ["PQRS", "RSPQ", "QPSR", "RQPS"], correct: 2, full: "Women who were content being housewives till the other day now sound apologetic about spending their time cooking." },
+        { intro: "Though he dialled frequently", p: "on telephone", q: "my brother could not contact me", r: "and had left no information", s: "as I had gone out of office", opts: ["QPRS", "SQRP", "QPSR", "SPQR"], correct: 0, full: "Though he dialled frequently on telephone, my brother could not contact me as I had gone out of office." },
+        { intro: "He said", p: "here is the cat", q: "throughout the night", r: "which had been paying havoc with things", s: "that ate the rat", opts: ["PSQR", "PSRQ", "QPRS", "QRPS"], correct: 1, full: "He said here is the cat that ate the rat which had been paying havoc with things throughout the night." },
+        { intro: "He sat", p: "through the Town Hall Park", q: "which flanked a path running", r: "under the boughs", s: "of a spreading tamarind tree", opts: ["PQSR", "RSQP", "RSPQ", "PRSQ"], correct: 2, full: "He sat under the boughs of a spreading tamarind tree which flanked a path running through the Town Hall Park." },
+        { intro: "I don't remember", p: "I saw a man dying in front of a hospital", q: "but when I left lucknow in 1984", r: "hit apparently by a fast moving car", s: "the exact date", opts: ["SQRP", "SQPR", "QRPS", "SPRQ"], correct: 1, full: "I don't remember the exact date but when I left lucknow in 1984 I saw a man dying in front of a hospital hit apparently by a fast moving car." },
+        { intro: "It was", p: "in keeping with my mood", q: "a soft summer evening", r: "as I walked sedately", s: "in the direction of new house", opts: ["SRPQ", "QRPS", "QPRS", "SQPR"], correct: 2, full: "It was a soft summer evening as I walked sedately in the direction of new house in keeping with my mood." },
+        { intro: "All such students", p: "get success", q: "who are honest and hard-working", r: "and recognition", s: "in every walk of life", opts: ["SPRQ", "PRQS", "QPRS", "PSRQ"], correct: 2, full: "All such students who are honest and hard-working get success and recognition in every walk of life." },
+        { intro: "The master", p: "who was very loyal to him", q: "punished the servant", r: "without giving any valid reason", s: "when he left the work unfinished", opts: ["RQPS", "RQSP", "QPSR", "QRPS"], correct: 2, full: "The master punished the servant who was very loyal to him when he left the work unfinished without giving any valid reason." },
+        { intro: "With her body", p: "dragging her unwilling feet", q: "weak and infirm", r: "doubled with age", s: "she persisted in her mission", opts: ["PQRS", "BPRS", "RQPS", "SRPQ"], correct: 2, full: "With her body doubled with age, weak and infirm, she persisted in her mission dragging her unwilling feet." },
+        { intro: "We must read", p: "if we want to absorb the fruits of great literature", q: "but with concentration", r: "them not as we do cricket stories", s: "undefined", opts: ["QPSR", "PSQR", "PRSQ", "PRQS"], correct: 2, full: "We must read them not as we do cricket stories but with concentration if we want to absorb the fruits of great literature." },
+        { intro: "I enclose", p: "and the postage", q: "a postal order", r: "the price of books", s: "which will cover", opts: ["RPSQ", "QSPR", "QSRP", "QPSR"], correct: 3, full: "I enclose a postal order which will cover the price of books and the postage." }
+    ];
+
+    let currentIdx = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('intro-part').innerText = q.intro;
+        
+        const partsBox = document.getElementById('parts-box');
+        partsBox.innerHTML = `
+            <div class="part-card"><span class="part-label">P:</span> ${q.p}</div>
+            <div class="part-card"><span class="part-label">Q:</span> ${q.q}</div>
+            <div class="part-card"><span class="part-label">R:</span> ${q.r}</div>
+            <div class="part-card"><span class="part-label">S:</span> ${q.s}</div>
+        `;
+
+        const optContainer = document.getElementById('options-container');
+        optContainer.innerHTML = '';
+        q.opts.forEach((opt, i) => {
+            const btn = document.createElement('div');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                btn.classList.add('selected');
+            };
+            optContainer.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        selectedIdx = null;
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select a sequence!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        feedback.style.display = 'block';
+
+        if (selectedIdx === q.correct) {
+            document.getElementById('result-title').innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            document.getElementById('result-title').innerText = `Incorrect. The proper sequence is ${q.opts[q.correct]}.`;
+            feedback.className = "feedback wrong";
+        }
+
+        document.getElementById('explanation-content').innerHTML = `<strong>Full Sentence:</strong><br>"${q.full}"`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `<h2>Complete!</h2><p>You have finished the Ordering of Words topic.</p><button class="btn btn-check" onclick="location.reload()">Restart</button>`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

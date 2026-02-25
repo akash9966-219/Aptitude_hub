@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Problems on Ages Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Problems on Ages</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading question...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Father is aged three times more than his son Ronit. After 8 years, he would be 2.5 times of Ronit's age. After a further 8 years, how many times would he be of Ronit's age?", options: ["2 times", "2.5 times", "2.75 times", "3 times"], correct: 0, explain: "Let Ronit's age = x. Father = x + 3x = 4x. (4x + 8) = 2.5(x + 8) => 4x + 8 = 2.5x + 20 => 1.5x = 12 => x = 8. Father = 32. After 16 total years: Son = 24, Father = 48. 48/24 = 2 times." },
+        { q: "Sum of ages of 5 children born at intervals of 3 years each is 50. Age of the youngest child is:", options: ["4 years", "8 years", "10 years", "None of these"], correct: 0, explain: "Let ages be x, x+3, x+6, x+9, x+12. Sum = 5x + 30 = 50 => 5x = 20 => x = 4." },
+        { q: "Father said: 'I was as old as you are now at your birth'. If father is 38 now, son's age 5 years ago was:", options: ["14 years", "19 years", "33 years", "38 years"], correct: 0, explain: "Let son's present age be x. Father's age at birth = 38 - x. Given: 38 - x = x => 2x = 38 => x = 19. 5 years ago: 19 - 5 = 14." },
+        { q: "A is 2 years older than B who is twice as old as C. Total sum is 27. How old is B?", options: ["7", "8", "9", "10"], correct: 3, explain: "C = x, B = 2x, A = 2x + 2. x + 2x + 2x + 2 = 27 => 5x = 25 => x = 5. B = 2x = 10." },
+        { q: "Ages of Sameer and Anand are in ratio 5:4. 3 years hence, ratio is 11:9. Anand's present age is:", options: ["24", "27", "40", "None of these"], correct: 0, explain: "5x+3 / 4x+3 = 11/9 => 45x + 27 = 44x + 33 => x = 6. Anand = 4x = 24." },
+        { q: "A man is 24 years older than his son. In 2 years, his age will be twice the son's age. Son's present age is:", options: ["14 years", "18 years", "20 years", "22 years"], correct: 3, explain: "Son = x, Man = x + 24. (x + 24 + 2) = 2(x + 2) => x + 26 = 2x + 4 => x = 22." },
+        { q: "6 years ago, Kunal:Sagar = 6:5. 4 years hence, ratio is 11:10. Sagar's present age is:", options: ["16 years", "18 years", "20 years", "None of these"], correct: 0, explain: "(6x+10)/(5x+10) = 11/10 => 60x + 100 = 55x + 110 => 5x = 10 => x = 2. Sagar (6 yrs ago) = 5*2=10. Present = 16." },
+        { q: "Sum of father and son is 60. 6 years ago, father was 5 times son. After 6 years, son's age will be:", options: ["12 years", "14 years", "18 years", "20 years"], correct: 3, explain: "(F-6) = 5(S-6). Also F+S=60. (60-S-6) = 5S-30 => 54-S = 5S-30 => 6S = 84 => S = 14. After 6 years: 14 + 6 = 20." },
+        { q: "Ratio Arun:Deepak = 4:3. After 6 years, Arun will be 26. Deepak's present age is:", options: ["12 years", "15 years", "19.5 years", "21 years"], correct: 1, explain: "Arun now = 26 - 6 = 20. 4x = 20 => x = 5. Deepak = 3x = 15." },
+        { q: "Sachin is younger than Rahul by 7 years. Ratio is 7:9. How old is Sachin?", options: ["16 years", "18 years", "28 years", "24.5 years"], correct: 3, explain: "Rahul = x, Sachin = x - 7. (x-7)/x = 7/9 => 9x - 63 = 7x => 2x = 63 => x = 31.5. Sachin = 31.5 - 7 = 24.5." },
+        { q: "Present ages in ratio 4:7:9. 8 years ago, sum was 56. Present ages are:", options: ["8, 20, 28", "16, 28, 36", "20, 35, 45", "None of these"], correct: 1, explain: "Sum now = 56 + (3 * 8) = 80. 4x + 7x + 9x = 80 => 20x = 80 => x = 4. Ages: 16, 28, 36." },
+        { q: "Ayesha's father was 38 at her birth. Mother was 36 when her brother (4 years younger than her) was born. Parent age difference:", options: ["2 years", "4 years", "6 years", "8 years"], correct: 2, explain: "At brother's birth: Mother = 36. Father = 38 + 4 = 42. Difference = 42 - 36 = 6." },
+        { q: "Present age is 2/5 of mother. After 8 years, he will be 1/2 of mother. Mother's present age:", options: ["32 years", "36 years", "40 years", "48 years"], correct: 2, explain: "Person = 2/5M. (2/5M + 8) = 1/2(M + 8) => 4M + 80 = 5M + 40 => M = 40." },
+        { q: "Q is younger than R by same amount he is older than T. Sum R+T = 50. Difference between R and Q's age:", options: ["1 year", "2 years", "25 years", "Data inadequate"], correct: 3, explain: "R - Q = Q - T => R + T = 2Q => 50 = 2Q => Q = 25. We know Q is 25, but we don't know R or T individually, so we cannot find (R-Q)." },
+        { q: "10 yrs ago, Father was 3 times son. 10 yrs hence, Father will be 2 times son. Present ratio:", options: ["5:2", "7:3", "9:2", "13:4"], correct: 1, explain: "(F-10) = 3(S-10) and (F+10) = 2(S+10). Solving: F-3S = -20 and F-2S = 10. Subtracting: S = 30, F = 70. Ratio 70:30 = 7:3." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Statement & Assumptions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --accent: #16a085;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .logic-guide {
+            flex: 1;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .quiz-area {
+            flex: 2;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Prevents flex items from overflowing */
+        }
+
+        .statement-box {
+            background: #eef2f3;
+            padding: 20px;
+            border-left: 5px solid var(--accent);
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .assumption-item {
+            margin: 10px 0;
+            padding: 15px;
+            background: #fff;
+            border: 1px dashed #cbd5e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .opt-btn {
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #f0fff4; }
+        .opt-btn.selected { border-color: var(--accent); background: #e6fffa; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .nav-footer {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .btn-main {
+            padding: 12px 30px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .btn-next { background: var(--accent); display: none; }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 950px) {
+            .container {
+                flex-direction: column;
+                padding: 15px;
+            }
+            .logic-guide {
+                position: static;
+                order: 2;
+            }
+            .quiz-area {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header { padding: 10px 15px; font-size: 0.9rem; }
+            .statement-box { font-size: 1rem; }
+            .opt-btn { font-size: 0.85rem; padding: 12px; }
+            .btn-main { width: 100%; }
+            .nav-footer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Statement Assumptions</h1>
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back</a>
+</div>
+
+<div class="container">
+    <div class="logic-guide">
+        <h3 style="margin-top:0; color: var(--accent);">Implicit Logic Guide</h3>
+        <p style="font-size: 0.9rem;">An assumption is <strong>Implicit</strong> if the person making the statement must believe it to be true for the statement to make sense.</p>
+        <ul style="font-size: 0.85rem; padding-left: 20px; line-height: 1.6;">
+            <li><strong>The "Bridge" Rule:</strong> The assumption connects the premise to the conclusion.</li>
+            <li><strong>Warnings:</strong> Assume people want to avoid the penalty or heed the advice.</li>
+            <li><strong>Government Actions:</strong> Assume the govt has the authority or resources mentioned.</li>
+        </ul>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        <div style="font-size: 0.8rem; line-height: 1.8; color: #718096;">
+            (A) Only I is implicit<br>
+            (B) Only II is implicit<br>
+            (C) Either I or II is implicit<br>
+            (D) Neither I nor II is implicit<br>
+            (E) Both I and II are implicit
+        </div>
+    </div>
+
+    <div class="quiz-area">
+        <div id="progress-text" style="color:#718096; margin-bottom:8px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; font-size:0.8rem;"></div>
+        <div id="statement" class="statement-box"></div>
+        <div id="assumptions"></div>
+        
+        <div class="options-grid" id="options">
+            <button class="opt-btn" onclick="selectOpt(0)">(A) Only assumption I is implicit</button>
+            <button class="opt-btn" onclick="selectOpt(1)">(B) Only assumption II is implicit</button>
+            <button class="opt-btn" onclick="selectOpt(2)">(C) Either I or II is implicit</button>
+            <button class="opt-btn" onclick="selectOpt(3)">(D) Neither I nor II is implicit</button>
+            <button class="opt-btn" onclick="selectOpt(4)">(E) Both I and II are implicit</button>
+        </div>
+
+        <div class="nav-footer">
+            <div id="feedback" style="font-size: 1.1rem; font-weight: 600;"></div>
+            <div>
+                <button class="btn-main" id="checkBtn" onclick="checkAnswer()">Check Logic</button>
+                <button class="btn-main btn-next" id="nextBtn" onclick="loadNext()">Next Challenge →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const dataset = [
+    { s: '"You are hereby appointed as a programmer with a probation period of one year and your performance will be reviewed at the end of the period for confirmation." - A line in an appointment letter.', a: ["The performance of an individual generally is not known at the time of appointment offer.", "Generally an individual tries to prove his worth in the probation period."], ans: 4 },
+    { s: "It is desirable to put the child in school at the age of 5 or so.", a: ["At that age the child reaches appropriate level of development and is ready to learn.", "The schools do not admit children after six years of age."], ans: 0 },
+    { s: '"In order to bring punctuality in our office, we must provide conveyance allowance to our employees." - In charge of a company tells Personnel Manager.', a: ["Conveyance allowance will not help in bringing punctuality.", "Discipline and reward should go hand in hand."], ans: 1 },
+    { s: "Unemployment allowance should be given to all unemployed Indian youth above 18 years of age.", a: ["There are unemployed youth in India who need monetary support.", "The government has sufficient funds to provide allowance to all unemployed youth."], ans: 4 },
+    { s: '"If you trouble me, I will slap you." - A mother warns her child.', a: ["With the warning, the child may stop troubling her.", "All children are basically naughty."], ans: 0 },
+    { s: "The State government has decided to appoint four thousand primary school teachers during the next financial year.", a: ["There are enough schools in the state to accommodate four thousand additional primary school teachers.", "The eligible candidates may not be interested to apply as the government may not finally appoint such a large number of primary school teachers."], ans: 0 },
+    { s: 'A warning in a train compartment - "To stop train, pull chain. Penalty for improper use Rs. 500."', a: ["Some people misuse the alarm chain.", "On certain occasions, people may want to stop a running train."], ans: 4 },
+    { s: "If it is easy to become an engineer, I don't want to be an engineer.", a: ["An individual aspires to be professional.", "One desires to achieve a thing which is hard earned."], ans: 1 },
+    { s: "The concession in rail fares for the journey to hill stations has been cancelled because it is not needed for people who can spend their holidays there.", a: ["Railways should give concession only to needy persons.", "Railways should not encourage people to spend their holidays at hill stations."], ans: 0 },
+    { s: '"The bridge was built at the cost of Rs. 128 crores and even civil bus service is not utilizing it, what a pity to see it grossly underutilized." - A citizen\'s view.', a: ["The building of such bridges does not serve any public objective.", "There has to be some accountability and utility of money spent on public projects."], ans: 1 },
+    { s: "The Government has decided to levy 2 percent on the tax amount payable for funding drought relief programmes.", a: ["The Government does not have sufficient money to fund drought relief programmes.", "The amount collected by way of surcharge may be adequate to fund these drought relief programmes."], ans: 4 },
+    { s: "Detergents should be used to clean clothes.", a: ["Detergents form more lather.", "Detergents help to dislodge grease and dirt."], ans: 1 },
+    { s: "It will be a substantial achievement in the field of education if one provides one school for every village in our country and enforce attendance.", a: ["Children in villages do not attend school regularly.", "Providing school to every village is desirable."], ans: 4 },
+    { s: "The government has decided to disinvest large chunk of its equity in select public sector undertakings for a better fiscal management.", a: ["The amount generated may reduce substantially the mounting fiscal deficits.", "There will be enough demand in the market for the shares."], ans: 4 },
+    { s: "Never before such a lucid book was available on the topic.", a: ["Some other books were available on this topic.", "You can write lucid books on very few topics."], ans: 0 },
+    { s: "Please do not use lift while going down - an instruction on the top floor of a five-storey building.", a: ["While going down, the lift is unable to carry any load.", "Provision of lift is a matter of facility and not of right."], ans: 3 },
+    { s: '"I have not received telephone bills for nine months inspite of several complaints" - A customer\'s letter.', a: ["Every customer has a right to get bills regularly.", "The customer's complaints point to defect in services expected to be corrected."], ans: 4 },
+    { s: '"This drink can be had either as it is, or after adding ice to it." - An advertisement.', a: ["People differ in their preferences.", "Some people will get attracted to the drink as it can be had as it is."], ans: 4 },
+    { s: "Government has permitted unaided colleges to increase their fees.", a: ["Unaided colleges are in financial difficulties.", "Aided colleges do not need to increase fees."], ans: 0 },
+    { s: "Be humble even after being victorious.", a: ["Many people are humble after being victorious.", "Generally people are not humble."], ans: 1 },
+    { s: "The government has decided to pay compensation of Rs. 1 lakh to the family members of those killed in railway accidents.", a: ["The government has enough funds to meet the expenses.", "There may be reduction in incidents of accidents in near future."], ans: 0 },
+    { s: "Films have become indispensable for the entertainment of people.", a: ["Films are the only media of entertainment.", "People enjoy films."], ans: 1 },
+    { s: 'Of all the newspapers published in Mumbai, readership of the "Times" is the largest.', a: ["'Times' is not popular in mofussil areas.", "'Times' has cartoons on social and political issues."], ans: 3 },
+    { s: "Apart from the entertainment value of television, its educational value cannot be ignored.", a: ["People take television to be a means of entertainment only.", "The educational value of television is not realised properly."], ans: 3 },
+    { s: "Children are influenced more by their teachers nowadays.", a: ["The children consider teachers as their models.", "A large amount of children's time is spent in school."], ans: 0 },
+    { s: "You know that your suit is excellent when people ask about your tailor.", a: ["People do not ask about your tailor if your suit is not good.", "The people want to know the criterion of an excellent suit."], ans: 0 },
+    { s: "His recent investment in the shares of Company A is only a gamble.", a: ["He may incur loss on his investment.", "He may gain from his investment."], ans: 2 },
+    { s: "Why don't you go to the court if the employer does not pay you the Provident Fund contribution?", a: ["Courts can intervene in matters of dispute between employer and employees.", "It is obligatory for the employer to pay the PF contribution."], ans: 4 },
+    { s: "'Double your money in five months.' - An advertisement.", a: ["The assurance is not genuine.", "People want their money to grow."], ans: 1 },
+    { s: "Collegiate education is drawing heavily upon national resources; it should be restricted to a brilliant few.", a: ["Our resources are very limited.", "Only a few students should be admitted to the colleges."], ans: 0 },
+    { s: 'A\'s advice to B - "Go to Jammu via Amritsar - the shortest route".', a: ["B wishes to go to Jammu.", "A gives advice to everybody."], ans: 0 },
+    { s: "All existing inequalities can be reduced by action of governments or by revolutionary change.", a: ["Inequality is a man-made phenomenon.", "No person would voluntarily part with what he possesses."], ans: 0 },
+    { s: "The campaign of 'Keep your city clean' did not evoke any response from the citizens.", a: ["People do not desire to keep their city clean.", "The Civil Council has failed in its campaign."], ans: 1 },
+    { s: "District administration advised farmers not using pesticides indiscriminately as it may pollute ground water.", a: ["People may stop using ground water if farmers continue.", "Farmers may refrain from using pesticides indiscriminately."], ans: 1 },
+    { s: "The coffee powder of company X is better in taste than the much advertised coffee of company Y.", a: ["If your product is not good, you spend more on advertisement.", "Some people are tempted to buy a product by the advertisement."], ans: 1 },
+    { s: "Of all the radio sets manufactured in India, the 'X' brand has the largest sale.", a: ["The sale of all radio sets manufactured in India is known.", "Manufacturing of no other radio set in India is as large as 'X' brand."], ans: 0 },
+    { s: '"You should not grant him leave in this week due to exigency of work." - A supervisor advise.', a: ["Request for leave can be turned down also.", "The supervisor has reviewed the work required during the period."], ans: 4 },
+    { s: "Like a mad man, I decided to follow him.", a: ["I am not a mad man.", "I am a mad man."], ans: 0 },
+    { s: "The first step in treating addicts is to re-establish their lost ties.", a: ["Addicts respond better when shown personal interest.", "Addiction and strained relationships are intimately connected."], ans: 4 },
+    { s: "Beware of dogs, our dogs do not bark, but they are trained to distinguish guests from intruders.", a: ["Barking dogs bite rarely.", "Our dogs could be dangerous for intruders."], ans: 1 },
+    { s: "Because of the potholes in road X, reaching airport in time has become difficult.", a: ["Reaching airport in time may not be always necessary.", "There is no other convenient road to the airport."], ans: 1 },
+    { s: "Safety and health practices in many Indian companies are well below international standards.", a: ["International standards are ideal and unrealistic.", "Indian organizations do not consider safety as a prime responsibility."], ans: 1 },
+    { s: "Greater public participation results in good civic governance. - Municipal Commissioner.", a: ["The municipal office is not competent to effect good administration.", "Good governance is a matter of collective will of people and admin."], ans: 1 },
+    { s: "The regulatory authority has set up a committee to find reasons for unstable stock prices.", a: ["The investors may regain confidence by this decision.", "The review committee has the expertise to find the causes."], ans: 1 },
+    { s: "Company will provide accommodation to only outside candidates if selected.", a: ["Local candidates would have other arrangements for stay.", "The company plans to select only local candidates."], ans: 0 },
+    { s: "Cases of food poisoning due to consumption of liquor are increasing in rural areas.", a: ["Percentage of people consuming liquor is more in rural areas.", "There are many unauthorized spurious liquor shops in rural areas."], ans: 1 },
+    { s: "Lack of stimulation in the first four or five years of life can have adverse consequences.", a: ["Development of intelligence occurs in the earliest years.", "50 percent of measurable intelligence is predictable by age four."], ans: 0 },
+    { s: "X-Airlines has decided to increase passenger fare by 15 percent.", a: ["Demand for seats may remain unchanged after hike.", "Other airline companies may also hike the passenger fares."], ans: 0 },
+    { s: "Shalini applied for a loan of Rs. 1,80,000 by mortgaging her house.", a: ["Bank has a practice of granting loans for Rs. 1,00,000 and above.", "The bank accepts house as collateral security."], ans: 1 },
+    { s: "Many historians have done more harm than good by distorting truth.", a: ["People believe what is reported by the historians.", "Historians are seldom expected to depict the truth."], ans: 0 },
+    { s: '"As there is a great demand, every person seeking tickets will be given only five tickets."', a: ["The organizers are not keen on selling the tickets.", "No one is interested in getting more than five tickets."], ans: 3 },
+    { s: '"Computer education should start at schools itself."', a: ["Learning computers is easy.", "Computer education fetches jobs easily."], ans: 3 },
+    { s: "If he is intelligent, he will pass the examination.", a: ["To pass, he must be intelligent.", "He will pass the examination."], ans: 0 },
+    { s: "Today I must satisfy myself only by looking at a pink headed duck in an encyclopaedia.", a: ["Pink headed ducks are as good as extinct now.", "People refer to encyclopaedia only for non-existing things."], ans: 0 },
+    { s: "The organization should promote employees on the basis of merit alone, not seniority.", a: ["Seniority does not alone reflect merit.", "It is possible to determine and measure merit."], ans: 4 },
+    { s: '"Out of A, B, C and D products, you buy B which alone is based on international technology."', a: ["Customers normally accept recommendations.", "International technology ensures better quality."], ans: 4 },
+    { s: '"If you want to give any advertisement, give it in the newspaper X." - A tells B.', a: ["B wants to publicise his products.", "Newspaper X has a wide circulation."], ans: 4 },
+    { s: "Kartik left for Delhi on Tuesday by train to attend a function on Friday.", a: ["Kartik may reach Delhi on Wednesday.", "Kartik may reach Delhi before Friday."], ans: 1 },
+    { s: '"Avon Cycles - Fast, easy to ride, reliable, and up-to-date automation." - Ad.', a: ["There is no other cycle with any of these features.", "People do not bother about the cost."], ans: 3 }
+];
+
+let currentIndex = 0;
+let selectedOption = null;
+
+function renderQuestion() {
+    const q = dataset[currentIndex];
+    document.getElementById('progress-text').innerText = `Challenge ${currentIndex + 1} of ${dataset.length}`;
+    document.getElementById('statement').innerText = q.s;
+    document.getElementById('assumptions').innerHTML = `
+        <div class="assumption-item"><strong>I.</strong> ${q.a[0]}</div>
+        <div class="assumption-item"><strong>II.</strong> ${q.a[1]}</div>
+    `;
+    
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => {
+        b.classList.remove('selected', 'correct', 'wrong');
+        b.disabled = false;
+    });
+    
+    document.getElementById('checkBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerText = "";
+    selectedOption = null;
+}
+
+function selectOpt(index) {
+    selectedOption = index;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach((b, i) => b.classList.toggle('selected', i === index));
+}
+
+function checkAnswer() {
+    if (selectedOption === null) return alert("Select your logical conclusion first!");
+    const correct = dataset[currentIndex].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns[correct].classList.add('correct');
+    if (selectedOption !== correct) {
+        btns[selectedOption].classList.add('wrong');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--wrong)'>Incorrect Inference</span>";
+    } else {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--correct)'>Logically Sound!</span>";
+    }
+    
+    btns.forEach(b => b.disabled = true);
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function loadNext() {
+    if (currentIndex < dataset.length - 1) {
+        currentIndex++;
+        renderQuestion();
+        window.scrollTo(0,0);
+    } else {
+        alert("Mastery Achieved! You have completed all 60 scenarios.");
+    }
+}
+
+renderQuestion();
+</script>
+</body>
+</html>

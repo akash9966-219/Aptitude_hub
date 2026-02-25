@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; background: white; padding: 10px; }
+        
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 9</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 9</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                direction: "Direction (Q.Nos. 1 - 2): Three of the words will be in the same classification, the remaining one will not be. Select the word that does NOT belong.",
+                q: "Which word does NOT belong with the others?",
+                options: ["book", "index", "glossary", "chapter"], ans: 0, 
+                logic: "An index, glossary, and chapter are all parts of a book; a book is the whole." 
+            },
+            { 
+                q: "Which word does NOT belong with the others?",
+                options: ["rye", "sourdough", "pumpernickel", "loaf"], ans: 3, 
+                logic: "Rye, sourdough, and pumpernickel are types of bread. A loaf is a shape/form of bread." 
+            },
+            { 
+                direction: "Direction (Q.No. 3): Look more closely to narrow your classification.",
+                q: "Which word does NOT belong with the others?",
+                options: ["biology", "chemistry", "theology", "zoology"], ans: 2, 
+                logic: "Biology, chemistry, and zoology are all sciences; theology is the study of religion." 
+            },
+            { 
+                direction: "Direction (Q.No. 4): Find the word that names a necessary part of the underlined word.",
+                q: "antique",
+                options: ["rarity", "artifact", "aged", "prehistoric"], ans: 2, 
+                logic: "By definition, an antique must be aged." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 5 - 6): Make a sentence to describe the relationship.",
+                q: "Careful is to cautious as boastful is to:",
+                options: ["arrogant", "humble", "joyful", "suspicious"], ans: 0, 
+                logic: "Careful and cautious are synonyms; boastful and arrogant are synonyms." 
+            },
+            { 
+                q: "Yard is to inch as quart is to:",
+                options: ["gallon", "ounce", "milk", "liquid"], ans: 1, 
+                logic: "An inch is a smaller unit of a yard; an ounce is a smaller unit of a quart." 
+            },
+            { 
+                direction: "Direction (Q.No. 7): Choose the picture for the empty box.",
+                img: "https://www.indiabix.com/_files/images/logical-reasoning/5-227-q-1.png",
+                q: "Which picture completes the relationship?",
+                options: ["1", "2", "3", "4"], ans: 0, 
+                logic: "Option 1 is correct based on the mirror and quantity relationship." 
+            },
+            { 
+                direction: "Direction (Q.No. 8): Determine which statement must also be a fact.",
+                passage: "Fact 1: Mary said, 'Ann and I both have cats.'\nFact 2: Ann said, 'I don't have a cat.'\nFact 3: Mary always tells the truth, but Ann sometimes lies.",
+                q: "Which must be a fact?",
+                options: ["I only (Ann has a cat)", "II only (Mary has a cat)", "I and II only", "All the statements are facts"], ans: 3, 
+                logic: "Since Mary tells the truth, both have cats. Therefore, Ann's statement is a lie." 
+            },
+            { 
+                direction: "Direction (Q.No. 9): Choose the most probable description.",
+                q: "Four people witnessed a mugging. Which description is probably right?",
+                options: ["Average height, thin, middle-aged", "Tall, thin, middle-aged", "Tall, thin, young", "Tall, average weight, middle-aged"], 
+                ans: 1, logic: "This description shares the most common traits mentioned by witnesses (Tall, Thin, Middle-aged)." 
+            },
+            { 
+                direction: "Direction (Q.No. 10): Housekeeping task puzzle.",
+                passage: "Five roommates Randy, Sally, Terry, Uma, and Vernon: Monday-Friday tasks.\n- Vernon: No vacuuming, not Tuesday.\n- Sally: Dusting, not Mon/Fri.\n- Mopping: Thursday.\n- Terry: Wednesday, not vacuuming.\n- Laundry: Friday, not Uma.\n- Randy: Monday.",
+                q: "What task does Terry do on Wednesday?",
+                options: ["vacuuming", "dusting", "mopping", "sweeping", "laundry"], 
+                ans: 3, logic: "By elimination, Terry must do sweeping on Wednesday." 
+            },
+            { 
+                direction: "Direction (Q.No. 11): Logical conclusion.",
+                passage: "Television convinces viewers crime likelihood is high and encourages passive acceptance.",
+                q: "Which follows logically?",
+                options: ["TV promotes criminal behaviour", "TV viewers more likely victimized", "People should not watch TV", "TV promotes a feeling of helpless vulnerability"], 
+                ans: 3, logic: "The combination of high fear and passivity leads to a feeling of helpless vulnerability." 
+            },
+            { 
+                direction: "Direction (Q.No. 12): Cause and Effect.",
+                passage: "I. Low-lying area residents evacuated.\nII. Government rushed relief supplies.",
+                q: "Relationship:",
+                options: ["I cause, II effect", "II cause, I effect", "Independent causes", "Independent effects", "Effects of common cause"], 
+                ans: 4, logic: "Both are likely effects of a common cause like a flood." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 13-15): Implicit assumptions.",
+                passage: "Statement: Cases of food poisoning due to liquor increasing in rural areas.",
+                q: "Assumptions: I. More drinkers in rural areas. II. Many unauthorized spurious liquor shops.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 1, logic: "Poisoning implies the presence of spurious (fake) liquor shops." 
+            },
+            { 
+                passage: "Statement: 'Computer education should start at schools itself.'",
+                q: "Assumptions: I. Learning is easy. II. Fetches jobs easily.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 3, logic: "Neither ease of learning nor job speed is necessarily assumed by a curriculum recommendation." 
+            },
+            { 
+                passage: "Statement: 'If you want to follow the footprints of an ideal leader, wear X shoes.'",
+                q: "Assumptions: I. People want to be leaders. II. Leaders must wear X shoes.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 0, logic: "Advertisements assume the target audience has the desire mentioned (being a leader)." 
+            },
+            { 
+                direction: "Direction (Q.No. 16): Arguments.",
+                passage: "Statement: Is paying ransom to kidnappers proper?",
+                q: "Arguments: I. Yes (save victims). II. No (encourages activities).",
+                options: ["Only I strong", "Only II strong", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 4, logic: "Both are strong: human life is vital (I), but deterrence is a major policy concern (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 17): Implicit assumptions.",
+                passage: "Statement: Residents requested Corporation to restore water normalcy as supply is inadequate.",
+                q: "Assumptions: I. No action taken. II. Municipality has enough water. III. Supply was adequate in past.",
+                options: ["Only I and III", "Only II", "Only II and III", "Only III", "None"], 
+                ans: 2, logic: "The word 'restore' implies it was adequate before (III). Requesting implies they believe the municipality can do it (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 18): Implicit assumptions.",
+                passage: "Statement: Employees asked for written exams for recruitment to prevent incompetent selections.",
+                q: "Assumptions: I. No exams used before. II. Exams identify competence. III. High level exams useless.",
+                options: ["Only I and II", "Only II and III", "Only I and III", "Only III", "None"], 
+                ans: 0, logic: "Asking to 'introduce' exams implies they didn't exist (I) and that the employees believe they work (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 19): Implicit assumptions.",
+                passage: "Statement: To reduce income-expenditure gap, company will increase prices next month.",
+                q: "Assumptions: I. Rate stays same after increase. II. Expenditure stays same. III. Rivals increase price.",
+                options: ["Only I and II", "Only II and III", "Only III", "All", "None"], 
+                ans: 0, logic: "To close a gap, you must assume income rises (I) while expenses don't rise simultaneously (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 20): Implicit assumptions.",
+                passage: "Statement: Quality of life not dependent only on wealth.",
+                q: "Assumptions: I. People want wealth. II. Other factors exist. III. Wealth doesn't contribute at all.",
+                options: ["Only I", "Only I and II", "Only II", "Only II and III", "Only I and III"], 
+                ans: 2, logic: "The phrase 'not only' directly implies that other factors exist (II)." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="q-img" alt="Pattern">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

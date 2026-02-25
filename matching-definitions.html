@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matching Definitions - Logical Reasoning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .definition-box {
+            background: #f8f9fa;
+            border-left: 5px solid var(--accent);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .definition-box h2 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            padding: 20px;
+            border: 2px solid #eee;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #f0f7ff; }
+        .opt-btn.selected { border-color: var(--accent); background: #e1f0ff; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress-text { font-weight: bold; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="definition-box" id="def-area">
+            <h2 id="def-title"></h2>
+            <p id="def-text"></p>
+        </div>
+
+        <div id="options" class="options-list"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress-text">Question 1 / 14</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="verify()">Validate Selection</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next Case →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    {
+        title: "Applying for Seasonal Employment",
+        text: "Occurs when a person requests to be considered for a job that is dependent on a particular season or time of year.",
+        opts: [
+            "The ski instructors at Top of the Peak Ski School work from December through March.",
+            "Matthew prefers jobs that allow him to work outdoors.",
+            "Lucinda makes an appointment with the beach resort restaurant manager to interview for the summer waitressing position.",
+            "Doug's ice cream shop stays open until 11 p.m. during the summer months."
+        ],
+        ans: 2
+    },
+    {
+        title: "Violating an Apartment Lease",
+        text: "Occurs when a tenant does something prohibited by the legally binding document that he or she has signed with a landlord.",
+        opts: [
+            "Tim calls his landlord to say he is not interested in renewing his lease next month.",
+            "Valerie has neglected to pay her landlord the monthly rent they agreed upon in writing for the last three months.",
+            "Mark writes a letter to his landlord that lists numerous complaints about the apartment.",
+            "Leslie calls her attorney to ask for advice regarding her landlord's neglect of the building."
+        ],
+        ans: 1
+    },
+    {
+        title: "Informal Gathering",
+        text: "Occurs when a group of people get together in a casual, relaxed manner.",
+        opts: [
+            "The book club meets on the first Thursday evening of every month.",
+            "Jeremy and a few coworkers decide to go out for a quick drink after work to celebrate a promotion.",
+            "Mary sends out 25 invitations for a formal bridal shower for her sister.",
+            "Clara seems to run into Peter whenever she eats at the Mexican restaurant."
+        ],
+        ans: 1
+    },
+    {
+        title: "Speculation",
+        text: "People speculate when they consider a situation and assume something to be true based on inconclusive evidence.",
+        opts: [
+            "Francine wears jeans after reading the employee handbook about 'Casual Fridays'.",
+            "Mary sits in traffic and wishes she had taken the train.",
+            "Jennifer feels confident in a hotel after consulting guidebooks and a travel agent.",
+            "When Emily opens the door in tears, Theo guesses that she's had a death in her family."
+        ],
+        ans: 3
+    },
+    {
+        title: "Posthumous Publication",
+        text: "Occurs when a book is published after the author's death.",
+        opts: [
+            "Richard died before he could see the amazing reviews of his novel.",
+            "Melissa's publisher cancels her contract after she fails to deliver the manuscript.",
+            "Clarence never thought he'd live to see the third book in his trilogy published.",
+            "Richard's final manuscript is edited and released by his family a year after his passing."
+        ],
+        ans: 3
+    },
+    {
+        title: "Guarantee",
+        text: "A promise or assurance of quality given in writing by the manufacturer or verbally by the seller.",
+        opts: [
+            "Melissa buys a DVD player with the highest consumer ratings.",
+            "A salesperson advises Curt to buy an air conditioner with a guarantee.",
+            "A shop specializes in refurbishing used cars.",
+            "Lori buys a camera from a coworker who says she will refund the money if the performance is not of high quality."
+        ],
+        ans: 3
+    },
+    {
+        title: "Legally Completing Time at Bat",
+        text: "In baseball, a batter completes his time at bat when he is put out or becomes a base runner.",
+        opts: [
+            "Jared's blooper puts him in scoring position.",
+            "The umpire calls a strike on a pitch that was outside.",
+            "Joe swings and misses, and the umpire calls a strike.",
+            "The count is two balls and two strikes."
+        ],
+        ans: 0
+    },
+    {
+        title: "Erratic Behavior",
+        text: "Occurs when an individual acts in a manner that lacks consistency, regularity, and uniformity.",
+        opts: [
+            "Julia gets angry whenever local politics is discussed.",
+            "Martin punches a hole in the door after being laid off.",
+            "Rhonda cannot decide which car to buy despite visiting the dealership.",
+            "Jeffrey, a model employee for years, has recently called in sick repeatedly, missed meetings, and been abusive."
+        ],
+        ans: 3
+    },
+    {
+        title: "Tiebreaker",
+        text: "An additional contest or period of play designed to establish a winner among tied contestants.",
+        opts: [
+            "At halftime, the score is tied at 28.",
+            "Mary and Megan have each scored three goals.",
+            "A referee tosses a coin to decide possession.",
+            "Two teams finished with 14 points and are now playing a five-minute overtime."
+        ],
+        ans: 3
+    },
+    {
+        title: "Five-Day Suspension",
+        text: "A student is banned for 5 days for (1) physically assaulting someone or (2) willfully destructing/defacing school property.",
+        opts: [
+            "Lillian gets caught cheating and is suspended.",
+            "Marc is asked to leave class for disruptions.",
+            "Franny uses spray paint to write derogatory comments on the locker room wall.",
+            "Students who fail an exam must stay after school for tutoring."
+        ],
+        ans: 2
+    },
+    {
+        title: "Restitution",
+        text: "Compensating someone for damaging their property.",
+        opts: [
+            "Jake breaks Leslie's camera and tells her he will pay for the repair.",
+            "Rebecca returns a neighbor's car with an empty tank and apologizes.",
+            "Tom calls a plumber to fix a burst pipe in Aaron's apartment while Aaron is away.",
+            "Lisa thinks her company should pay for her flat tire caused by a pothole."
+        ],
+        ans: 0
+    },
+    {
+        title: "Reentry",
+        text: "Occurs when a person leaves his or her social system for a period of time and then returns.",
+        opts: [
+            "Jacob leaves one restaurant to manage a better one across town.",
+            "Catherine is studying abroad in France for her junior year.",
+            "Malcolm is readjusting to civilian life after two years of overseas military service.",
+            "Sharon decides she can no longer live with her roommate."
+        ],
+        ans: 2
+    },
+    {
+        title: "Embellishing the Truth",
+        text: "Occurs when a person adds fictitious details or exaggerates facts or true stories.",
+        opts: [
+            "Isabel tells coworkers a play was excellent.",
+            "A realtor describes a house 11 blocks from the ocean as prime waterfront property.",
+            "Fred describes himself as very experienced after 10 years of teaching.",
+            "A coach says only the most talented players get scholarships."
+        ],
+        ans: 1
+    },
+    {
+        title: "Establishing a Power of Attorney",
+        text: "A legal document giving one individual the authority to act for another.",
+        opts: [
+            "Louise hires a lawyer to review a house-selling contract.",
+            "Simone's mother takes legal steps to enable Simone to cash checks and make deposits for her.",
+            "Jack thinks his elderly father can no longer make decisions.",
+            "Mrs. Lenox opens a retirement account at her daughter's urging."
+        ],
+        ans: 1
+    }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `Question ${idx + 1} / ${data.length}`;
+    document.getElementById('def-title').innerText = item.title;
+    document.getElementById('def-text').innerText = item.text;
+    
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    item.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        box.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function verify() {
+    if (selected === null) return alert("Please select the best example.");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((b, i) => {
+        if (i === correct) b.classList.add('correct');
+        if (i === selected && i !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Matching Definitions practice completed!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

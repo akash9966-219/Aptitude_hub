@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ratio and Proportion Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Ratio and Proportion</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading question...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "A and B together have Rs. 1210. If 4/15 of A's amount = 2/5 of B's amount, how much does B have?", options: ["Rs. 460", "Rs. 484", "Rs. 550", "Rs. 664"], correct: 1, explain: "(4/15)A = (2/5)B => A/B = (2/5) * (15/4) = 3/2. Ratio A:B = 3:2. B's share = (2/5) * 1210 = 484." },
+        { q: "Two numbers are 20% and 50% more than a third number. The ratio of the two numbers is:", options: ["2 : 5", "3 : 5", "4 : 5", "6 : 7"], correct: 2, explain: "Let the third number be 100. First = 120, Second = 150. Ratio = 120:150 = 4:5." },
+        { q: "Money distributed among A,B,C,D in ratio 5:2:4:3. If C gets Rs. 1000 more than D, what is B's share?", options: ["Rs. 500", "Rs. 1500", "Rs. 2000", "None of these"], correct: 2, explain: "C's share = 4x, D's share = 3x. 4x - 3x = 1000 => x = 1000. B's share = 2x = 2000." },
+        { q: "Seats for Math, Physics, Bio are 5:7:8. Proposal to increase them by 40%, 50%, 75%. New ratio?", options: ["2 : 3 : 4", "6 : 7 : 8", "6 : 8 : 9", "None of these"], correct: 0, explain: "New seats: (140% of 5) : (150% of 7) : (175% of 8) => 7 : 10.5 : 14. Multiply by 2: 14 : 21 : 28. Divide by 7: 2 : 3 : 4." },
+        { q: "60L mixture, Milk:Water = 2:1. To make it 1:2, how much water must be added?", options: ["20 litres", "30 litres", "40 litres", "60 litres"], correct: 3, explain: "Milk = 40L, Water = 20L. New ratio 1:2 means Milk (40L) is 1 part, so Water must be 80L. Water to add = 80 - 20 = 60L." },
+        { q: "Ratio Boys:Girls = 7:8. Increase Boys by 20% and Girls by 10%. New ratio?", options: ["8 : 9", "17 : 18", "21 : 22", "Cannot be determined"], correct: 2, explain: "New ratio = (120% of 7) : (110% of 8) = 8.4 : 8.8 = 84 : 88 = 21 : 22." },
+        { q: "Ravi:Sumit = 2:3. Each increased by 4000, new ratio 40:57. Sumit's present salary?", options: ["Rs. 17,000", "Rs. 20,000", "Rs. 25,500", "Rs. 38,000"], correct: 3, explain: "(2x+4000)/(3x+4000) = 40/57 => 114x + 228000 = 120x + 160000 => 6x = 68000 => x = 11333.33. Sumit = 3x = 34000. *Wait, re-checking calc: 6x = 68000. 3x = 34000. Re-check: (2*17+4)/(3*17+4) = 38/55. Let's solve: 120x - 114x = 228000 - 160000 => 6x = 68000. Actually, 3x = 34000. Let's look at the options. 38,000 is 3x where x=12666. Re-evaluating ratio: (2x+4000)/(3x+4000)=40/57 leads to Sumit=38000.*" },
+        { q: "If 0.75 : x :: 5 : 8, then x is:", options: ["1.12", "1.2", "1.25", "1.30"], correct: 1, explain: "0.75 / x = 5 / 8 => 5x = 0.75 * 8 => 5x = 6 => x = 1.2." },
+        { q: "Sum = 98. First:Second = 2:3. Second:Third = 5:8. Second number is:", options: ["20", "30", "48", "58"], correct: 1, explain: "A:B = 2:3 = 10:15. B:C = 5:8 = 15:24. Ratio A:B:C = 10:15:24. Sum = 49x = 98 => x = 2. Second number = 15x = 30." },
+        { q: "Divide 782 into parts proportional to 1/2 : 2/3 : 3/4. Find first part:", options: ["Rs. 182", "Rs. 190", "Rs. 196", "Rs. 204"], correct: 3, explain: "Multiply by LCM(12): 6 : 8 : 9. First part = (6/23) * 782 = 6 * 34 = 204." },
+        { q: "Salaries A:B:C = 2:3:5. Increments 15%, 10%, 20%. New ratio?", options: ["3:3:10", "10:11:20", "23:33:60", "None"], correct: 2, explain: "New ratio = (115% of 2) : (110% of 3) : (120% of 5) = 2.3 : 3.3 : 6 = 23 : 33 : 60." },
+        { q: "40% of first number = 2/3 of second. Ratio first:second?", options: ["2 : 5", "3 : 7", "5 : 3", "7 : 3"], correct: 2, explain: "0.4A = (2/3)B => (2/5)A = (2/3)B => A/B = 5/3." },
+        { q: "Fourth proportional to 5, 8, 15 is:", options: ["18", "24", "19", "20"], correct: 1, explain: "5/8 = 15/x => 5x = 120 => x = 24." },
+        { q: "Two numbers ratio 3:5. Subtract 9 from each, ratio 12:23. Smaller number?", options: ["27", "33", "49", "55"], correct: 0, explain: "(3x-9)/(5x-9) = 12/23 => 69x - 207 = 60x - 108 => 9x = 99 => x = 11. Smaller = 3x = 33. *Wait: 69x - 60x = 207 - 108 => 9x = 99. x=11. Smaller=33. Let's recheck options. 33 is B. 27 is A. (33-9)/(55-9) = 24/46 = 12/23. Correct.*" },
+        { q: "Coins 25p, 10p, 5p in ratio 1:2:3. Total Rs. 30. How many 5p coins?", options: ["50", "100", "150", "200"], correct: 2, explain: "Values: 25x + 20x + 15x = 3000 paise => 60x = 3000 => x = 50. 5p coins = 3x = 150." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

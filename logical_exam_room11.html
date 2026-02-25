@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 11</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 11</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                direction: "Remember, you are looking for the word that does NOT belong in the same group as the others. Sometimes, all four words seem to fit in the same group. If so, look more closely to further narrow your classification.",
+                q: "Which word does NOT belong with the others?",
+                options: ["two", "three", "six", "eight"], ans: 1, 
+                logic: "Two, six, and eight are all even numbers; three is an odd number." 
+            },
+            { 
+                direction: "Direction (Q.No. 2): The words in the bottom row are related in the same way as the words in the top row. For each item, find the word that completes the bottom row of words.",
+                passage: "walk    skip    run\ntoss    pitch    ?",
+                q: "Find the word that completes the bottom row:",
+                options: ["swerve", "hurl", "jump", "dance"], ans: 1, 
+                logic: "The first row contains words related to moving on foot at different speeds/styles. The second row contains words related to throwing an object; 'hurl' fits this pattern." 
+            },
+            { 
+                direction: "Direction (Q.No. 3): Read each definition and all four choices carefully, and find the answer that provides the best example of the given definition.",
+                passage: "Definition: People speculate when they consider a situation and assume something to be true based on inconclusive evidence.",
+                q: "Which situation below is the best example of Speculation?",
+                options: [
+                    "Francine decides that it would be appropriate to wear jeans to her new office on Friday after reading about 'Casual Fridays' in her employee handbook.",
+                    "Mary spends thirty minutes sitting in traffic and wishes that she took the train instead of driving.",
+                    "After consulting several guidebooks and her travel agent, Jennifer feels confident that the hotel she has chosen is first-rate.",
+                    "When Emily opens the door in tears, Theo guesses that she's had a death in her family."
+                ], ans: 3, 
+                logic: "Theo is making a guess based on the evidence of tears, which is inconclusive (she could be crying for many reasons). The other options involve concrete evidence or simple wishes." 
+            },
+            { 
+                direction: "Direction (Q.No. 4): Based on the first two statements, the third statement may be true, false, or uncertain.",
+                passage: "Middletown is north of Centerville.\nCenterville is east of Penfield.\nPenfield is northwest of Middletown.",
+                q: "If the first two statements are true, the third statement is:",
+                options: ["true", "false", "uncertain"], ans: 1, 
+                logic: "If Middletown is North of Centerville and Centerville is East of Penfield, then Penfield is Southwest of Middletown, not Northwest." 
+            },
+            { 
+                direction: "Direction (Q.No. 5): Choose your answer based solely on the information given in the first three facts.",
+                passage: "Fact 1: All chickens are birds.\nFact 2: Some chickens are hens.\nFact 3: Female birds lay eggs.",
+                q: "Which of the following statements must also be a fact?\nI: All birds lay eggs.\nII: Some Hens are birds.\nIII: Some chickens are not hens.",
+                options: ["I only", "II only", "II and III only", "None of the statements"], ans: 1, 
+                logic: "Since all chickens are birds (Fact 1) and some chickens are hens (Fact 2), those hens must be birds. We cannot assume all birds lay eggs (only females) or that some chickens are definitely not hens." 
+            },
+            { 
+                direction: "Direction (Q.No. 6): Read the question carefully and choose the correct answer.",
+                passage: "Madison: 10 miles | Frances: 5 miles | Samantha: 7 miles.\nAlexis is farther away than Frances, but closer than Samantha.",
+                q: "Approximately how far away from the airport is Alexis?",
+                options: ["nine miles", "seven miles", "eight miles", "six miles"], ans: 3, 
+                logic: "Alexis is between 5 (Frances) and 7 (Samantha) miles. Six miles is the only option in that range." 
+            },
+            { 
+                direction: "Direction (Q.No. 7): Use the logic of the passage to identify the city.",
+                passage: "Cities: Last Stand, Mile City, New Town, Olliopolis, Polberg.\n- Desert (least), Forest (most).\n- New Town = Mountains (32in).\n- Coast = 27in.\n- Olliopolis = 44in.\n- Last Stand > Olliopolis.\n- Mile City > Polberg, but < New Town.",
+                q: "Which city got the most rain?",
+                options: ["Last Stand", "Mile City", "New Town", "Olliopolis", "Polberg"], ans: 0, 
+                logic: "Rainfall: 12, 27, 32, 44, 65. New Town is 32. Olliopolis is 44. Last Stand > Olliopolis, so Last Stand must be 65 (the most)." 
+            },
+            { 
+                direction: "Direction (Q.No. 8): What conclusion can be drawn from the argument?",
+                passage: "One New York publisher estimated 50,000 to 60,000 people want an anthology of Shakespeare. Scholars point out his psychological insights into characters are amazing even today.",
+                q: "This paragraph best supports the statement that:",
+                options: [
+                    "Shakespeare's characters are more interesting than fictional characters today.",
+                    "people even today are interested in Shakespeare's work because of the characters.",
+                    "academic scholars are putting together an anthology of Shakespeare's work.",
+                    "New Yorkers have a renewed interested in the work of Shakespeare.",
+                    "Shakespeare was a psychiatrist as well as a playwright."
+                ], ans: 1, 
+                logic: "The passage links the high demand for the anthology to the 'amazing' psychological insights into the characters." 
+            },
+            { 
+                direction: "Direction (Q.No. 9): Choose the statement best supported by the information.",
+                passage: "The Fourth Amendment protects against unreasonable searches. No search of a home may be conducted without a written search warrant issued on probable cause, approved by a neutral judge.",
+                q: "The police cannot search a person's home unless they have:",
+                options: ["legal authorization", "direct evidence of a crime.", "read the person his rights.", "a reasonable belief that a crime has occurred.", "requested that a judge be present."], ans: 0, 
+                logic: "A 'written search warrant' is the specific form of legal authorization required." 
+            },
+            { 
+                direction: "Direction (Q.No. 10): Statement and Assumptions.",
+                passage: "Statement: The government has decided to pay compensation to the tune of Rs. 1 lakh to the family members of those who are killed in railway accidents.",
+                q: "Assumptions: I. The government has enough funds. II. There may be reduction in incidents in near future.",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], ans: 0, 
+                logic: "To promise payment, the government must assume it has the funds. Compensation does not imply a reduction in future accidents." 
+            },
+            { 
+                direction: "Direction (Q.No. 11): Statement and Assumptions.",
+                passage: "Statement: The State Government has abolished the scheme of providing concessional air ticket to students.",
+                q: "Assumptions: I. Students will not travel by air in future. II. Students who travel by air can bear the full expense.",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], ans: 1, 
+                logic: "By removing the concession, the government assumes those choosing to fly can afford the standard rate. It doesn't assume students will stop flying entirely." 
+            },
+            { 
+                direction: "Direction (Q.No. 12): Statement and Assumptions.",
+                passage: "Statement: Employees can now avail lunch break at any half-hour slot between 1.00 p.m. and 2.30 p.m.",
+                q: "Assumptions: I. Employees may welcome the decision. II. There may not be a break in work because of staggered slots.",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], ans: 4, 
+                logic: "The policy assumes employees will use the flexibility (I) and that this staggered approach will maintain continuous operations (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 13): Statement and Assumptions.",
+                passage: "Statement: No regular funds have been provided for welfare activities in this year's budget of the factory.",
+                q: "Assumptions: I. The factory does not desire to carry out welfare. II. Budgetary provision is necessary for welfare.",
+                options: ["Only assumption I is implicit", "Only assumption II is implicit", "Either I or II is implicit", "Neither I nor II is implicit", "Both I and II are implicit"], ans: 1, 
+                logic: "The statement implies that without budget funds, welfare can't happen (II). It doesn't necessarily mean they don't 'desire' it, just that it isn't funded." 
+            },
+            { 
+                direction: "Direction (Q.No. 14): Courses of Action.",
+                passage: "Statement: A large number of people visiting India from country X have tested positive for a killer disease.",
+                q: "Courses: I. Ban all people from country X. II. Set up detection and quarantine centres at ports.",
+                options: ["Only I follows", "Only II follows", "Either I or II follows", "Neither I nor II follows", "Both I and II follow"], ans: 1, 
+                logic: "A total ban is extreme and affects citizens; detection and quarantine (II) is a logical, standard medical response." 
+            },
+            { 
+                direction: "Direction (Q.No. 15): Courses of Action.",
+                passage: "Statement: Alert villagers caught a group of dreaded dacoits armed with murderous weapons.",
+                q: "Courses: I. Provide villagers with sophisticated weapons. II. Reward villagers for their courage.",
+                options: ["Only I follows", "Only II follows", "Either I or II follows", "Neither I nor II follows", "Both I and II follow"], ans: 1, 
+                logic: "Arming civilians (I) is dangerous and leads to lawlessness; rewarding bravery (II) is the appropriate positive reinforcement." 
+            },
+            { 
+                direction: "Direction (Q.No. 16): Logical Conclusions.",
+                passage: "Statements: Some men are educated. Educated persons prefer small families.",
+                q: "Conclusions: I. All small families are educated. II. Some men prefer small families.",
+                options: ["Only conclusion I follows", "Only conclusion II follows", "Either I or II follows", "Neither I nor II follows", "Both I and II follow"], ans: 1, 
+                logic: "If some men are educated, and those educated people prefer small families, then at least some men prefer small families." 
+            },
+            { 
+                direction: "Direction (Q.No. 17): Arguments.",
+                passage: "Statement: Should we scrap the system of formal education beyond graduation?",
+                q: "Arguments: I. Yes (early employment). II. No (lack of depth).",
+                options: ["Only argument I is strong", "Only argument II is strong", "Either I or II is strong", "Neither I nor II is strong", "Both I and II are strong"], ans: 1, 
+                logic: "Argument II is strong because advanced education is fundamentally about specialization and depth. Argument I is weak because 'early employment' doesn't justify scrapping higher education." 
+            },
+            { 
+                direction: "Direction (Q.No. 18): Arguments.",
+                passage: "Statement: Should Government close down loss-making public sector enterprises?",
+                q: "Arguments: I. No (job loss). II. Yes (survival of fittest).",
+                options: ["Only argument I is strong", "Only argument II is strong", "Either I or II is strong", "Neither I nor II is strong", "Both I and II are strong"], ans: 0, 
+                logic: "In a social context, the livelihood of thousands of employees (I) is a strong argument against immediate closure. II is an abstract economic principle." 
+            },
+            { 
+                direction: "Direction (Q.No. 19): Arguments.",
+                passage: "Statement: Should Doordarshan be given autonomous status?",
+                q: "Arguments: I. Yes (fair coverage). II. No (unhealthy outlook of a few).",
+                options: ["Only argument I is strong", "Only argument II is strong", "Either I or II is strong", "Neither I nor II is strong", "Both I and II are strong"], ans: 4, 
+                logic: "Both are strong: Autonomy can lead to impartiality (I), but it also removes government oversight, potentially giving power to a small group (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 20): Arguments.",
+                passage: "Statement: Should India support all the international policies of United States of America?",
+                q: "Arguments: I. No (others don't). II. Yes (access to funds).",
+                options: ["Only argument I is strong", "Only argument II is strong", "Either I or II is strong", "Neither I nor II is strong", "Both I and II are strong."], ans: 3, 
+                logic: "Neither is strong. Foreign policy should be based on national interest, not just because others disagree (I) or solely for money (II)." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Sequence Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f8faff;
+            --card: #ffffff;
+            --accent: #3498db;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a252f 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .word-box {
+            background: #f1f7ff;
+            border: 2px dashed var(--accent);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.8;
+            color: var(--primary);
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #edf2f7;
+            padding: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fdfdfd; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .sidebar {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            height: fit-content;
+            border-top: 5px solid var(--accent);
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .btn-next {
+            background: var(--accent);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+        }
+
+        @media (max-width: 850px) {
+            .container { grid-template-columns: 1fr; }
+            .options-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none;">← Back to Hub</a>
+    <strong>Logical Sequence Practise</strong>
+    <span id="progress">Question 1 / 23</span>
+</header>
+
+<div class="container">
+    <div class="quiz-card">
+        <p style="margin-top:0; color: #7f8c8d; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Meaningful Sequence</p>
+        <div class="word-box" id="wordList"></div>
+
+        <div class="options-list" id="options"></div>
+
+        <div class="controls">
+            <div id="feedback" style="font-weight: bold; font-size: 1.1rem;"></div>
+            <button class="btn-next" id="nextBtn" onclick="loadNext()">Next Question →</button>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <h3 style="margin-top: 0; color: var(--primary);">Sequence Logic</h3>
+        <p id="logicHint" style="font-size: 0.95rem; line-height: 1.6; color: #555;">
+            Select an option to reveal the logical flow used to solve this problem.
+        </p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <div id="visualAid" style="font-style: italic; font-size: 0.85rem; color: #95a5a6;"></div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { words: "1. Key, 2. Door, 3. Lock, 4. Room, 5. Switch on", opts: ["5, 1, 2, 4, 3", "4, 2, 1, 5, 3", "1, 3, 2, 4, 5", "1, 2, 3, 5, 4"], ans: 2, hint: "Key → Lock → Door → Room → Switch on." },
+    { words: "1. Word, 2. Paragraph, 3. Sentence, 4. Letters, 5. Phrase", opts: ["4, 1, 5, 2, 3", "4, 1, 3, 5, 2", "4, 2, 5, 1, 3", "4, 1, 5, 3, 2"], ans: 3, hint: "Letters → Word → Phrase → Sentence → Paragraph." },
+    { words: "1. Police, 2. Punishment, 3. Crime, 4. Judge, 5. Judgement", opts: ["3, 1, 2, 4, 5", "1, 2, 4, 3, 5", "5, 4, 3, 2, 1", "3, 1, 4, 5, 2"], ans: 3, hint: "Crime → Police → Judge → Judgement → Punishment." },
+    { words: "1. Family, 2. Community, 3. Member, 4. Locality, 5. Country", opts: ["3, 1, 2, 4, 5", "3, 1, 2, 5, 4", "3, 1, 4, 2, 5", "3, 1, 4, 5, 2"], ans: 0, hint: "Member → Family → Community → Locality → Country." },
+    { words: "1. Poverty, 2. Population, 3. Death, 4. Unemployment, 5. Disease", opts: ["2, 3, 4, 5, 1", "3, 4, 2, 5, 1", "2, 4, 1, 5, 3", "1, 2, 3, 4, 5"], ans: 2, hint: "Population → Unemployment → Poverty → Disease → Death." },
+    { words: "1. Leaf, 2. Fruit, 3. Stem, 4. Root, 5. Flower", opts: ["3, 4, 5, 1, 2", "4, 3, 1, 5, 2", "4, 1, 3, 5, 2", "4, 3, 1, 2, 5"], ans: 1, hint: "Root → Stem → Leaf → Flower → Fruit." },
+    { words: "1. Nation, 2. Village, 3. City, 4. District, 5. State", opts: ["2, 3, 4, 5, 1", "2, 3, 4, 1, 5", "1, 3, 5, 4, 2", "1, 2, 3, 4, 5"], ans: 0, hint: "Village → City → District → State → Nation." },
+    { words: "1. Caste, 2. Family, 3. Couple, 4. Clan, 5. Species", opts: ["2, 3, 1, 4, 5", "3, 4, 5, 1, 2", "3, 2, 1, 4, 5", "4, 5, 3, 2, 1"], ans: 2, hint: "Couple → Family → Caste → Clan → Species." },
+    { words: "1. Cut, 2. Put on, 3. Mark, 4. Measure, 5. Tailor", opts: ["3, 1, 5, 4, 2", "2, 4, 3, 1, 5", "1, 3, 2, 4, 5", "4, 3, 1, 5, 2"], ans: 3, hint: "Measure → Mark → Cut → Tailor → Put on." },
+    { words: "1. House, 2. Street, 3. Room, 4. Town, 5. District", opts: ["3, 2, 1, 4, 5", "3, 1, 4, 2, 5", "3, 1, 2, 4, 5", "3, 1, 2, 5, 4"], ans: 2, hint: "Room → House → Street → Town → District." },
+    { words: "1. Wall, 2. Clay, 3. House, 4. Room, 5. Bricks", opts: ["5, 2, 1, 4, 3", "2, 5, 4, 1, 3", "2, 5, 1, 4, 3", "1, 2, 3, 4, 5"], ans: 2, hint: "Clay → Bricks → Wall → Room → House." },
+    { words: "1. Probation, 2. Interview, 3. Selection, 4. Appointment, 5. Advertisement, 6. Application", opts: ["5, 6, 3, 2, 4, 1", "5, 6, 4, 2, 3, 1", "5, 6, 2, 3, 4, 1", "6, 5, 4, 2, 3, 1"], ans: 2, hint: "Ad → Application → Interview → Selection → Appointment → Probation." },
+    { words: "1. Elephant, 2. Cat, 3. Mosquito, 4. Tiger, 5. Whale", opts: ["5, 3, 1, 2, 4", "3, 2, 4, 1, 5", "1, 3, 5, 4, 2", "2, 5, 1, 4, 3"], ans: 1, hint: "Size: Mosquito (3) → Cat (2) → Tiger (4) → Elephant (1) → Whale (5)." },
+    { words: "1. Yarn, 2. Plant, 3. Saree, 4. Cotton, 5. Cloth", opts: ["2, 4, 5, 1, 3", "2, 4, 3, 5, 1", "2, 4, 1, 5, 3", "2, 4, 5, 3, 1"], ans: 2, hint: "Plant → Cotton → Yarn → Cloth → Saree." },
+    { words: "1. Infant, 2. Old, 3. Adult, 4. Adolescent, 5. Child", opts: ["5, 4, 3, 2, 1", "3, 4, 2, 1, 5", "2, 3, 4, 5, 1", "1, 5, 4, 3, 2"], ans: 3, hint: "Infant → Child → Adolescent → Adult → Old." },
+    { words: "1. Leaves, 2. Branch, 3. Flower, 4. Tree, 5. Fruit", opts: ["4, 3, 1, 2, 5", "4, 2, 5, 1, 3", "4, 3, 2, 1, 5", "4, 2, 1, 3, 5"], ans: 3, hint: "Tree → Branch → Leaves → Flower → Fruit." },
+    { words: "1. Tree, 2. Seed, 3. Flowers, 4. Fruit, 5. Plant", opts: ["5, 2, 1, 3, 4", "2, 5, 1, 4, 3", "2, 5, 1, 3, 4", "2, 5, 3, 1, 4"], ans: 2, hint: "Seed → Plant → Tree → Flowers → Fruit." },
+    { words: "1. Adult, 2. Child, 3. Infant, 4. Boy, 5. Adolescent", opts: ["1, 3, 4, 5, 2", "2, 3, 5, 4, 1", "2, 3, 4, 1, 5", "3, 2, 4, 5, 1"], ans: 3, hint: "Infant → Child → Boy → Adolescent → Adult." },
+    { words: "1. Protect, 2. Pressure, 3. Relief, 4. Rain, 5. Flood", opts: ["2, 4, 3, 1, 5", "2, 4, 5, 1, 3", "2, 5, 4, 1, 3", "3, 2, 4, 5, 1"], ans: 1, hint: "Pressure → Rain → Flood → Protect → Relief." },
+    { words: "1. Presentation, 2. Recommendation, 3. Arrival, 4. Discussion, 5. Introduction", opts: ["5, 3, 4, 1, 2", "3, 5, 4, 2, 1", "3, 5, 1, 4, 2", "5, 3, 1, 2, 4"], ans: 2, hint: "Arrival → Introduction → Presentation → Discussion → Recommendation." },
+    { words: "1. Income, 2. Status, 3. Education, 4. Well-being, 5. Job", opts: ["3, 1, 5, 2, 4", "1, 3, 2, 5, 4", "1, 2, 5, 3, 4", "3, 5, 1, 2, 4"], ans: 3, hint: "Education → Job → Income → Status → Well-being." },
+    { words: "1. Heel, 2. Shoulder, 3. Skull, 4. Neck, 5. Knee, 6. Chest, 7. Thigh, 8. Stomach, 9. Face, 10. Hand", opts: ["3, 4, 7, 9, 2, 5, 8, 10, 6, 1", "3, 9, 4, 2, 10, 6, 8, 7, 5, 1", "2, 4, 7, 10, 1, 5, 8, 9, 6, 3", "4, 7, 10, 1, 9, 6, 2, 5, 8, 3"], ans: 1, hint: "Skull → Face → Neck → Shoulder → Hand → Chest → Stomach → Thigh → Knee → Heel." },
+    { words: "1. Rainbow, 2. Rain, 3. Sun, 4. Happy, 5. Child", opts: ["4, 2, 3, 5, 1", "2, 3, 1, 5, 4", "4, 5, 1, 2, 3", "2, 1, 4, 5, 3"], ans: 1, hint: "Rain → Sun → Rainbow → Child → Happy." }
+];
+
+let currentIdx = 0;
+
+function render() {
+    const q = data[currentIdx];
+    document.getElementById('progress').innerText = `Question ${currentIdx + 1} / ${data.length}`;
+    document.getElementById('wordList').innerText = q.words;
+    document.getElementById('logicHint').innerText = "Select an option to reveal the logical flow.";
+    document.getElementById('visualAid').innerText = "";
+    
+    const optArea = document.getElementById('options');
+    optArea.innerHTML = '';
+    
+    q.opts.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = text;
+        btn.onclick = () => check(i, q.ans, btn);
+        optArea.appendChild(btn);
+    });
+    
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerText = '';
+}
+
+function check(idx, correct, btn) {
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if(idx === correct) {
+        btn.classList.add('correct');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--correct)'>Correct!</span>";
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--wrong)'>Incorrect</span>";
+    }
+    
+    document.getElementById('logicHint').innerHTML = `<strong>Reasoning:</strong><br>${data[currentIdx].hint}`;
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function loadNext() {
+    if(currentIdx < data.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        alert("Section Complete! You have mastered Logical Sequences.");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

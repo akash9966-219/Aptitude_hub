@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; white-space: pre-line; }
+        
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 5</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 5</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "JAK, KBL, LCM, MDN, _____", options: ["OEP", "NEO", "MEN", "PFQ"], ans: 1, logic: "The first and third letters are in alphabetical order: J, K, L, M, N and K, L, M, N, O. The middle letter is constant A, B, C, D, E. Thus, NEO." },
+            { q: "SCD, TEF, UGH, ____, WKL", options: ["CMN", "UJI", "VIJ", "IJT"], ans: 2, logic: "First letter: S, T, U, V, W. Second and third letters: CD, EF, GH, IJ, KL. Thus, VIJ." },
+            { q: "Find the necessary part: PURCHASE", options: ["trade", "money", "bank", "acquisition"], ans: 3, logic: "A purchase, by definition, is the act of acquiring something. While money is usually involved, an acquisition is the fundamental essence of a purchase." },
+            { q: "snow : mountain : ski :: warmth : lake : ?", options: ["sand", "swim", "sunburn", "vacation"], ans: 1, logic: "Snow is the condition at a mountain to ski; warmth is the condition at a lake to swim." },
+            { q: "apple : fruit : supermarket :: novel : book : ?", options: ["bookstore", "magazine", "vegetable", "shopping"], ans: 0, logic: "An apple is a type of fruit sold at a supermarket; a novel is a type of book sold at a bookstore." },
+            { q: "PULSATE : THROB", options: ["walk : run", "tired : sleep", "examine : scrutinize", "ballet : dancer", "find : lose"], ans: 2, logic: "Pulsate and Throb are synonyms. Examine and Scrutinize are synonyms." },
+            { q: "dionot = oak tree\nblyonot = oak leaf\nblycrin = maple leaf\nWhich word could mean 'maple syrup'?", options: ["blymuth", "hupponot", "patricrin", "crinweel"], ans: 3, logic: "bly = leaf, onot = oak, crin = maple. Since 'crin' means maple, the answer must contain 'crin'. Option 4 is the only one." },
+            { q: "Statement: Efforts should be made to displace the excessive craze for fashion from youngsters.", options: ["fashion is the need of the day", "craze is detrimental to personality", "hoard for fashion should be done away with to allow constructive development", "work valued more than appearance"], ans: 2, logic: "The passage suggests displacing the craze so that it doesn't interfere with other aspects of development." },
+            { q: "Statement: People who exercise 30 mins a day are less prone to heart ailments.", options: ["Only conclusion I follows", "Only conclusion II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Conclusion I is a logical extension (moderate exercise for health). II is an extreme generalization not supported by the text." },
+            { q: "Statement: People who speak too much against dowry are those who had taken it themselves.", options: ["Only conclusion I follows", "Only conclusion II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "It implies it's easier to talk than act (I) and highlights the hypocrisy or double standards of such individuals (II)." },
+            { q: "Statement: The best way to escape from a problem is to solve it.", options: ["Only conclusion I follows", "Only conclusion II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "The statement directly links 'escaping' (freedom from the problem) to having the 'solution'." },
+            { q: "Statement: Never before such a lucid book was available on the topic.", options: ["Only assumption I implicit", "Only assumption II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Saying 'never before' implies that other books did exist on the topic, but were not as lucid (I)." },
+            { q: "Argument: Should cottage industries be encouraged in rural areas?", options: ["Only argument I is strong", "Only argument II is strong", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "Argument II provides a concrete socio-economic reason (unemployment). Argument I is a subjective generalization." },
+            { q: "Argument: Should so much money be spent on advertisements?", options: ["Only argument I is strong", "Only argument II is strong", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Both are strong: one argues the economic necessity in capitalism (I), the other argues resource efficiency (II)." },
+            { q: "Action: Severe storm likely to hit in 48 hours.", options: ["Only I and II", "Only III follows", "Only II and III", "Only I and III", "All follow"], ans: 3, logic: "Closing establishments (I) and activating disaster management (III) are safety precautions. Hiding info (II) is dangerous." },
+            { q: "Argument: Should IITs be privatized?", options: ["None is strong", "All are strong", "Only I is strong", "Only I and III are strong", "Only II and III are strong"], ans: 3, logic: "I (financial health/competition) and III (concern for standards) are the core logical points of the debate." },
+            { q: "Argument: Should trade unions be banned?", options: ["Only I strong", "Only II strong", "Only I and II strong", "Only I, II and III", "None of these"], ans: 1, logic: "Argument II is the strongest as it highlights the fundamental purpose of unions for employee representation." },
+            { q: "Statement: Govt decides to release food grains from FCI during pre-harvest.", options: ["All implicit", "Only II and III", "None implicit", "Only I and II", "None of these"], ans: 3, logic: "Releasing stock assumes a current shortage (I) and that new crops will soon arrive to fill the stores (II)." },
+            { q: "Statement: Bill Clinton is the second democrat re-elected after Roosevelt.", options: ["Only I implicit", "Only II implicit", "Only III implicit", "Either I or III", "Either II or III"], ans: 1, logic: "Re-election logically implies that the majority of the voting public maintains faith in the leader." },
+            { q: "Statement: 'Television X - the neighbour's envy, the owner's pride'", options: ["Only I and II", "Only II and III", "Only I and III", "All are implicit", "None of these"], ans: 3, logic: "The ad assumes catchy slogans work (I), that people value being better than neighbours (III), and that envy exists (II)."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

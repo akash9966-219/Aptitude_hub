@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Talkies & General Awareness Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #7c3aed; --bg: #f5f3ff; --card: #ffffff; --accent: #8b5cf6; --correct: #10b981; --wrong: #ef4444; --text: #1f2937; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: var(--primary); font-size: 0.9rem; letter-spacing: 1px; }
+        .q-text { font-size: 1.3rem; line-height: 1.4; margin-bottom: 25px; font-weight: 600; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt { padding: 15px 20px; border: 2px solid #e5e7eb; border-radius: 12px; background: none; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s ease; }
+        .opt:hover:not(:disabled) { border-color: var(--accent); background: #fdf2ff; }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 10px; border-left: 5px solid var(--primary); display: none; font-size: 0.95rem; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .btn-nav { padding: 12px 25px; border-radius: 10px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; transition: 0.3s; }
+        .btn-nav:disabled { background: #d1d5db; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. What is the theme of the 18th edition of the Mumbai International Film Festival (MIFF)?", opts: ["India in Renaissance", "India in Enlightenment", "India in Enlightenment Age", "India in Amrit Kaal"], ans: 3, exp: "The 18th MIFF featured a thematic focus and special awards for films reflecting 'India in Amrit Kaal'." },
+    { q: "2. Which country has pledged military support to Ukraine worth 1 billion euros in 2024?", opts: ["Germany", "France", "Spain", "Italy"], ans: 2, exp: "Spain's Prime Minister Pedro Sanchez signed a security deal with President Zelenskyy pledging 1 billion euros for 2024." },
+    { q: "3. Defence Secretary Giridhar Aramane released a special ₹250 coin to commemorate which organization?", opts: ["Indian Coast Guard", "Ministry of Defence", "DRDO", "MDL Shipyard"], ans: 3, exp: "The coin was released to celebrate the 250th anniversary of Mazagon Dock Shipbuilders Limited (MDL)." },
+    { q: "4. According to the World Migration Report 2024, what is a significant factor in internal displacement?", opts: ["Political conflicts", "Economic opportunities", "War conflicts", "Climate change"], ans: 3, exp: "Climate change is identified as a primary driver, with 216 million people projected to be displaced internally by 2050." },
+    { q: "5. Which company admitted that its Covishield vaccine can cause rare side effects (TTS)?", opts: ["Pfizer", "Moderna", "Serum Institute", "AstraZeneca"], ans: 3, exp: "AstraZeneca admitted in a UK court that the vaccine can, in very rare cases, cause Thrombosis with Thrombocytopenia Syndrome." },
+    { q: "6. Which foundation day did the CSIR-Indian Institute of Petroleum (CSIR-IIP) celebrate recently?", opts: ["Golden Jubilee", "65th Foundation Day", "Silver Jubilee", "75th Anniversary"], ans: 1, exp: "CSIR-IIP Dehradun celebrated its 65th Foundation Day on April 27, 2024." },
+    { q: "7. Which spectrum band is COAI requesting a ban on for WiFi 6E routers in India?", opts: ["2.4 GHz", "5 GHz", "6 GHz", "8 GHz"], ans: 2, exp: "COAI sought a ban on 6 GHz WiFi 6E routers as the government has not yet finalized policy for license-free use of this band." },
+    { q: "8. In which year was the Indian Historical Records Commission (IHRC) established?", opts: ["1915", "1923", "1900", "1919"], ans: 3, exp: "The IHRC was established in 1919 as an advisory body on archival matters." },
+    { q: "9. Which country tested the Pyoljji-1-2 anti-aircraft and Hwasal-1 Ra-3 strategic cruise missiles?", opts: ["South Korea", "United States", "North Korea", "Iran"], ans: 2, exp: "North Korea conducted these tests in April 2024, emphasizing 'super-large warhead' power." },
+    { q: "10. When did India initiate the first phase of 2024 Lok Sabha elections across 102 seats?", opts: ["April 17", "April 19", "April 21", "April 23"], ans: 1, exp: "The first phase of the world's largest democratic exercise began on April 19, 2024." },
+    { q: "11. What is Mamta G Sagar known for winning in 2024?", opts: ["Fiction writer", "Academic research", "Kannada poet", "Political activism"], ans: 2, exp: "Kannada poet Mamta G. Sagar won the World Literary Prize 2024 from the World Organization of Writers." },
+    { q: "12. In which year did the Jallianwala Bagh Massacre occur?", opts: ["1919", "1947", "1924", "1930"], ans: 0, exp: "The massacre took place on April 13, 1919, in Amritsar." },
+    { q: "13. In which country was a new scorpion species (Euscorpiops krachan) with 8 eyes found?", opts: ["India", "Brazil", "Australia", "Thailand"], ans: 3, exp: "Discovered in the Kaeng Krachan National Park in Thailand." },
+    { q: "14. What is the approved increase in DA and DR for central government employees in 2024?", opts: ["2%", "3%", "4%", "5%"], ans: 2, exp: "The Union Cabinet approved a 4% increase, bringing the total DA to 50% of basic pay." },
+    { q: "15. Which organization celebrated its 174th Foundation Day on March 4th, 2024?", opts: ["Geological Survey of India", "Archaeological Survey of India", "NIO", "ICAR"], ans: 0, exp: "The Geological Survey of India (GSI) was founded in 1851." },
+    { q: "16. In which institutions did the government launch 'Mera Pehla Vote Desh Ke Liye'?", opts: ["Higher Educational Institutions", "Primary Schools", "Government Offices", "Religious Institutions"], ans: 0, exp: "The campaign targeted first-time voters in colleges and universities." },
+    { q: "17. Which country celebrates National Democracy Day on Falgun 7 of Bikram Sambat?", opts: ["Bhutan", "Sri Lanka", "Bangladesh", "Nepal"], ans: 3, exp: "Nepal celebrates the end of the Rana regime and the start of democracy on this day." },
+    { q: "18. Which chemical used in cotton candy led to its ban in Tamil Nadu?", opts: ["Rhodamine-B", "Artificial sweetener", "Citric Acid", "Sodium Chloride"], ans: 0, exp: "Rhodamine-B is a synthetic dye used in textiles and is toxic if consumed in food." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `QUESTION ${idx + 1} OF ${data.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Answer Insight:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

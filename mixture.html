@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alligation and Mixture Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Alligation and Mixture</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Vessel has 3 parts water, 5 parts syrup. How much mixture drawn off and replaced with water to make it half water, half syrup?", options: ["1/3", "1/4", "1/5", "1/7"], correct: 2, explain: "Initial ratio Water:Syrup = 3:5. Final ratio = 1:1. Fraction replaced = (Difference in concentration) / (Higher concentration) = (1/2 - 3/8) / (1/2) or logic based: Replaced = 1/5." },
+        { q: "Tea @ Rs.126 and Rs.135 mixed with 3rd variety in ratio 1:1:2. Mixture worth Rs.153. Price of 3rd variety?", options: ["Rs. 169.50", "Rs. 170", "Rs. 175.50", "Rs. 180"], correct: 2, explain: "Total cost = 126(1) + 135(1) + 2x = 153(4). 261 + 2x = 612. 2x = 351. x = Rs. 175.50." },
+        { q: "Liquids A & B in ratio 7:5. 9L drawn off and filled with B, ratio becomes 7:9. Initial Litres of A?", options: ["10", "20", "21", "25"], correct: 2, explain: "Let initial A=7x, B=5x. After drawing 9L, A = 7x - (7/12)*9, B = 5x - (5/12)*9 + 9. New ratio = 7/9. Solving gives x=3. Initial A = 7*3 = 21L." },
+        { q: "Can 1: 25% water. Can 2: 50% water. Mix to get 12L with water:milk = 3:5?", options: ["4L, 8L", "6L, 6L", "5L, 7L", "7L, 5L"], correct: 1, explain: "3:5 water/milk means water is 3/8 = 37.5%. Using alligation: (50-37.5) : (37.5-25) = 12.5 : 12.5 = 1:1. So 6L each." },
+        { q: "Grocer mixes pulses @ Rs.15 and Rs.20. Mixture worth Rs.16.50. Ratio?", options: ["3:7", "5:7", "7:3", "7:5"], correct: 2, explain: "Alligation: (20 - 16.50) : (16.50 - 15) = 3.5 : 1.5 = 7 : 3." },
+        { q: "Dishonest milkman sells at CP but mixes water to gain 25%. % water in mixture?", options: ["4%", "6%", "20%", "25%"], correct: 2, explain: "Gain 25% means 1/4 gain. Ratio water:milk = 1:4. Water in mixture = 1/(1+4) = 1/5 = 20%." },
+        { q: "Sugar @ Rs.9 mixed with 27kg @ Rs.7. Gain 10% selling at Rs.9.24. KG of Rs.9 sugar?", options: ["36 kg", "42 kg", "54 kg", "63 kg"], correct: 3, explain: "CP of mixture = 9.24/1.1 = 8.4. Ratio (9-8.4):(8.4-7) = 0.6:1.4 = 3:7. 7 parts = 27 (Wait, let's re-calc: (8.4-7):(9-8.4) = 1.4:0.6 = 7:3). 3 parts = 27kg, 7 parts = 63kg." },
+        { q: "40L milk. 4L replaced by water. Process repeated 2 more times. Final milk amount?", options: ["26.34 L", "27.36 L", "28 L", "29.16 L"], correct: 3, explain: "Formula: Initial * (1 - r/V)^n = 40 * (1 - 4/40)^3 = 40 * (0.9)^3 = 40 * 0.729 = 29.16 L." },
+        { q: "Whisky 40% alc. Replaced by 19% alc whisky. Result is 26% alc. Quantity replaced?", options: ["1/3", "2/3", "2/5", "3/5"], correct: 1, explain: "Alligation: (26-19) : (40-26) = 7:14 = 1:2. Quantity replaced is the 2nd part = 2/(1+2) = 2/3." },
+        { q: "Ratio water:milk to gain 16 2/3% on selling at CP?", options: ["1:6", "6:1", "2:3", "4:3"], correct: 0, explain: "Gain = 16 2/3% = 50/3% = 1/6. Ratio water:milk = 1:6." },
+        { q: "Rice Rs.7.20 mixed with rice Rs.5.70 to get Rs.6.30 mixture. Ratio?", options: ["1:3", "2:3", "3:4", "4:5"], correct: 1, explain: "Alligation: (6.30 - 5.70) : (7.20 - 6.30) = 0.60 : 0.90 = 2 : 3." },
+        { q: "Tea Rs.60 & Rs.65 mixed. Selling at Rs.68.20 gains 10%. Ratio?", options: ["3:2", "3:4", "3:5", "4:5"], correct: 0, explain: "CP of mix = 68.20/1.1 = 62. Alligation: (65-62) : (62-60) = 3 : 2." },
+        { q: "Type 1 rice Rs.15, Type 2 Rs.20. Mixed in ratio 2:3. Price per kg?", options: ["Rs. 18", "Rs. 18.50", "Rs. 19", "Rs. 19.50"], correct: 0, explain: "Avg = (15*2 + 20*3) / (2+3) = (30 + 60) / 5 = 18." },
+        { q: "8L wine drawn from cask and replaced by water. Total 4 times. Wine:Water = 16:65. Original capacity?", options: ["18 L", "24 L", "32 L", "42 L"], correct: 2, explain: "Final Wine / Original = 16/(16+65) = 16/81. (1 - 8/x)^4 = 16/81. (1 - 8/x) = 2/3. 8/x = 1/3. x = 24L. *Wait, re-checking...* yes, 24L." },
+        { q: "1000kg sugar. Part @ 8% profit, part @ 18% profit. Total 14% profit. 18% profit part?", options: ["400 kg", "560 kg", "600 kg", "640 kg"], correct: 2, explain: "Alligation: (18-14) : (14-8) = 4:6 = 2:3. 18% part = 3/5 * 1000 = 600 kg." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

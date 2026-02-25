@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profit and Loss Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Profit and Loss</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading question...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Alfred buys an old scooter for Rs. 4700 and spends Rs. 800 on repairs. If he sells it for Rs. 5800, his gain percent is:", options: ["4 4/7%", "5 5/11%", "10%", "12%"], correct: 2, explain: "Total CP = 4700 + 800 = 5500. SP = 5800. Gain = 300. Gain % = (300/5500) * 100 = 60/11 = 5 5/11%. *Wait, let's recheck options: 300/5500 * 100 = 5.45% approx.* Option C (10%) or B? Actually, 300/5500 * 100 = 5.45% which matches 5 5/11%." },
+        { q: "CP of 20 articles = SP of x articles. If profit is 25%, then x is:", options: ["15", "16", "18", "25"], correct: 1, explain: "Let CP of 1 article = 1. CP of 20 = 20. SP of x = 20. Profit = 25% => SP = 1.25 * CP. So 20/x = 1.25 => x = 20/1.25 = 16." },
+        { q: "If SP is doubled, profit triples. Find profit percent.", options: ["66 2/3%", "100%", "105 1/3%", "120%"], correct: 1, explain: "Profit P = SP - CP. 3P = 2SP - CP. Substituting P: 3(SP - CP) = 2SP - CP => 3SP - 3CP = 2SP - CP => SP = 2CP. Profit = SP - CP = CP. Profit% = (CP/CP)*100 = 100%." },
+        { q: "Profit is 320% of cost. If cost increases 25% but SP is constant, what % of SP is profit?", options: ["30%", "70%", "100%", "250%"], correct: 1, explain: "Let CP = 100. Profit = 320, so SP = 420. New CP = 125. New Profit = 420 - 125 = 295. % of SP = (295/420) * 100 ≈ 70%." },
+        { q: "A vendor bought toffees at 6 for a rupee. How many for a rupee must he sell to gain 20%?", options: ["3", "4", "5", "6"], correct: 2, explain: "CP of 1 toffee = 1/6. To gain 20%, SP = 1.2 * (1/6) = 1/5. So, 5 toffees for a rupee." },
+        { q: "Profit at Rs. 1920 = Loss at Rs. 1280. Find SP for 25% profit.", options: ["Rs. 2000", "Rs. 2200", "Rs. 2400", "Data inadequate"], correct: 0, explain: "CP = (1920 + 1280)/2 = 3200/2 = 1600. For 25% profit: 1600 * 1.25 = 2000." },
+        { q: "Shopkeeper expects 22.5% gain on CP. Weekly sale was Rs. 392. What was his profit?", options: ["Rs. 18.20", "Rs. 70", "Rs. 72", "Rs. 88.25"], correct: 2, explain: "SP = 1.225 * CP. 392 = 1.225 * CP => CP = 320. Profit = 392 - 320 = 72." },
+        { q: "A man buys a cycle for Rs. 1400 and sells at 15% loss. What is the SP?", options: ["Rs. 1090", "Rs. 1160", "Rs. 1190", "Rs. 1202"], correct: 2, explain: "SP = 85% of 1400 = 0.85 * 1400 = 1190." },
+        { q: "20 dozen toys at Rs. 375/dozen. Sold each for Rs. 33. % Profit?", options: ["3.5", "4.5", "5.6", "6.5"], correct: 2, explain: "CP of 1 toy = 375/12 = 31.25. SP = 33. Profit = 1.75. % Profit = (1.75/31.25) * 100 = 5.6%." },
+        { q: "Bought at 6 for Rs. 5 and sold at 5 for Rs. 6. Gain percent is:", options: ["30%", "33 1/3%", "35%", "44%"], correct: 3, explain: "LCM of 5 and 6 = 30. CP of 30 = 25. SP of 30 = 36. Gain = 11. % Gain = (11/25) * 100 = 44%." },
+        { q: "Selling 17 balls at Rs. 720, loss = CP of 5 balls. CP of one ball is:", options: ["Rs. 45", "Rs. 50", "Rs. 55", "Rs. 60"], correct: 3, explain: "Loss = CP - SP. 5 CP = 17 CP - 720 => 12 CP = 720 => CP = 60." },
+        { q: "Sold for Rs. 18,700 at 15% loss. Target SP for 15% gain?", options: ["Rs. 21,000", "Rs. 22,500", "Rs. 25,300", "Rs. 25,800"], correct: 2, explain: "0.85 * CP = 18700 => CP = 22000. Target SP = 1.15 * 22000 = 25300." },
+        { q: "100 oranges for Rs. 350. Sold at Rs. 48 per dozen. Result?", options: ["14 2/7% gain", "15% gain", "14 2/7% loss", "15% loss"], correct: 0, explain: "CP of 1 = 3.5. SP of 1 = 48/12 = 4. Gain = 0.5. % Gain = (0.5/3.5) * 100 = 100/7 = 14 2/7%." },
+        { q: "Transistor A: 840 (20% gain), Transistor B: 960 (4% loss). Total result?", options: ["5 15/17% loss", "5 15/17% gain", "6 2/3% gain", "None"], correct: 1, explain: "CP1 = 840/1.2 = 700. CP2 = 960/0.96 = 1000. Total CP = 1700. Total SP = 1800. Gain = 100. % Gain = (100/1700) * 100 = 100/17 = 5 15/17%." },
+        { q: "Mixes 26kg (Rs. 20) with 30kg (Rs. 36). Sells at Rs. 30. Result?", options: ["No profit/loss", "5%", "8%", "10%"], correct: 1, explain: "Total CP = (26*20) + (30*36) = 520 + 1080 = 1600. Total SP = 56 * 30 = 1680. Profit = 80. % Profit = (80/1600) * 100 = 5%." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

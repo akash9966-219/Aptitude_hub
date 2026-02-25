@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Synonyms Quiz - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #1cc88a;
+            --secondary: #13855c;
+            --dark: #2e3759;
+            --bg: #f8f9fc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .instructions {
+            background: #e1f5fe;
+            border-left: 5px solid #03a9f4;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta { color: #888; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; }
+        
+        .word-display {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .option:hover { border-color: var(--primary); background: #f0fff4; }
+        .option.selected { border-color: var(--primary); background: #e6fffa; }
+
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Synonyms Practice</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='verbal-ability.html'">⬅ Back to Topics</button>
+
+    <div class="instructions">
+        <strong>Direction:</strong> Out of the four given options, choose the one which best expresses the meaning of the given word.
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="q-count" class="question-meta">Question 1 of 60</div>
+        
+        <div class="word-display" id="main-word">WORD</div>
+        
+        <div id="options-container" class="options-list">
+            </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div id="explanation-content" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Word ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { w: "CORPULENT", opts: ["Lean", "Gaunt", "Emaciated", "Obese"], correct: 3, ex: "Corpulent means fat or overweight." },
+        { w: "BRIEF", opts: ["Limited", "Small", "Little", "Short"], correct: 3, ex: "Brief means lasting a short duration." },
+        { w: "EMBEZZLE", opts: ["Misappropriate", "Balance", "Remunerate", "Clear"], correct: 0, ex: "Embezzle means to steal or misappropriate funds." },
+        { w: "VENT", opts: ["Opening", "Stodge", "End", "Past tense of go"], correct: 0, ex: "A vent is an opening that allows air or gas to escape." },
+        { w: "AUGUST", opts: ["Common", "Ridiculous", "Dignified", "Petty"], correct: 2, ex: "August means respected and impressive; dignified." },
+        { w: "CANNY", opts: ["Obstinate", "Handsome", "Clever", "Stout"], correct: 2, ex: "Canny means having or showing shrewdness and good judgment; clever." },
+        { w: "ALERT", opts: ["Energetic", "Observant", "Intelligent", "Watchful"], correct: 3, ex: "Alert means quick to notice any unusual and potentially dangerous circumstances." },
+        { w: "WARRIOR", opts: ["Soldier", "Sailor", "Pirate", "Spy"], correct: 0, ex: "A warrior is a brave or experienced soldier or fighter." },
+        { w: "DISTANT", opts: ["Far", "Removed", "Reserved", "Separate"], correct: 0, ex: "Distant means far away in space or time." },
+        { w: "ADVERSITY", opts: ["Failure", "Helplessness", "Misfortune", "Crisis"], correct: 2, ex: "Adversity refers to difficulties or misfortune." },
+        { w: "FAKE", opts: ["Original", "Imitation", "Trustworthy", "Loyal"], correct: 1, ex: "Fake means a thing that is not genuine; an imitation." },
+        { w: "INDICT", opts: ["Condemn", "Reprimand", "Accuse", "Allege"], correct: 2, ex: "To indict is to formally accuse of or charge with a crime." },
+        { w: "STRINGENT", opts: ["Dry", "Strained", "Rigorous", "Shrill"], correct: 2, ex: "Stringent means strict, precise, and exacting; rigorous." },
+        { w: "LAMENT", opts: ["Complain", "Comment", "Condone", "Console"], correct: 0, ex: "To lament is to express regret or disappointment about something." },
+        { w: "HESITATED", opts: ["Stopped", "Paused", "Slowed", "Postponed"], correct: 1, ex: "Hesitated means to pause before saying or doing something." },
+        { w: "RESCUE", opts: ["Command", "Help", "Defence", "Safety"], correct: 1, ex: "To rescue is to save someone from a dangerous or distressing situation; to help." },
+        { w: "ATTEMPT", opts: ["Serve", "Explore", "Try", "Explain"], correct: 2, ex: "Attempt means to make an effort to achieve or complete something; to try." },
+        { w: "FORAY", opts: ["Maraud", "Contest", "Ranger", "Intuition"], correct: 0, ex: "A foray is a sudden attack or incursion; to maraud." },
+        { w: "RECKLESS", opts: ["Courageous", "Rash", "Bold", "Daring"], correct: 1, ex: "Reckless means acting without thinking about the consequences; rash." },
+        { w: "CONSEQUENCES", opts: ["Results", "Conclusions", "Difficulties", "Applications"], correct: 0, ex: "Consequences are the results or effects of an action." },
+        { w: "IMPROVEMENT", opts: ["Advancement", "Betterment", "Promotion", "Preference"], correct: 1, ex: "Improvement is the process of making something better." },
+        { w: "INEBRIATE", opts: ["Dreamy", "Stupefied", "Unsteady", "Drunken"], correct: 3, ex: "Inebriate means to make someone drunk; intoxicated." },
+        { w: "STERILE", opts: ["Barren", "Arid", "Childless", "Dry"], correct: 0, ex: "Sterile means unable to produce fruit or offspring; barren." },
+        { w: "ABJECT", opts: ["Challenge", "Miserable", "Deny", "Disobey"], correct: 1, ex: "Abject means experienced to the maximum degree; extremely unpleasant and miserable." },
+        { w: "MOVING", opts: ["Taking", "Toying", "Shifting", "Turning"], correct: 2, ex: "Moving can mean shifting from one place to another." },
+        { w: "IRONIC", opts: ["Inflexible", "Bitter", "Good-natured", "Disguisedly sarcastic"], correct: 3, ex: "Ironic means using language that signifies the opposite, typically for humorous effect." },
+        { w: "TIMID", opts: ["Fast", "Slow", "Medium", "Shy"], correct: 3, ex: "Timid means showing a lack of courage or confidence; easily frightened; shy." },
+        { w: "EXTRICATE", opts: ["Pull", "Free", "Tie", "Complicate"], correct: 1, ex: "To extricate is to free someone or something from a constraint or difficulty." },
+        { w: "NEUTRAL", opts: ["Unbiased", "Non-aligned", "Undecided", "Indifferent"], correct: 0, ex: "Neutral means not supporting or helping either side in a conflict; unbiased." },
+        { w: "SHALLOW", opts: ["Artificial", "Superficial", "Foolish", "Worthless"], correct: 1, ex: "Shallow means not exhibiting, requiring, or capable of serious thought; superficial." },
+        { w: "DIVERSION", opts: ["Amusement", "Distortion", "Deviation", "Bylane"], correct: 2, ex: "Diversion means the action of turning something aside from its course; deviation." },
+        { w: "INSOLVENT", opts: ["Poor", "Bankrupt", "Penniless", "Broke"], correct: 1, ex: "Insolvent means unable to pay one's debts; bankrupt." },
+        { w: "INEXPLICABLE", opts: ["Confusing", "Unaccountable", "Chaotic", "Unconnected"], correct: 1, ex: "Inexplicable means unable to be explained or accounted for." },
+        { w: "FEEBLE", opts: ["Weak", "Vain", "Arrogant", "Sick"], correct: 0, ex: "Feeble means lacking physical strength, especially as a result of age or illness." },
+        { w: "TRANSIENT", opts: ["Transparent", "Fleeting", "Feeble", "Fanciful"], correct: 1, ex: "Transient means lasting only for a short time; impermanent." },
+        { w: "BARE", opts: ["Uncovered", "Tolerate", "Clear", "Neat"], correct: 0, ex: "Bare means not clothed or covered." },
+        { w: "REPEAL", opts: ["Sanction", "Perpetuate", "Pass", "Cancel"], correct: 3, ex: "To repeal is to revoke or annul a law or congressional act." },
+        { w: "SALACITY", opts: ["Bliss", "Depression", "Indecency", "Recession"], correct: 2, ex: "Salacity means lewdness or indecency." },
+        { w: "ECSTATIC", opts: ["Animated", "Bewildered", "Enraptured", "Illful"], correct: 2, ex: "Ecstatic means feeling or expressing overwhelming happiness or joyful excitement." },
+        { w: "ADMONISH", opts: ["Punish", "Curse", "Dismiss", "Reprimand"], correct: 3, ex: "To admonish is to warn or reprimand someone firmly." },
+        { w: "DILIGENT", opts: ["Progressive", "Brilliant", "Inventive", "Hard-working"], correct: 3, ex: "Diligent means having or showing care and conscientiousness in one's work." },
+        { w: "PIOUS", opts: ["Pure", "Pretentious", "Clean", "Devout"], correct: 3, ex: "Pious means devoutly religious." },
+        { w: "BROWSE", opts: ["Heal", "Deceive", "Examine", "Strike"], correct: 2, ex: "To browse is to survey or examine goods or text in a leisurely way." },
+        { w: "INFREQUENT", opts: ["Never", "Usual", "Rare", "Sometimes"], correct: 2, ex: "Infrequent means not occurring often; rare." },
+        { w: "RESTRAINT", opts: ["Hindrance", "Repression", "Obstacle", "Restriction"], correct: 3, ex: "Restraint is a measure or condition that keeps someone or something under control." },
+        { w: "DEIFY", opts: ["Flatter", "Challenge", "Worship", "Face"], correct: 2, ex: "To deify is to worship, regard, or treat someone or something as a god." },
+        { w: "HARBINGER", opts: ["Messenger", "Steward", "Forerunner", "Pilot"], correct: 2, ex: "A harbinger is a person or thing that announces or signals the approach of another; a forerunner." },
+        { w: "VENUE", opts: ["Place", "Agenda", "Time", "Duration"], correct: 0, ex: "A venue is the place where something happens, especially an organized event." },
+        { w: "CANDID", opts: ["Apparent", "Explicit", "Frank", "Bright"], correct: 2, ex: "Candid means truthful and straightforward; frank." },
+        { w: "MELD", opts: ["To soothe", "Merge", "Purchase", "Glisten"], correct: 1, ex: "To meld is to blend or combine; to merge." },
+        { w: "LYNCH", opts: ["Hang", "Madden", "Kill", "Shoot"], correct: 2, ex: "To lynch is to kill someone for an alleged offense without a legal trial." },
+        { w: "TORTURE", opts: ["Torment", "Chastisement", "Harassment", "Terror"], correct: 0, ex: "Torture is the action of inflicting severe pain; torment." },
+        { w: "ABUNDANT", opts: ["Ripe", "Cheap", "Plenty", "Absent"], correct: 2, ex: "Abundant means existing or available in large quantities; plentiful." },
+        { w: "ENTIRE", opts: ["Part", "Quarter", "Whole", "Half"], correct: 2, ex: "Entire means with no part left out; whole." },
+        { w: "DESTITUTION", opts: ["Humility", "Moderation", "Poverty", "Beggary"], correct: 2, ex: "Destitution means poverty so extreme that one lacks the means to provide for oneself." },
+        { w: "WRETCHED", opts: ["Poor", "Foolish", "Insane", "Strained"], correct: 0, ex: "Wretched can mean in a very unhappy or unfortunate state; poor quality." },
+        { w: "INTIMIDATE", opts: ["To hint", "Frighten", "Bluff", "Harass"], correct: 1, ex: "To intimidate is to frighten someone, especially in order to make them do what one wants." },
+        { w: "CANTANKEROUS", opts: ["Quarrelsome", "Rash", "Disrespectful", "Noisy"], correct: 0, ex: "Cantankerous means bad-tempered, argumentative, and uncooperative." },
+        { w: "RANT", opts: ["Praise inordinately", "Formalise", "To preach noisily", "Treat with screen"], correct: 2, ex: "To rant is to speak or shout at length in an angry, impassioned way." },
+        { w: "ZANY", opts: ["Clown", "Pet", "Thief", "Magician"], correct: 0, ex: "Zany means amusingly unconventional and idiosyncratic; like a clown." }
+    ];
+
+    let currentIdx = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Word ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('main-word').innerText = q.w;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.opts.forEach((opt, i) => {
+            const btn = document.createElement('div');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                btn.classList.add('selected');
+            };
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        selectedIdx = null;
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        feedback.style.display = 'block';
+
+        if (selectedIdx === q.correct) {
+            document.getElementById('result-title').innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            document.getElementById('result-title').innerText = `Incorrect. The correct answer is: ${q.opts[q.correct]}`;
+            feedback.className = "feedback wrong";
+        }
+
+        document.getElementById('explanation-content').innerHTML = `<strong>Definition:</strong> ${q.ex}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `<h2>Practice Complete!</h2><p>You've mastered these 60 synonyms.</p><button class="btn btn-check" onclick="location.reload()">Restart Quiz</button>`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

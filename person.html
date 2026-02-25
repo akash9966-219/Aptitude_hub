@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Persons & Personalities Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e293b; --bg: #fdfdfd; --card: #ffffff; --accent: #f59e0b; --correct: #059669; --wrong: #e11d48; --text: #334155; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-left: 10px solid var(--accent); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: var(--accent); letter-spacing: 1px; }
+        .q-text { font-size: 1.2rem; line-height: 1.5; margin-bottom: 25px; color: var(--primary); }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        .opt { padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.3s; }
+        .opt:hover:not(:disabled) { background: #fffbeb; border-color: var(--accent); }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 15px; background: #fffbeb; border-radius: 8px; border: 1px dashed var(--accent); display: none; line-height: 1.4; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
+        .btn-nav { padding: 12px 0; border-radius: 6px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; }
+        .btn-nav:hover:not(:disabled) { background: #334155; }
+        .btn-nav:disabled { opacity: 0.4; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">PREVIOUS</button>
+            <button class="btn-nav" id="next" onclick="move(1)">NEXT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Who launched SAHI and BODH at the India AI Summit 2026?", opts: ["Ashwini Vaishnaw", "Mansukh Mandaviya", "JP Nadda", "Piyush Goyal"], ans: 2, exp: "Health Minister JP Nadda launched these AI initiatives to integrate ethical AI into the national healthcare system." },
+    { q: "2. Topped the Civil Judge examination merit list (Disability category) in Kerala?", opts: ["Nivedita Menon", "Anjana Prakash", "Thanya Nathan", "Meera Nair"], ans: 2, exp: "Thanya Nathan achieved the top rank in this category, highlighting inclusivity in the judiciary." },
+    { q: "3. Arunachal mountaineer who summited Mount Aconcagua (Western Hemisphere highest)?", opts: ["Anshu Jamsenpa", "Premlata Agarwal", "Kabak Yano", "Arunima Sinha"], ans: 2, exp: "Kabak Yano successfully reached the 22,831-foot peak in February 2026." },
+    { q: "4. Won a 7th consecutive term as President of Uganda in 2026?", opts: ["Bobi Wine", "Kyagulanyi Ssentamu", "Yoweri Museveni", "Ruhakana Rugunda"], ans: 2, exp: "Yoweri Museveni extended his long-standing rule with over 71% of the total vote." },
+    { q: "5. Won UN Secretary General’s Award 2025 for 'Equal Partners' project in S. Sudan?", opts: ["Major Swathi Shantha Kumar", "Col. Anjali Menon", "Lt. Gen. Vandana Rao", "Capt. Priya Nair"], ans: 0, exp: "Major Swathi was recognized for her efforts in promoting gender parity in peacekeeping." },
+    { q: "6. First Indian personality inducted into the Japanese samurai art of Kenjutsu?", opts: ["Pawan Kalyan", "Prabhas", "Mahesh Babu", "Allu Arjun"], ans: 0, exp: "Pawan Kalyan was formally inducted into this traditional martial art in early 2026." },
+    { q: "7. Karnataka’s longest-serving Chief Minister (surpassing Devaraj Urs)?", opts: ["Basavaraj Bommai", "Siddaramaiah", "Ramakrishna Hegde", "S. M. Krishna"], ans: 1, exp: "Siddaramaiah reached this milestone in January 2026, becoming the state's most tenured CM." },
+    { q: "8. Conferred with the Nritya Kalanidhi award at the 19th Dance Festival?", opts: ["Alarmel Valli", "Padma Subrahmanyam", "Malavika Sarukkai", "Urmila Satyanarayanan"], ans: 3, exp: "The prestigious title was awarded to Bharatanatyam exponent Urmila Satyanarayanan." },
+    { q: "9. Given additional charge of Secretary, Ministry of Parliamentary Affairs?", opts: ["Nikunja Bihari Dhal", "Ashok Kumar Meena", "Niraj Verma", "Rajiv Gauba"], ans: 2, exp: "Niraj Verma was assigned the role during the leave period of the incumbent." },
+    { q: "10. Created the record-breaking apple-and-sand Santa Claus in Puri?", opts: ["Sudarsan Pattnaik", "Raghunath Mohapatra", "Jitish Kallat", "Anish Kapoor"], ans: 0, exp: "Renowned sand artist Sudarsan Pattnaik used thousands of apples to create the sculpture." },
+    { q: "11. Author of 'Salman Khan: The Sultan of Bollywood' (HarperCollins India)?", opts: ["Anupama Chopra", "Mohar Basu", "Shubhra Gupta", "Rajeev Masand"], ans: 1, exp: "Journalist Mohar Basu authored this biography detailing the superstar's cinematic journey." },
+    { q: "12. Elected Chair of the BWF Athletes’ Commission (2026–2029)?", opts: ["Greysia Polii", "An Se-young", "Jia Yifan", "PV Sindhu"], ans: 3, exp: "Double Olympic medalist PV Sindhu was elected to lead the commission representing global players." },
+    { q: "13. Associated with Pokhran tests and 'Jai Jawan, Jai Kisan, Jai Vigyan'?", opts: ["Atal Bihari Vajpayee", "Lal Bahadur Shastri", "Jawaharlal Nehru", "Narendra Modi"], ans: 0, exp: "Atal Bihari Vajpayee added 'Jai Vigyan' to the slogan after the 1998 nuclear tests." },
+    { q: "14. First Asian batter to cross 4,000 runs in Women’s T20 Internationals?", opts: ["Smriti Mandhana", "Harmanpreet Kaur", "Suzie Bates", "Mithali Raj"], ans: 1, exp: "Harmanpreet Kaur reached the 4k milestone during the home series in early 2026." },
+    { q: "15. Won golden double in Women’s and Junior Women’s Skeet?", opts: ["Manu Bhaker", "Raiza Dhillon", "Abhinav Bindra", "Apurvi Chandela"], ans: 1, exp: "Raiza Dhillon dominated the skeet events at the 68th National Championship." },
+    { q: "16. TIME’s 2025 CEO of the Year for leading YouTube?", opts: ["Sundar Pichai", "Neal Mohan", "Satya Nadella", "Shantanu Narayen"], ans: 1, exp: "Neal Mohan was recognized for driving YouTube's growth in AI and creator monetization." },
+    { q: "17. Unanimously elected as the Michigan Republican Party Co-Chair?", opts: ["Ravi Patel", "Sunny Reddy", "Anil Deshmukh", "Rakesh Verma"], ans: 1, exp: "Sunny Reddy made headlines as a South Asian leader taking a prominent role in the GOP state wing." },
+    { q: "18. [Duplicate Removed - See Q17]", opts: ["N/A", "N/A", "N/A", "N/A"], ans: 0, exp: "Question 18 was a duplicate of Question 17." },
+    { q: "19. Appointed as the next director of Mossad (assuming June 2026)?", opts: ["Roman Gofman", "David Barnea", "Meir Cohen", "Yossi Levi"], ans: 0, exp: "Major General Roman Gofman was named to succeed David Barnea as head of the agency." },
+    { q: "20. Received the inaugural FIFA Peace Prize (2026 World Cup Draw)?", opts: ["Joe Biden", "Gianni Infantino", "Antonio Guterres", "Donald Trump"], ans: 3, exp: "Donald Trump was awarded the prize for his administration's role in the Abraham Accords and peace efforts." },
+    { q: "21. Investor and global brand ambassador for Perplexity AI?", opts: ["Lionel Messi", "Cristiano Ronaldo", "Kylian Mbappe", "Neymar Jr."], ans: 1, exp: "The football legend partnered with the AI company to enhance global search technology." },
+    { q: "22. Costliest player at the WPL 2026 auction?", opts: ["Smriti Mandhana", "Harmanpreet Kaur", "Deepti Sharma", "Shafali Verma"], ans: 2, exp: "Deepti Sharma fetched the highest price, reflecting her value as a versatile all-rounder." },
+    { q: "23. Official tournament ambassador for ICC Men’s T20 World Cup 2026?", opts: ["Rohit Sharma", "Virat Kohli", "Lasith Malinga", "Kane Williamson"], ans: 0, exp: "Rohit Sharma was named the global face for the tournament hosted by India and Sri Lanka." },
+    { q: "24. Nominated next Executive Chairman of NALSA?", opts: ["Justice Surya Kant", "Justice D.Y. Chandrachud", "Justice Vikram Nath", "Justice Sanjay Kishan Kaul"], ans: 0, exp: "Justice Surya Kant was nominated to lead the legal services authority." },
+    { q: "25. Won the Miss Universe 2025 title?", opts: ["Victoria Kjær Theilvig", "Praveenar Singh", "Fátima Bosch", "Manika Vishwakarma"], ans: 0, exp: "Victoria Kjær Theilvig of Denmark was crowned Miss Universe 2025." },
+    { q: "26. Defeated Carlos Alcaraz to win the ATP Finals title in Turin?", opts: ["Novak Djokovic", "Jannik Sinner", "Daniil Medvedev", "Stefanos Tsitsipas"], ans: 1, exp: "Jannik Sinner won his first ATP Finals title by defeating Alcaraz in a thrilling match." },
+    { q: "27. 4th player in Test history to reach 4000 runs and 300+ wickets?", opts: ["Ravichandran Ashwin", "Ravindra Jadeja", "Mitchell Santner", "Nathan Lyon"], ans: 1, exp: "Ravindra Jadeja joined an elite group including Kapil Dev, Ian Botham, and Richard Hadlee." },
+    { q: "28. New President and CEO of Walmart Inc. (from Feb 2026)?", opts: ["Brian Cornell", "Andy Jassy", "Doug McMillon", "John Furner"], ans: 3, exp: "John Furner was appointed to succeed Doug McMillon as the head of the retail giant." },
+    { q: "29. Felicitated by UP Police for Women’s ODI World Cup performance?", opts: ["Smriti Mandhana", "Deepti Sharma", "Harmanpreet Kaur", "Shafali Verma"], ans: 1, exp: "The UP Police honored the state-born all-rounder for her contributions to the Indian team." },
+    { q: "30. Selected for 4-year US astronaut training for a 2029 mission?", opts: ["Ritu Karidhal", "Kunchala Kaivalya Reddy", "Sirisha Bandla", "Kalpana Rao"], ans: 1, exp: "Young trainee Kunchala Kaivalya Reddy was selected for this elite NASA-partnered program." },
+    { q: "31. Won the 2025 Booker Prize for the novel 'Flesh'?", opts: ["Salman Rushdie", "Margaret Atwood", "David Szalay", "Kazuo Ishiguro"], ans: 2, exp: "David Szalay won the prestigious literary award for his profound work 'Flesh'." },
+    { q: "32. First Indian para-archer in the able-bodied national team?", opts: ["Tejal Rajendra Salve", "Sheetal Devi", "Vaidehi Hirachandra Jadhav", "Deepika Kumari"], ans: 1, exp: "Sheetal Devi made history by being selected based on her exceptional world-class scores." },
+    { q: "33. First Muslim/South Asian Mayor of New York City (2026)?", opts: ["Eric Adams", "Ocasio-Cortez", "Andrew Yang", "Zohran Mamdani"], ans: 3, exp: "Zohran Mamdani, son of Mira Nair, was sworn in as the 112th Mayor of NYC." },
+    { q: "34. Director General of Bureau of Indian Standards (Nov 2025)?", opts: ["Sanjay Garg", "Rajeev Chaturvedi", "Anil Kumar Singh", "Deepak Sharma"], ans: 0, exp: "Sanjay Garg assumed the role to oversee India's quality standardization." },
+    { q: "35. Reclaimed ATP World No. 1 after winning 2025 Paris Masters?", opts: ["Novak Djokovic", "Carlos Alcaraz", "Daniil Medvedev", "Jannik Sinner"], ans: 0, exp: "Novak Djokovic reclaimed the top spot following his victory over Felix Auger-Aliassime." },
+    { q: "36. 2025 Top Agri-Food Pioneer (World Food Prize Foundation)?", opts: ["Chef Vikas Khanna", "Chef Ranveer Brar", "Chef Kunal Kapur", "Chef Sanjeev Kapoor"], ans: 0, exp: "Vikas Khanna was recognized for his massive 'Feed India' initiatives." },
+    { q: "37. Appointed as the 53rd Chief Justice of India?", opts: ["Justice Surya Kant", "Justice DY Chandrachud", "Justice Sanjay Kishan Kaul", "Justice BR Gavai"], ans: 0, exp: "Justice Surya Kant succeeded Justice BR Gavai as the CJI in early 2026." },
+    { q: "38. [Duplicate Removed - See Q37]", opts: ["N/A", "N/A", "N/A", "N/A"], ans: 0, exp: "Question 38 was a duplicate of Question 37." },
+    { q: "39. Won silver medals for India at U-23 World Wrestling (Serbia)?", opts: ["Haruna & Ruka", "Hansika & Sarika", "Vinesh & Sakshi", "Anshu & Sonam"], ans: 1, exp: "Hansika Lamba and Sarika Malik secured silver in their respective weight categories." },
+    { q: "40. Won India’s first-ever MMA medal at Asian Youth Games?", opts: ["Dechachot Barisri", "Palash Mandal", "Arjun Singh", "Veer Bhadu"], ans: 1, exp: "Palash Mandal secured the historic bronze for India in the Bahrain games." },
+    { q: "41. Conferred honorary rank of Lieutenant Colonel in Territorial Army?", opts: ["Abhinav Bindra", "P. V. Sindhu", "Bajrang Punia", "Neeraj Chopra"], ans: 3, exp: "Olympic champion Neeraj Chopra was honored for his contributions to sports and the nation." },
+    { q: "42. First Indian to receive WCPA-Kenton Miller Award?", opts: ["Ramesh Kumar", "Priya Singh", "Anil Mehta", "Dr. Sonali Ghosh"], ans: 3, exp: "Dr. Sonali Ghosh was recognized for innovation in managing Kaziranga National Park." },
+    { q: "43. Recommended by Tata Trusts for 3rd term as Tata Sons Chairman?", opts: ["Ratan Tata", "Cyrus Mistry", "N Chandrasekaran", "Natarajan Chandrasekar"], ans: 2, exp: "N Chandrasekaran's leadership was endorsed for another term to ensure group stability." },
+    { q: "44. First Indian woman compound archer to win World Cup bronze (Nanjing)?", opts: ["Deepika Kumari", "Laxmirani Majhi", "Bombayla Devi", "Jyothi Surekha Vennam"], ans: 3, exp: "Jyothi Surekha Vennam became the first to reach the podium in this specific category." },
+    { q: "45. Won Bolivia’s presidential election ending 2 decades of leftist rule?", opts: ["Rodrigo Paz", "Jorge Tuto Quiroga", "Evo Morales", "Luis Arce"], ans: 0, exp: "Rodrigo Paz won a historic victory, shifting the political landscape of the nation." },
+    { q: "46. First Indian actor to join the $1.4 billion billionaire club?", opts: ["Salman Khan", "Aamir Khan", "Shah Rukh Khan", "Akshay Kumar"], ans: 2, exp: "Shah Rukh Khan's net worth reached $1.4 billion (₹12,490 crore) in late 2025." },
+    { q: "47. Transgender person from Karnataka on SC equal opportunity committee?", opts: ["Akkai Padmashali", "Grace Banu", "Vyjayanthi Mogli", "Nithya Rajshekhar"], ans: 0, exp: "Akkai Padmashali was appointed to help draft policies for transgender rights in the judiciary." },
+    { q: "48. Author of 'Ready, Relevant and Resurgent II' force manual?", opts: ["General Anil Chauhan", "General Bipin Rawat", "Admiral R. Hari Kumar", "AC Marshal V.R. Chaudhari"], ans: 0, exp: "CDS General Anil Chauhan authored the book on shaping a future-ready Indian force." },
+    { q: "49. Won gold at 2025 World Para Athletics (High Jump & 100m)?", opts: ["Devendra & Manish", "Nishad & Simran", "Mariyappan & Avani", "Sumit & Bhavina"], ans: 1, exp: "Nishad Kumar and Simran Sharma both secured golds at the event in Japan." },
+    { q: "50. First Indian fast bowler to play 50 matches across all formats?", opts: ["Jasprit Bumrah", "Mohammed Shami", "Ishant Sharma", "Bhuvneshwar Kumar"], ans: 0, exp: "Jasprit Bumrah achieved this milestone of longevity and consistency across all three formats." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `ID: PERSON_${idx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            const all = document.querySelectorAll('.opt'); all.forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); all[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Achievement Data:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

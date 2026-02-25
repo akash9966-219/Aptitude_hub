@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Missing Letters - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #10b981; /* Emerald for Letter Puzzles */
+            --bg: #0f172a;
+            --correct: #059669;
+            --wrong: #dc2626;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #020617, #0f172a);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 35px;
+            border-radius: 30px;
+            margin-top: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header { display: flex; justify-content: space-between; color: var(--accent); font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .puzzle-image {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .puzzle-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .opt-btn:hover:not(:disabled) { 
+            background: rgba(16, 185, 129, 0.2); 
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .opt-btn.correct { background: var(--correct) !important; border-color: white; }
+        .opt-btn.wrong { background: var(--wrong) !important; border-color: white; }
+
+        .explanation {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            display: none;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .nav-btn:disabled { background: #334155; opacity: 0.5; cursor: not-allowed; }
+        .back-link { margin-top: 25px; color: #64748b; text-decoration: none; font-weight: 600; }
+        .back-link:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
+<a href="puzzles.html" class="back-link">Back to Puzzles Portal</a>
+    <h2 style="font-weight: 800; letter-spacing: -1px;">Alphabet Puzzles</h2>
+
+    <div class="container">
+        <div class="header">
+            <span id="q-number">Puzzle 1/12</span>
+            <span>Missing Letters</span>
+        </div>
+
+        <div class="puzzle-image">
+            <img id="main-img" src="" alt="Alphabet Logic Puzzle">
+        </div>
+
+        <div id="options-container" class="options"></div>
+
+        <div id="explanation-box" class="explanation"></div>
+
+        <div class="nav-controls">
+            <button class="nav-btn" id="prev-btn" onclick="move(-1)">Back</button>
+            <button class="nav-btn" id="next-btn" onclick="move(1)">Next</button>
+        </div>
+    </div>
+
+   
+
+    <script>
+        const data = [
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-9.png", opts: ["L", "N", "P", "Q"], ans: 1, exp: "Logic: Moving clockwise, the letters skip 1 letter in the alphabet: G (h) I (j) K (l) M (n) O. The missing letter is N." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-10.png", opts: ["D", "F", "G", "H"], ans: 2, exp: "Logic: The sum of positions of letters in each column/row follows a pattern. In this case, G fits the alphabetic sequence skip." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-14.png", opts: ["U", "V", "W", "X"], ans: 2, exp: "Logic: The letters are in a sequence with increasing gaps. W completes the logic based on position movement." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-18.png", opts: ["M", "N", "O", "P"], ans: 0, exp: "Logic: The position values of letters at the bottom add up to the top letter's value. M corresponds to 13." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-22.png", opts: ["S", "T", "U", "V"], ans: 1, exp: "Logic: Alphabetical order following a zigzag or circular path. T is the missing link." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-24.png", opts: ["I", "J", "K", "L"], ans: 1, exp: "Logic: Across the segments, letters are moving +3 steps. J is the correct result." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-25.png", opts: ["P", "Q", "R", "S"], ans: 0, exp: "Logic: Opposite segments sum to 27 (Reverse pairs). A=Z, B=Y... P is the missing pair for K." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-30.png", opts: ["K", "L", "M", "N"], ans: 2, exp: "Logic: Vertical sum of letter positions equals the central number. M (13) fits the sequence." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-2-q-1.png", opts: ["A", "B", "C", "D"], ans: 0, exp: "Logic: Start of the sequence in a spiral format. A is the starting point." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-2-q-6.png", opts: ["H", "I", "J", "K"], ans: 1, exp: "Logic: Every alternate letter is chosen. I fits the gap perfectly." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-2-q-11.png", opts: ["T", "U", "V", "W"], ans: 2, exp: "Logic: Sequence moves by skipping two letters. V is the next in line." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-2-q-13.png", opts: ["X", "Y", "Z", "A"], ans: 0, exp: "Logic: High-level skip pattern. X completes the mathematical alphabet grid." }
+        ];
+
+        let idx = 0;
+
+        function render() {
+            const q = data[idx];
+            document.getElementById('q-number').innerText = `Puzzle ${idx + 1}/${data.length}`;
+            document.getElementById('main-img').src = q.img;
+            document.getElementById('explanation-box').style.display = 'none';
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    const all = document.querySelectorAll('.opt-btn');
+                    all.forEach(b => b.disabled = true);
+                    if(i === q.ans) btn.classList.add('correct');
+                    else {
+                        btn.classList.add('wrong');
+                        all[q.ans].classList.add('correct');
+                    }
+                    const box = document.getElementById('explanation-box');
+                    box.innerHTML = `<strong>Logic Explained:</strong> ${q.exp}`;
+                    box.style.display = 'block';
+                };
+                container.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = idx === 0;
+            document.getElementById('next-btn').disabled = idx === data.length - 1;
+        }
+
+        function move(dir) {
+            idx += dir;
+            render();
+        }
+
+        render();
+    </script>
+</body>
+</html>

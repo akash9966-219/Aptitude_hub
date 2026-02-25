@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Logical Deduction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --accent: #8e44ad;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .logic-sidebar {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            height: fit-content;
+            border-top: 5px solid var(--accent);
+        }
+
+        .statement-section {
+            background: #f8f9fa;
+            border-left: 5px solid var(--accent);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .conclusion-section {
+            margin-bottom: 25px;
+        }
+
+        .conclusion-item {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: #fff;
+            border: 1px dashed #ddd;
+            border-radius: 6px;
+        }
+
+        .options-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #e1e4e8;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fdfaff; }
+        .opt-btn.selected { border-color: var(--accent); background: #f5eeff; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        #progress-info { font-size: 0.9rem; color: #636e72; }
+
+        @media (max-width: 800px) {
+            .container { grid-template-columns: 1fr; }
+            .logic-sidebar { order: 2; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="score-text">Question 1 / 51</span>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <div class="statement-section">
+            <div style="font-weight: bold; color: var(--accent); margin-bottom: 10px;">PREMISES:</div>
+            <div id="premises" style="font-size: 1.1rem; line-height: 1.6;"></div>
+        </div>
+
+        <div class="conclusion-section">
+            <div style="font-weight: bold; margin-bottom: 10px;">CONCLUSIONS:</div>
+            <div id="conclusions"></div>
+        </div>
+
+        <div class="options-list" id="options">
+            <button class="opt-btn" onclick="select(0)">Only conclusion I follows</button>
+            <button class="opt-btn" onclick="select(1)">Only conclusion II follows</button>
+            <button class="opt-btn" onclick="select(2)">Either I or II follows</button>
+            <button class="opt-btn" onclick="select(3)">Neither I nor II follows</button>
+            <button class="opt-btn" onclick="select(4)">Both I and II follow</button>
+        </div>
+
+        <div class="controls">
+            <div id="feedback" style="font-weight:bold;"></div>
+            <button class="btn btn-primary" id="checkBtn" onclick="evaluateLogic()">Verify Deduction</button>
+            <button class="btn btn-next" id="nextBtn" onclick="loadNext()">Next Question →</button>
+        </div>
+    </div>
+
+    <div class="logic-sidebar">
+        <h3 style="margin-top:0">Venn Tips</h3>
+        <p style="font-size: 0.9rem;">
+            <strong>All A are B:</strong> Circle A is inside Circle B.<br><br>
+            <strong>Some A are B:</strong> Circle A and B overlap.<br><br>
+            <strong>No A is B:</strong> Circles are separate.<br><br>
+            <em>*A conclusion follows only if it is true in <strong>every</strong> possible Venn diagram.</em>
+        </p>
+    </div>
+</div>
+
+<script>
+const data = [
+    { p: ["No women teacher can play.", "Some women teachers are athletes."], c: ["Male athletes can play.", "Some athletes can play."], ans: 3 },
+    { p: ["All bags are cakes.", "All lamps are cakes."], c: ["Some lamps are bags.", "No lamp is bag."], ans: 2 },
+    { p: ["All mangoes are golden in colour.", "No golden-coloured things are cheap."], c: ["All mangoes are cheap.", "Golden-coloured mangoes are not cheap."], ans: 1 },
+    { p: ["Some kings are queens.", "All queens are beautiful."], c: ["All kings are beautiful.", "All queens are kings."], ans: 3 },
+    { p: ["Some doctors are fools.", "Some fools are rich."], c: ["Some doctors are rich.", "Some rich are doctors."], ans: 3 },
+    { p: ["All roads are waters.", "Some waters are boats."], c: ["Some boats are roads.", "All waters are boats."], ans: 3 },
+    { p: ["No bat is ball.", "No ball is wicket."], c: ["No bat is wicket.", "All wickets are bats."], ans: 3 },
+    { p: ["All flowers are trees.", "No fruit is tree."], c: ["No fruit is flower.", "Some trees are flowers."], ans: 4 },
+    { p: ["Every minister is a student.", "Every student is inexperienced."], c: ["Every minister is inexperienced.", "Some inexperienced are students."], ans: 4 },
+    { p: ["All roads are poles.", "No pole is a house."], c: ["Some roads are houses.", "Some houses are poles."], ans: 3 },
+    { p: ["All fish are tortoise.", "No tortoise is a crocodile."], c: ["No crocodile is a fish.", "No fish is a crocodile."], ans: 4 },
+    { p: ["Some dedicated souls are angels.", "All social workers are angels."], c: ["Some dedicated souls are social workers.", "Some social workers are dedicated souls."], ans: 3 },
+    { p: ["No gentleman is poor.", "All gentlemen are rich."], c: ["No poor man is rich.", "No rich man is poor."], ans: 3 },
+    { p: ["Some swords are sharp.", "All swords are rusty."], c: ["Some rusty things are sharp.", "Some rusty things are not sharp."], ans: 0 },
+    { p: ["All fishes are grey in colour.", "Some fishes are heavy."], c: ["All heavy fishes are grey in colour.", "All light fishes are not grey in colour."], ans: 0 },
+    { p: ["All good athletes win.", "All good athletes eat well."], c: ["All those who eat well are good athletes.", "All those who win eat well."], ans: 3 },
+    { p: ["All film stars are playback singers.", "All film directors are film stars."], c: ["All film directors are playback singers.", "Some film stars are film directors."], ans: 4 },
+    { p: ["All hill stations have a sun-set point.", "X is a hill station."], c: ["X has a sun-set point.", "Places other than hill stations do not have sun-set points."], ans: 0 },
+    { p: ["Some dreams are nights.", "Some nights are days."], c: ["All days are either nights or dreams.", "Some days are nights."], ans: 1 },
+    { p: ["All jungles are tigers.", "Some tigers are horses."], c: ["Some horses are jungles.", "No horse is jungle."], ans: 2 },
+    { p: ["All poles are guns.", "Some boats are not poles."], c: ["All guns are boats.", "Some boats are not guns."], ans: 3 },
+    { p: ["Many scooters are trucks.", "All trucks are trains."], c: ["Some scooters are trains.", "No truck is a scooter."], ans: 0 },
+    { p: ["Some papers are pens.", "Angle is a paper."], c: ["Angle is not a pen.", "Angle is a pen."], ans: 2 },
+    { p: ["All birds are tall.", "Some tall are hens."], c: ["Some birds are hens.", "Some hens are tall."], ans: 1 },
+    { p: ["Some papers are pens.", "Some pencils are pens."], c: ["Some pens are pencils.", "Some pens are papers."], ans: 4 },
+    { p: ["Some men are educated.", "Educated persons prefer small families."], c: ["All small families are educated.", "Some men prefer small families."], ans: 1 },
+    { p: ["All educated people read newspapers.", "Rahul does not read newspaper."], c: ["Rahul is not educated.", "Reading newspaper is not essential to be educated."], ans: 0 },
+    { p: ["All pens are chalks.", "All chairs are chalks."], c: ["Some pens are chairs.", "Some chalks are pens."], ans: 1 },
+    { p: ["Bureaucrats marry only intelligent girls.", "Tanya is very intelligent."], c: ["Tanya will marry a bureaucrat.", "Tanya will not marry a bureaucrat."], ans: 3 },
+    { p: ["Some engineers are fools.", "Anand is an engineer."], c: ["Some fools are engineers.", "Anand is a fool."], ans: 0 },
+    { p: ["All windows are doors.", "No door is wall."], c: ["No window is wall.", "No wall is door."], ans: 4 },
+    { p: ["Most teachers are boys.", "Some boys are students."], c: ["Some students are boys.", "Some teachers are students."], ans: 0 },
+    { p: ["No man is a donkey.", "Rahul is a man."], c: ["Rahul is not a donkey.", "All men are not Rahul."], ans: 0 },
+    { p: ["Some books are pens.", "No pen is pencil."], c: ["Some books are pencils.", "No book is pencil."], ans: 2 },
+    { p: ["All men are married.", "Some men are educated."], c: ["Some married are educated.", "Some educated are married."], ans: 4 },
+    { p: ["All tubes are handles.", "All cups are handles."], c: ["All cups are tubes.", "Some handles are not cups."], ans: 3 },
+    { p: ["No magazine is cap.", "All caps are cameras."], c: ["No camera is magazine.", "Some cameras are magazines."], ans: 2 },
+    { p: ["All huts are mansions.", "All mansions are temples."], c: ["Some temples are huts.", "Some temples are mansions."], ans: 4 },
+    { p: ["Some books are tables.", "Some tables are mirrors."], c: ["Some mirrors are books.", "No book is mirror."], ans: 2 },
+    { p: ["All trucks fly.", "Some scooters fly."], c: ["All trucks are scooters.", "Some scooters do not fly."], ans: 3 },
+    { p: ["Raman is always successful.", "No fool is always successful."], c: ["Raman is a fool.", "Raman is not a fool."], ans: 1 },
+    { p: ["Some desks are caps.", "No cap is red."], c: ["Some caps are desks.", "No desk is red."], ans: 0 },
+    { p: ["Some hens are cows.", "All cows are horses."], c: ["Some horses are hens.", "Some hens are horses."], ans: 4 },
+    { p: ["All water is divine.", "All temples are divine."], c: ["All water is temple.", "All temples are water."], ans: 3 },
+    { p: ["All men are dogs.", "All dogs are cats."], c: ["All men are cats.", "All cats are men."], ans: 0 },
+    { p: ["All young scientists are open-minded.", "No open-minded men are superstitious."], c: ["No scientist is superstitious.", "No young people are superstitious."], ans: 3 },
+    { p: ["Some pastries are toffees.", "All toffees are chocolates."], c: ["Some chocolates are toffees.", "Some toffees are not pastries."], ans: 0 },
+    { p: ["All boys are honest.", "Sachin is honest."], c: ["Sachin is a boy.", "All honest persons are boys."], ans: 3 },
+    { p: ["All pens are roads.", "All roads are houses."], c: ["All houses are pens.", "Some houses are pens."], ans: 1 },
+    { p: ["All artists are smokers.", "Some smokers are drunkards."], c: ["All smokers are artists.", "Some drunkards are not smokers."], ans: 3 },
+    { p: ["All cars are cats.", "All fans are cats."], c: ["All cars are fans", "Some fans are cars."], ans: 3 }
+];
+
+let currentIdx = 0;
+let selectedOpt = null;
+
+function renderQuestion() {
+    const q = data[currentIdx];
+    document.getElementById('score-text').innerText = `Question ${currentIdx + 1} / ${data.length}`;
+    
+    document.getElementById('premises').innerHTML = q.p.map(p => `• ${p}`).join('<br>');
+    document.getElementById('conclusions').innerHTML = q.c.map((c, i) => `<span class="conclusion-item"><strong>${i === 0 ? 'I.' : 'II.'}</strong> ${c}</span>`).join('');
+    
+    document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'wrong');
+        btn.disabled = false;
+    });
+    
+    document.getElementById('checkBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerText = "";
+    selectedOpt = null;
+}
+
+function select(idx) {
+    selectedOpt = idx;
+    document.querySelectorAll('.opt-btn').forEach((btn, i) => {
+        btn.classList.toggle('selected', i === idx);
+    });
+}
+
+function evaluateLogic() {
+    if (selectedOpt === null) return alert("Select a conclusion status!");
+    const correct = data[currentIdx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns[correct].classList.add('correct');
+    if (selectedOpt !== correct) {
+        btns[selectedOpt].classList.add('wrong');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--wrong)'>Logical Fallacy</span>";
+    } else {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--correct)'>Valid Deduction!</span>";
+    }
+    
+    btns.forEach(b => b.disabled = true);
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function loadNext() {
+    if (currentIdx < data.length - 1) {
+        currentIdx++;
+        renderQuestion();
+        window.scrollTo(0,0);
+    } else {
+        alert("Syllogism Training Complete!");
+    }
+}
+
+renderQuestion();
+</script>
+</body>
+</html>

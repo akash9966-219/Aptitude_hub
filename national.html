@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>National Affairs Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #0f172a; --bg: #f1f5f9; --card: #ffffff; --accent: #0284c7; --correct: #16a34a; --wrong: #dc2626; --text: #334155; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 40px; border-radius: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 8px solid var(--accent); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: bold; color: var(--accent); }
+        .q-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; font-weight: 600; color: var(--primary); }
+        .options { display: grid; gap: 12px; }
+        .opt { padding: 15px; border: 1px solid #cbd5e1; border-radius: 8px; background: white; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt:hover:not(:disabled) { background: #f0f9ff; border-color: var(--accent); }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; border-left: 4px solid var(--accent); display: none; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .btn-nav { padding: 12px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. City where the Intl. Conference on Dam Safety 2026 was held?", opts: ["Hyderabad", "Chennai", "Mumbai", "Bengaluru"], ans: 0, exp: "Hyderabad hosted the summit to discuss structural safety and climate resilience for India's 6,000+ dams." },
+    { q: "2. City where President Murmu inaugurated the Ol Chiki script centenary?", opts: ["Bhubaneswar", "New Delhi", "Kolkata", "Ranchi"], ans: 1, exp: "The celebrations were held in New Delhi to honor the 100th year of Pandit Raghunath Murmu's Santhali script." },
+    { q: "3. India's rank in the Henley Passport Index 2026?", opts: ["75th", "71st", "85th", "56th"], ans: 0, exp: "India improved to 75th place, allowing visa-free or visa-on-arrival access to 62 destinations." },
+    { q: "4. Name of the proposed museum converting North and South Blocks?", opts: ["Bharat Heritage", "Yuge Yugeen Bharat", "National Gallery", "Viksit Bharat"], ans: 1, exp: "Yuge Yugeen Bharat National Museum will be the world's largest, covering 5,000 years of Indian history." },
+    { q: "5. India's rank in global R&D spending per WIPO report?", opts: ["5th", "7th", "10th", "3rd"], ans: 2, exp: "India entered the top 10 globally in R&D spending for the first time, reflecting massive innovation growth." },
+    { q: "6. Current doctor-population ratio in India (surpassing WHO norm)?", opts: ["1:811", "1:1000", "1:950", "1:890"], ans: 0, exp: "With 13.8 lakh allopathic doctors and 5.6 lakh AYUSH doctors, India reached a ratio of 1:811." },
+    { q: "7. Mandated duration of the Vande Mataram version at official functions?", opts: ["2m 45s", "3m 10s", "4m 00s", "5m 15s"], ans: 1, exp: "The Ministry of Home Affairs protocol specifies a duration of 3 minutes and 10 seconds for the full version." },
+    { q: "8. City where Delhi Tourism partnered with Bharat Taxi?", opts: ["Mumbai", "Bengaluru", "New Delhi", "Jaipur"], ans: 2, exp: "The MoU was signed in New Delhi to provide safe, tech-enabled taxi services via a cooperative model." },
+    { q: "9. India's rank in LEED-certified real estate space outside the US?", opts: ["First", "Third", "Fourth", "Second"], ans: 3, exp: "India consistently ranks second globally, after China, for LEED-certified sustainable green buildings." },
+    { q: "10. First Indian port to deploy an advanced anti-drone system?", opts: ["VOC Port", "Chennai Port", "Cochin Port", "Visakhapatnam Port"], ans: 0, exp: "V.O. Chidambaranar Port (Tuticorin) became the first to deploy this tech for coastal infrastructure security." },
+    { q: "11. Year target for NITI Aayog's draft blueprint for Andhra clean energy hub?", opts: ["2035", "2030", "2040", "2028"], ans: 1, exp: "The plan aims to transform AP into a clean energy and green hydrogen powerhouse by 2030." },
+    { q: "12. Authority that launched a digital portal for medicinal plant Certificates of Origin?", opts: ["AYUSH", "National Biodiversity Authority", "Biotechnology Dept", "Medicinal Plants Board"], ans: 1, exp: "The NBA launched the portal to streamline the export of cultivated medicinal plants." },
+    { q: "13. Joint host of The Cities of Care Conference 2026 in Chennai?", opts: ["IISc", "JNU", "Delhi University", "IIT Madras"], ans: 3, exp: "IIT Madras Research Park hosted the event to focus on urban climate action and sustainable development." },
+    { q: "14. City that hosted Wings India 2026 (Jan 28-31)?", opts: ["New Delhi", "Mumbai", "Hyderabad", "Bengaluru"], ans: 2, exp: "Begumpet Airport in Hyderabad hosted Asia's largest civil aviation show." },
+    { q: "15. First airport operator to deploy hydrogen-powered passenger buses?", opts: ["Cochin Intl Airport", "AAI", "GMR Airports", "Adani Airports"], ans: 0, exp: "CIAL (Kochi) partnered with the Kerala Hydrogen Valley initiative to launch these zero-emission buses." },
+    { q: "16. State that launched Mukhyamantri Gramotthan Yojana?", opts: ["Maharashtra", "Gujarat", "Rajasthan", "Madhya Pradesh"], ans: 0, exp: "Maharashtra launched the scheme to provide urban-style amenities like sewage systems and solar lights to villages." },
+    { q: "17. Location of the newly inaugurated CSIR-NIO Shore-Based Laboratory?", opts: ["Chennai", "Kochi", "Visakhapatnam", "Paradip"], ans: 2, exp: "The lab was inaugurated in Visakhapatnam to strengthen India's Blue Economy and ocean research." },
+    { q: "18. City of the first Dr. Babasaheb Ambedkar Advocate Training Centre?", opts: ["Pune", "Nagpur", "Mumbai", "Navi Mumbai"], ans: 3, exp: "The research and training facility for legal professionals was inaugurated in Navi Mumbai." },
+    { q: "19. Which NCW Foundation Day was observed on Jan 31, 2026?", opts: ["32nd", "33rd", "34th", "35th"], ans: 2, exp: "The National Commission for Women observed its 34th Foundation Day with a focus on women-led development." },
+    { q: "20. Signed an SoI with NIIT Foundation for Aspirational Blocks digital literacy?", opts: ["Skill Ministry", "NITI Aayog", "NIC", "Digital India Corp"], ans: 1, exp: "NITI Aayog partnered with NIIT to scale digital skills in India's most underserved blocks." },
+    { q: "21. First operator with seamless mobile connectivity across Vidyasagar Setu?", opts: ["Reliance Jio", "Vodafone Idea", "Bharti Airtel", "BSNL"], ans: 2, exp: "Airtel deployed dedicated fiber and antenna sites to ensure zero-drop zones on the iconic bridge." },
+    { q: "22. India's rank in the Responsible Nations Index?", opts: ["14th", "16th", "18th", "20th"], ans: 2, exp: "India was ranked 18th, reflecting improvements in governance, social welfare, and climate commitments." },
+    { q: "23. City of India's first immersive fertility knowledge centre (Aksigen)?", opts: ["Delhi", "Mumbai", "Bengaluru", "Chennai"], ans: 1, exp: "The Bharat Daftary Knowledge Centre was launched in Mumbai to demystify IVF technology." },
+    { q: "24. City for APEDA Organic Conclave-cum-Buyer Seller Meet?", opts: ["Guwahati", "Dibrugarh", "Silchar", "Jorhat"], ans: 0, exp: "Guwahati hosted the meet to boost Assam's organic agricultural exports." },
+    { q: "25. Implementing One Station One Product (OSOP) scheme across India?", opts: ["MSME Ministry", "Culture Ministry", "KVIC", "Indian Railways"], ans: 3, exp: "Indian Railways uses OSOP to turn stations into promotional hubs for local regional crafts." },
+    { q: "26. Startup that launched the world's first Digital Life Vault at TiECon?", opts: ["Bengaluru", "Hyderabad", "Mangaluru", "Kochi"], ans: 2, exp: "The Mangaluru-based startup 'Soult' launched the vault for legacy and document management." },
+    { q: "27. Conducted skill drive training for 1.9 lakh people under national mission?", opts: ["NITI Aayog", "ICMR", "CSIR", "NSDC"], ans: 2, exp: "The CSIR Integrated Skill Initiative reached this milestone across its 37 labs in early 2026." },
+    { q: "28. Synthetic cow breed (HF x Tharparkar) developed in India?", opts: ["Karan Fries", "Gir", "Sahiwal", "Red Sindhi"], ans: 0, exp: "Karan Fries is a high-yielding breed developed by NDRI, Karnal, specifically for Indian conditions." },
+    { q: "29. City hosting the 9th International Spice Conference (Feb 2026)?", opts: ["Kochi", "Chennai", "Bengaluru", "Mumbai"], ans: 0, exp: "Kochi, the spice capital, hosted the event with the theme 'Spice 360 – Getting Future Ready'." },
+    { q: "30. Rajasthan's first fully organic village panchayat?", opts: ["Khuri", "Bamanwas Kankar", "Mandawa", "Barmer"], ans: 1, exp: "Bamanwas Kankar was recognized as India’s first organic panchayat for chemical-free farming." },
+    { q: "31. Optional health insurance for CGHS beneficiaries?", opts: ["Ayushman Bharat", "CGHS Health Plus", "Paripoorna Mediclaim Ayush Bima", "New India Cover"], ans: 2, exp: "The scheme allows CGHS users to opt for additional AYUSH-focused medical coverage." },
+    { q: "32. Highway where NHAI set 4 Guinness Records for bituminous paving?", opts: ["NH-544G", "NH-48", "NH-16", "NH-44"], ans: 0, exp: "NH-544G (Bengaluru-Vijayawada) saw record-breaking speed and volume in bituminous paving." },
+    { q: "33. Company that launched a 'people-first' AI platform for local languages?", opts: ["Jio", "Tata Group", "Infosys", "Wipro"], ans: 0, exp: "Reliance Jio launched the platform to democratize AI across 22 Indian languages on personal devices." },
+    { q: "34. Akasa Air joined IATA as India's which numbered airline?", opts: ["Third", "Fourth", "Fifth", "Sixth"], ans: 2, exp: "Akasa Air became the 5th Indian airline to join the global body, joining AI, AI Express, IndiGo, and SpiceJet." },
+    { q: "35. Number of states that signed MoUs under Tex-RAMPS initiative?", opts: ["15", "10", "20", "25"], ans: 1, exp: "10 states joined the Ministry of Textiles' scheme to boost MSME performance in the textile sector." },
+    { q: "36. City that declared waterborne disease outbreak an epidemic (Bhagirathpura)?", opts: ["Bhopal", "Jabalpur", "Gwalior", "Indore"], ans: 3, exp: "Indore health authorities declared the epidemic in the Bhagirathpura area after a spike in cases." },
+    { q: "37. PSU supporting Eklavya Schools via NSTFDC MoU?", opts: ["Indian Oil", "ONGC", "NTPC", "Coal India Limited"], ans: 3, exp: "CIL committed CSR funds for digital labs and infra in 76 tribal residential schools." },
+    { q: "38. Easternmost village that hosted 'Alo Prabhat' first sunrise 2026?", opts: ["Dong", "Kibithoo", "Tawang", "Walong"], ans: 0, exp: "Dong village in Arunachal's Anjaw district celebrated being the first inhabited place to see the sun." },
+    { q: "39. City on track to become India's slum-free city?", opts: ["Surat", "Bhubaneswar", "Ahmedabad", "Pune"], ans: 0, exp: "Surat's 'zero slum' policy and massive redevelopment have made it a model for urban rehabilitation." },
+    { q: "40. City with mandatory QR codes on road signages for complaints?", opts: ["Mumbai", "Bengaluru", "Hyderabad", "New Delhi"], ans: 1, exp: "Bengaluru (BBMP) implemented QR codes so citizens can track maintenance and report issues instantly." },
+    { q: "41. River of the Dulhasti Stage-II Hydel Project?", opts: ["Ravi", "Chenab", "Jhelum", "Beas"], ans: 1, exp: "The 260 MW project is located on the Chenab river in Jammu & Kashmir's Kishtwar district." },
+    { q: "42. City where 'Operation Milap' traced 1,300 missing persons?", opts: ["New Delhi", "Mumbai", "Kolkata", "Chennai"], ans: 0, exp: "Delhi Police's South-West District successfully reunited over 1,300 missing individuals with families." },
+    { q: "43. Implementation date of Health and National Security Cess on tobacco?", opts: ["Jan 1", "Mar 1", "Apr 1", "Feb 1"], ans: 3, exp: "The new cess replaced the GST compensation cess on tobacco products effective February 1, 2026." },
+    { q: "44. GIS-based digital platform for land and property data?", opts: ["Bhoomi", "National Records", "Land Stack", "Revenue Hub"], ans: 2, exp: "Land Stack was launched to integrate land data with modern GIS for a single-window experience." },
+    { q: "45. Provider that launched nationwide VoWiFi (Wi-Fi Calling) in 2026?", opts: ["Airtel", "BSNL", "Jio", "Vodafone Idea"], ans: 1, exp: "BSNL rolled out VoWiFi across all circles on New Year 2026 to improve indoor coverage." },
+    { q: "46. Model for Nashik–Solapur–Akkalkot greenfield corridor?", opts: ["EPC", "TOT", "BOT", "HAM"], ans: 3, exp: "The Hybrid Annuity Model (HAM) is being used to develop this 6-lane economic corridor." },
+    { q: "47. City where the Indian AI Research Organization (IAIRO) is established?", opts: ["Ahmedabad", "Surat", "Vadodara", "Gandhinagar"], ans: 3, exp: "Gandhinagar (Gujarat) was chosen as the headquarters for the newly formed IAIRO." },
+    { q: "48. Institution developing the AI-based Grievance System (IGMS) for Delhi?", opts: ["IIT Kanpur", "IIT Delhi", "IIT Bombay", "IIT Madras"], ans: 1, exp: "IIT Delhi partnered with the Delhi govt to automate and track public grievance resolution." },
+    { q: "49. REPM scheme primary aim for self-reliance?", opts: ["Import Minerals", "Sintered Magnets", "Coal Power", "Agri Equipment"], ans: 1, exp: "The scheme promotes domestic manufacturing of Sintered Rare Earth Permanent Magnets used in EVs." },
+    { q: "50. Company backing the startup that built India's first indigenous MRI?", opts: ["Zoho", "Infosys", "TCS", "Wipro"], ans: 0, exp: "Zoho-backed Voxelgrid developed the 1.5 Tesla indigenous MRI scanner to reduce healthcare costs." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `Question ${idx + 1} of 50`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            const all = document.querySelectorAll('.opt'); all.forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); all[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

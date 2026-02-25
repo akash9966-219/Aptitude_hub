@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Rule Detection Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --bg: #fdfcf0;
+            --card: #ffffff;
+            --accent: #ca8a04;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #1e293b;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--accent); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .instruction { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .rule-text { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 25px; padding: 10px; background: #fefce8; border-radius: 8px; }
+
+        .q-image-box { 
+            background: #ffffff; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 30px;
+            display: inline-block;
+            border: 1px solid #eab308;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .q-image { max-width: 100%; height: auto; mix-blend-mode: multiply; }
+
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            margin-top: 20px;
+        }
+
+        .opt-btn { 
+            padding: 15px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            background: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .explanation { 
+            margin-top: 25px; 
+            padding: 20px; 
+            background: #fefce8; 
+            border-radius: 10px; 
+            border-left: 5px solid var(--accent);
+            display: none;
+            text-align: left;
+        }
+
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .btn { 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            border: none; 
+            background: var(--primary); 
+            color: white; 
+            cursor: pointer; 
+            font-weight: 600;
+            flex: 1;
+        }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="figures.html" class="back-link">← Back to Figure Portal</a>
+
+    <div class="quiz-card">
+        <div class="instruction">Rule Detection Q<span id="q-num">1</span> of 11</div>
+        <div class="rule-text" id="rule-display">Rule: Loading...</div>
+        
+        <div class="q-image-box">
+            <img id="q-img" src="" alt="Rule Detection" class="q-image">
+        </div>
+
+        <div class="options-grid" id="options">
+            <button class="opt-btn" onclick="check(1)">1</button>
+            <button class="opt-btn" onclick="check(2)">2</button>
+            <button class="opt-btn" onclick="check(3)">3</button>
+            <button class="opt-btn" onclick="check(4)">4</button>
+        </div>
+
+        <div id="exp-box" class="explanation">
+            <strong>Analysis Tip:</strong>
+            Observe each series (1, 2, 3, 4) from left to right. Only one series will strictly follow the logic mentioned in the rule across every single step.
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prev" onclick="change(-1)">Previous</button>
+            <button class="btn" id="next" onclick="change(1)">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { rule: "Closed figures losing their sides and open figures gaining their sides.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/3.png", ans: 2 },
+    { rule: "Any figure can be traced by a single unbroken line without retracting.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/4.png", ans: 3 },
+    { rule: "Closed figures gradually become open and open figures gradually become closed.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/12.png", ans: 2 },
+    { rule: "Closed figures become more and more open and open figures become more and more closed.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/7.png", ans: 1 },
+    { rule: "The series becomes complex as it proceeds.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/5.png", ans: 4 },
+    { rule: "Closed figures become more and more open and open figures become more and more closed.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/10.png", ans: 2 },
+    { rule: "Closed figures become more and more open and open figures become more and more closed.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/2.png", ans: 3 },
+    { rule: "The series becomes simpler as it proceeds.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/11.png", ans: 1 },
+    { rule: "As the circle decreases in size, its sectors increase in number.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/6.png", ans: 2 },
+    { rule: "The series becomes complex as it proceeds.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/9.png", ans: 1 },
+    { rule: "Closed figures become more and more open and open figures become more and more closed.", src: "https://www.indiabix.com/_files/images/non-verbal-reasoning/rule-detection/8.png", ans: 3 }
+];
+
+let current = 0;
+
+function load() {
+    const q = questions[current];
+    document.getElementById('q-num').innerText = current + 1;
+    document.getElementById('rule-display').innerText = `Rule: ${q.rule}`;
+    document.getElementById('q-img').src = q.src;
+    document.getElementById('exp-box').style.display = 'none';
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => {
+        b.className = 'opt-btn';
+        b.disabled = false;
+    });
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next').disabled = current === questions.length - 1;
+}
+
+function check(choice) {
+    const correct = questions[current].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach((b, i) => {
+        b.disabled = true;
+        if (i + 1 === correct) b.classList.add('correct');
+        else if (i + 1 === choice) b.classList.add('wrong');
+    });
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function change(n) {
+    current += n;
+    load();
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>State-Wise Current Affairs 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e3a8a; --bg: #f8fafc; --card: #ffffff; --accent: #3b82f6; --correct: #10b981; --wrong: #ef4444; --text: #1e293b; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: 700; color: var(--accent); }
+        .q-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 30px; font-weight: 600; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        .opt { padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt:hover:not(:disabled) { border-color: var(--accent); background: #eff6ff; }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 20px; background: #f0f9ff; border-radius: 12px; border-left: 4px solid var(--accent); display: none; }
+        .nav { display: flex; justify-content: space-between; margin-top: 35px; gap: 10px; }
+        .btn-nav { padding: 12px 24px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which state is home to the 1,750 MW Demwe Lower hydel project with an extension till 2037?", opts: ["Sikkim", "Arunachal Pradesh", "Himachal Pradesh", "Uttarakhand"], ans: 1, exp: "Arunachal Pradesh's project on the Lohit river received the extension due to litigation 'zero period' rules." },
+    { q: "2. Which state launched the CBDC-based Digital Food Coupon Pilot?", opts: ["Gujarat", "Maharashtra", "Rajasthan", "Karnataka"], ans: 0, exp: "Launched in Gujarat (Ahmedabad, Surat) to modernize PDS using digital rupee." },
+    { q: "3. Where was the Kumar Bhaskar Varma Setu inaugurated over the Brahmaputra?", opts: ["West Bengal", "Assam", "Tripura", "Manipur"], ans: 1, exp: "This bridge is a massive connectivity booster in Assam." },
+    { q: "4. Which state signed a Letter of Intent with Starlink (SpaceX)?", opts: ["Maharashtra", "Rajasthan", "Gujarat", "Madhya Pradesh"], ans: 1, exp: "Rajasthan aims to provide satellite internet in remote and tribal areas." },
+    { q: "5. Which state hosted the 18th Foundation Day of NSSTA?", opts: ["Maharashtra", "Gujarat", "Uttar Pradesh", "Rajasthan"], ans: 2, exp: "The National Statistical Systems Training Academy is located in Greater Noida, UP." },
+    { q: "6. Which state launched 'Sthree Suraksha' (₹1,000 monthly pension)?", opts: ["Tamil Nadu", "Kerala", "Karnataka", "Telangana"], ans: 3, exp: "Telangana launched this for over 10 lakh women and transwomen." },
+    { q: "7. Which state introduced AI facial recognition for MLA attendance?", opts: ["Telangana", "Karnataka", "Andhra Pradesh", "Tamil Nadu"], ans: 2, exp: "Andhra Pradesh implemented this to modernize assembly records." },
+    { q: "8. Which state police launched Phase 2 of 'Operation Prahar'?", opts: ["Haryana", "Rajasthan", "Punjab", "Uttar Pradesh"], ans: 0, exp: "Haryana Police targeted gangsters and wanted criminals under this operation." },
+    { q: "9. New dragonfly species 'Lyriothemis keralensis' discovered in?", opts: ["Kerala", "Tamil Nadu", "Karnataka", "Andhra Pradesh"], ans: 0, exp: "Named after the state of Kerala where it was found." },
+    { q: "10. National e-Vidhan Application (NeVA) launched in which assembly?", opts: ["Uttar Pradesh", "Rajasthan", "Madhya Pradesh", "Bihar"], ans: 1, exp: "Rajasthan's assembly went digital with the NeVA launch." },
+    { q: "11. Which state's Pharmacy Council signed an MoU with IPC for drug safety?", opts: ["Maharashtra", "Kerala", "Goa", "Gujarat"], ans: 1, exp: "Kerala partnered with the Indian Pharmacopoeia Commission." },
+    { q: "12. Nationwide pulses revolution launched from which state?", opts: ["Uttar Pradesh", "Rajasthan", "Madhya Pradesh", "Maharashtra"], ans: 2, exp: "Launched from MP under the Self-Reliance in Pulses Mission." },
+    { q: "13. ₹50 crore heritage grant for Koch dynasty Darrang kings legacy in?", opts: ["West Bengal", "Assam", "Tripura", "Meghalaya"], ans: 1, exp: "Assam approved this to preserve royal heritage." },
+    { q: "14. Amaravati Quantum Valley project launched by?", opts: ["Telangana", "Andhra Pradesh", "Tamil Nadu", "Karnataka"], ans: 1, exp: "Andhra Pradesh aims to be a global hub for quantum research." },
+    { q: "15. Largest wool producer in India in 2026?", opts: ["J&K", "Karnataka", "Rajasthan", "Telangana"], ans: 2, exp: "Rajasthan contributes nearly half of India's total wool output." },
+    { q: "16. 14 new 1.5 Tesla MRI machines inaugurated in?", opts: ["Maharashtra", "Rajasthan", "Gujarat", "Madhya Pradesh"], ans: 2, exp: "Gujarat CM inaugurated these to boost healthcare infrastructure." },
+    { q: "17. SJVN's 70 MW Dhubri Solar Power Project in?", opts: ["West Bengal", "Assam", "Odisha", "Bihar"], ans: 1, exp: "Located in the Dhubri district of Assam." },
+    { q: "18. Approved paper ballots for Panchayat elections 2026?", opts: ["Kerala", "Karnataka", "Tamil Nadu", "Andhra Pradesh"], ans: 3, exp: "Andhra Pradesh made this switch to strengthen public trust." },
+    { q: "19. Which state introduced automatic property mutation?", opts: ["Karnataka", "Maharashtra", "Tamil Nadu", "Telangana"], ans: 3, exp: "Telangana automated land transactions to speed up the process." },
+    { q: "20. Frontier Nagaland Territorial Authority (FNTA) located in?", opts: ["Assam", "Manipur", "Arunachal Pradesh", "Nagaland"], ans: 3, exp: "An autonomous arrangement for eastern districts of Nagaland." },
+    { q: "21. First indigenous Green Urea plant (Pudimadaka)?", opts: ["Gujarat", "Rajasthan", "Tamil Nadu", "Andhra Pradesh"], ans: 3, exp: "Setting up at the Green Hydrogen Hub in Andhra Pradesh." },
+    { q: "22. First live National UAV Test and Innovation Corridor?", opts: ["Odisha", "Karnataka", "Maharashtra", "Telangana"], ans: 3, exp: "Telangana is pioneering this drone testing infrastructure." },
+    { q: "23. 16.5% of India's total renewable energy capacity (Rank 1)?", opts: ["Rajasthan", "Gujarat", "Tamil Nadu", "Karnataka"], ans: 0, exp: "Rajasthan leads India in renewable capacity as of late 2025." },
+    { q: "24. Launched 'Pilloo AI' for business billing?", opts: ["Andhra", "Telangana", "Karnataka", "Tamil Nadu"], ans: 1, exp: "Telangana-based startup innovation for local businesses." },
+    { q: "25. Digitisation of old manual birth/death records in?", opts: ["Manipur", "Nagaland", "Mizoram", "Arunachal Pradesh"], ans: 1, exp: "Nagaland modernized its civil registration system." },
+    { q: "26. Guinness World Record: 5,555 e-cycles to women in 24hrs?", opts: ["Andhra", "Telangana", "Karnataka", "Tamil Nadu"], ans: 0, exp: "Andhra Pradesh achieved this feat for women's mobility." },
+    { q: "27. Chhari-Dhand Ramsar site located in?", opts: ["UP", "Rajasthan", "Gujarat", "MP"], ans: 2, exp: "Located in the Kutch region of Gujarat." },
+    { q: "28. ₹1,715cr projects + new Legislative Assembly foundation in?", opts: ["West Bengal", "Assam", "Arunachal", "Meghalaya"], ans: 2, exp: "Arunachal Pradesh launched these mega infrastructure projects." },
+    { q: "29. Host of India Energy Week (IEW) 2026?", opts: ["Gujarat", "Goa", "Maharashtra", "Kerala"], ans: 1, exp: "Goa hosted the international energy summit." },
+    { q: "30. 'Mukhya Mantrir Eti Koli Duti Paat' for tea workers in?", opts: ["West Bengal", "Assam", "Tripura", "Arunachal"], ans: 1, exp: "Assam launched this for the welfare of tea garden laborers." },
+    { q: "31. Living root bridges nominated for UNESCO evaluation?", opts: ["Assam", "Sikkim", "Nagaland", "Meghalaya"], ans: 3, exp: "Meghalaya's Jingkieng Jri are up for World Heritage status." },
+    { q: "32. Namo Laxmi Scheme (₹1,250cr for 12 lakh girls) in?", opts: ["Rajasthan", "MP", "Gujarat", "Maharashtra"], ans: 2, exp: "Gujarat's initiative to support schoolgirls' education." },
+    { q: "33. BNHS MoU for vulture breeding in?", opts: ["Odisha", "Jharkhand", "Chhattisgarh", "West Bengal"], ans: 1, exp: "Jharkhand partnered to save critically endangered vultures." },
+    { q: "34. Cine Startup Incubator at T-Hub launched in?", opts: ["Andhra", "Telangana", "Karnataka", "Maharashtra"], ans: 1, exp: "Telangana's move to boost the film-tech industry." },
+    { q: "35. India’s first government-run menopause clinics?", opts: ["Kerala", "Tamil Nadu", "Maharashtra", "Gujarat"], ans: 0, exp: "Kerala launched these to address specialized women's health." },
+    { q: "36. Operation Sahyadri Checkmate (poultry drug lab bust) in?", opts: ["Gujarat", "MP", "Maharashtra", "Rajasthan"], ans: 2, exp: "Maharashtra police busted a massive mephedrone lab." },
+    { q: "37. Bacillus subtilis declared State Microbe in?", opts: ["Tamil Nadu", "Karnataka", "Kerala", "Maharashtra"], ans: 2, exp: "Kerala is the first state to designate a state microbe." },
+    { q: "38. President’s Police Colour Award 15th recipient?", opts: ["Assam", "Sikkim", "Arunachal", "Meghalaya"], ans: 0, exp: "Assam Police received this high honor for service." },
+    { q: "39. Matabari Tourism Circuit (₹450cr) to be developed in?", opts: ["Assam", "Meghalaya", "Tripura", "Manipur"], ans: 2, exp: "Tripura's major religious tourism push." },
+    { q: "40. First Dog Sanctuary in Ludhiana (pilot project) in?", opts: ["Haryana", "Rajasthan", "Himachal", "Punjab"], ans: 3, exp: "Punjab's strategy to handle the stray dog menace." },
+    { q: "41. ₹25,000 monthly support for research scholars in?", opts: ["Kerala", "Karnataka", "Assam", "Odisha"], ans: 2, exp: "Assam launched the Atal Vichal Agragami scheme." },
+    { q: "42. New spaceport at Hope Island (Private missions)?", opts: ["Tamil Nadu", "Kerala", "Odisha", "Andhra Pradesh"], ans: 3, exp: "Andhra Pradesh's second site for rocket launches." },
+    { q: "43. Partnered with UAE for 'Bharat Future City'?", opts: ["Andhra", "Maharashtra", "Karnataka", "Telangana"], ans: 3, exp: "Telangana's global urban collaboration hub." },
+    { q: "44. First integrated private satellite manufacturing in Sanand?", opts: ["Maharashtra", "Karnataka", "Tamil Nadu", "Gujarat"], ans: 3, exp: "Gujarat is becoming a hub for private aerospace." },
+    { q: "45. Mukhya Mantri Sehat Yojana (₹10 lakh free medical)?", opts: ["Punjab", "Haryana", "Rajasthan", "UP"], ans: 0, exp: "Punjab's healthcare coverage scheme for families." },
+    { q: "46. Fujiyama 1 GW solar cell plant commissioned in?", opts: ["Rajasthan", "Gujarat", "UP", "MP"], ans: 2, exp: "Located in Uttar Pradesh to boost solar production." },
+    { q: "47. 'Operation Prahar' (Gangster network) launched in?", opts: ["Haryana", "Rajasthan", "UP", "Punjab"], ans: 0, exp: "Haryana's crackdown on organized crime." },
+    { q: "48. Early Childhood Care MoU signed between?", opts: ["Odisha/Assam", "Odisha/Meghalaya", "Meghalaya/Manipur", "Odisha/Jharkhand"], ans: 1, exp: "Odisha and Meghalaya collaborated for child development." },
+    { q: "49. ChemVolt Global 5 GWh Gigafactory MoU signed with?", opts: ["Andhra", "Tamil Nadu", "Gujarat", "Maharashtra"], ans: 0, exp: "Andhra Pradesh secured this lithium-ion investment." },
+    { q: "50. Largest 34 MW solar captive open access project in?", opts: ["Rajasthan", "Punjab", "Gujarat", "Haryana"], ans: 3, exp: "Commissioned in Haryana for industrial energy." },
+    { q: "51. Bembla River Irrigation Project (₹4,775cr) approved in?", opts: ["Gujarat", "Karnataka", "Andhra", "Maharashtra"], ans: 3, exp: "Maharashtra's major irrigation expansion project." },
+    { q: "52. Maruti Suzuki ₹35,000cr plant (10 lakh capacity) in?", opts: ["Maharashtra", "Karnataka", "Gujarat", "Tamil Nadu"], ans: 2, exp: "Gujarat's massive automotive expansion at Kharkhoda." },
+    { q: "53. Project Dolphin (2nd survey) began in which state?", opts: ["Bihar", "UP", "West Bengal", "Odisha"], ans: 1, exp: "UP's riverine survey for dolphin conservation." },
+    { q: "54. Two new MSME Technology Centres approved in?", opts: ["Himachal", "Uttarakhand", "J&K", "Sikkim"], ans: 2, exp: "Approved for J&K to foster industrial growth." },
+    { q: "55. 'Aame Padhiba Aama Bhasare' (Mother tongue edu) in?", opts: ["Chhattisgarh", "Jharkhand", "Odisha", "Assam"], ans: 2, exp: "Odisha's initiative for primary education in tribal languages." },
+    { q: "56. Resumed sand mining after PESA Rules 2025?", opts: ["Chhattisgarh", "Jharkhand", "Odisha", "MP"], ans: 3, exp: "Madhya Pradesh implemented new rules for mining." },
+    { q: "57. ₹830cr multimodal infrastructure projects in?", opts: ["Odisha", "West Bengal", "Bihar", "Jharkhand"], ans: 3, exp: "Jharkhand's connectivity boost launched by the PM." },
+    { q: "58. MoU with Digital India BHASHINI for AI tools?", opts: ["Karnataka", "MP", "Gujarat", "Rajasthan"], ans: 3, exp: "Rajasthan integrated multilingual AI in its platforms." },
+    { q: "59. World’s largest green ammonia project ($10B) in?", opts: ["Gujarat", "Maharashtra", "Tamil Nadu", "Andhra"], ans: 3, exp: "Andhra Pradesh's green energy milestone." },
+    { q: "60. Led in personal electric vehicle adoption in 2025?", opts: ["Kerala", "Karnataka", "Maharashtra", "Tamil Nadu"], ans: 0, exp: "Kerala has the highest EV uptake among the middle class." },
+    { q: "61. Country’s first full-stack Sovereign AI Park in?", opts: ["Tamil Nadu", "Karnataka", "Maharashtra", "Gujarat"], ans: 1, exp: "Karnataka's ₹10,000cr tech investment." },
+    { q: "62. Regional AI Impact Conference 2026 host?", opts: ["Karnataka", "Maharashtra", "Tamil Nadu", "MP"], ans: 1, exp: "Maharashtra hosted this to set up AI labs." },
+    { q: "63. First to receive XV Finance Commission grants for 25-26?", opts: ["Meghalaya", "Sikkim", "Arunachal", "Nagaland"], ans: 2, exp: "Arunachal Pradesh was the first recipient." },
+    { q: "64. Gruha Lakshmi Digital Marketing portal for women in?", opts: ["Karnataka", "Tamil Nadu", "Maharashtra", "Gujarat"], ans: 0, exp: "Karnataka's portal for women entrepreneurs." },
+    { q: "65. Similipal National Park (Crocodile rise) in?", opts: ["Odisha", "West Bengal", "Andhra", "Chhattisgarh"], ans: 0, exp: "Odisha's park saw a significant population growth." },
+    { q: "66. First chronic kidney disease (CKD) patient registry in?", opts: ["Kerala", "Odisha", "Maharashtra", "Karnataka"], ans: 3, exp: "Karnataka's health database initiative." },
+    { q: "67. Topped NITI Aayog Export Preparedness Index 2024?", opts: ["MH/TN", "GJ/AP", "UP/KA", "KL/PB"], ans: 0, exp: "Maharashtra and Tamil Nadu remained the export leaders." },
+    { q: "68. Foundation of BSL-4 Biocontainment Facility in?", opts: ["Maharashtra", "Karnataka", "Gujarat", "Telangana"], ans: 2, exp: "Gujarat's new high-security lab in Gandhinagar." },
+    { q: "69. ERONET system for NRI voter verification launched in?", opts: ["Tamil Nadu", "Karnataka", "Andhra", "Kerala"], ans: 3, exp: "Kerala's digital leap for overseas voters." },
+    { q: "70. First woman Chief Justice Revati Mohite Dere in?", opts: ["Meghalaya", "Kerala", "Maharashtra", "Assam"], ans: 2, exp: "Appointed to lead the Bombay High Court (Maharashtra)." },
+    { q: "71. Kamala Hydroelectric Project located in?", opts: ["Himachal", "Arunachal", "Uttarakhand", "Sikkim"], ans: 1, exp: "Arunachal's latest approved power project." },
+    { q: "72. Largest integrated inland Rainbow Trout farm in?", opts: ["Andhra", "Telangana", "Karnataka", "Maharashtra"], ans: 0, exp: "Andhra Pradesh's aquaculture milestone." },
+    { q: "73. ICGS Samudra Pratap Pollution Control Vessel commissioned in?", opts: ["Maharashtra", "Kerala", "Tamil Nadu", "Goa"], ans: 3, exp: "Commissioned in Goa to protect the coastline." },
+    { q: "74. Top rank in Inter-Operable Criminal Justice System (ICJS)?", opts: ["Haryana", "Assam", "Uttarakhand", "Uttar Pradesh"], ans: 3, exp: "UP leads in digital policing integration." },
+    { q: "75. Wildlife exchange pact (Assam + ?) for tigers?", opts: ["MP", "Maharashtra", "Rajasthan", "UP"], ans: 0, exp: "Madhya Pradesh and Assam signed this biodiversity pact." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `ID: ST_${idx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

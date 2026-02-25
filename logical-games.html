@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytical Reasoning - Logical Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+            --panel: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .nav-bar {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .rules-panel {
+            flex: 1;
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            border-top: 5px solid var(--accent);
+        }
+
+        .quiz-panel {
+            flex: 1.2;
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .passage-content {
+            line-height: 1.6;
+            color: #444;
+            white-space: pre-wrap;
+        }
+
+        .question-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .opt-btn {
+            padding: 12px 18px;
+            border: 2px solid #edf2f7;
+            background: #f8fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fff; }
+        .opt-btn.selected { border-color: var(--accent); background: #fff7ed; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        .badge {
+            background: #eee;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <div style="font-weight: bold; font-size: 1.1rem;">Analytical Reasoning: Complex Games</div>
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+</div>
+
+<div class="main-layout">
+    <div class="rules-panel">
+        <span class="badge" id="game-title">Game Context</span>
+        <div id="passage-text" class="passage-content" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="quiz-panel">
+        <div id="progress" style="margin-bottom: 10px; color: #7f8c8d; font-size: 0.85rem;"></div>
+        <div id="question-text" class="question-header"></div>
+        <div id="options-box" class="options-container"></div>
+        
+        <div class="controls">
+            <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">Submit Selection</button>
+            <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const games = [
+    {
+        title: "Island Budget Allocation ($7M)",
+        passage: "Budget Requests (Minimum needed):\n• Hurricane: 2.5M | Harbor: 1M\n• Music: 0.5M | Senate Remodel: 1.5M\n• Agriculture: 2M | National Radio: 0.5M\n• Small Business: 3M | Airport: 4M\n\n*No provision for surplus; each program must be funded fully or not at all.",
+        questions: [
+            { q: "Senators fund the International Airport (4M) and Agricultural subsidies (2M). Which could they spend the rest on?", opts: ["School music program and national radio", "Hurricane preparedness", "Harbor improvements and the school music program", "Small business loan program", "National radio and senate office building remodeling"], ans: 0 },
+            { q: "If they fund Agriculture (2M), Radio (0.5M), and Small Business Loans (3M), what two other programs fit in the remaining 1.5M?", opts: ["Harbor and Airport", "Harbor and Music", "Hurricane and Music", "Hurricane and Airport", "Harbor and Hurricane"], ans: 1 },
+            { q: "If Agriculture, Radio, and Small Business are funded, what is the only other SINGLE program that fits the 1.5M remaining budget?", opts: ["Hurricane", "Harbor", "Music", "Senate Remodeling", "Airport"], ans: 3 }
+        ]
+    },
+    {
+        title: "Executive Parking Arrangement",
+        passage: "Spaces: CEO - Pres - VP - Sec - Treas (in that order)\n\n• First space car: Red\n• Blue car is between Red and Green\n• Last space car: Purple (owned by David)\n• Secretary: Yellow car\n• Enid: Green car\n• Alice's car: Next to David's\n• Bert's car: Between Cheryl's and Enid's",
+        questions: [
+            { q: "Who is the secretary?", opts: ["Enid", "David", "Cheryl", "Bert", "Alice"], ans: 3 },
+            { q: "Who is the CEO?", opts: ["Alice", "Bert", "Cheryl", "David", "Enid"], ans: 2 },
+            { q: "What color is the vice president's car?", opts: ["Green", "Yellow", "Blue", "Purple", "Red"], ans: 0 }
+        ]
+    },
+    {
+        title: "Rainfall Distribution Logic",
+        passage: "Cities: Last Stand, Mile City, New Town, Olliopolis, Polberg\nLocations: Mountains, Forest, Coast, Desert, Valley\nAmounts: 12\", 27\", 32\", 44\", 65\"\n\n• Desert: Least rain | Forest: Most rain\n• New Town: Mountains\n• Last Stand > Olliopolis (44\")\n• New Town > Mile City > Polberg\n• Mountains: 32\" | Coast: 27\"",
+        questions: [
+            { q: "Which city got the most rain?", opts: ["Last Stand", "Mile City", "New Town", "Olliopolis", "Polberg"], ans: 0 },
+            { q: "How much rain did Mile City get?", opts: ["12 inches", "27 inches", "32 inches", "44 inches", "65 inches"], ans: 1 },
+            { q: "Which city is in the desert?", opts: ["Last Stand", "Mile City", "New Town", "Olliopolis", "Polberg"], ans: 4 },
+            { q: "Where is Olliopolis located?", opts: ["The mountains", "The coast", "In a valley", "The desert", "The forest"], ans: 2 }
+        ]
+    },
+    {
+        title: "Roommate Chore Schedule",
+        passage: "Roommates: Randy, Sally, Terry, Uma, Vernon\nTasks: Mopping, Sweeping, Laundry, Vacuuming, Dusting\nDays: Monday - Friday\n\n• Vernon: No vacuuming, No Tuesday chore\n• Sally: Dusting (Not Mon/Fri)\n• Mopping: Done on Thursday\n• Terry: Wednesday chore (Not vacuuming)\n• Laundry: Done on Friday (Not by Uma)\n• Randy: Monday chore",
+        questions: [
+            { q: "What task does Terry do on Wednesday?", opts: ["Vacuuming", "Dusting", "Mopping", "Sweeping", "Laundry"], ans: 3 },
+            { q: "What day does Uma do her task?", opts: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], ans: 3 },
+            { q: "What task does Vernon do?", opts: ["Vacuuming", "Dusting", "Mopping", "Sweeping", "Laundry"], ans: 4 },
+            { q: "What day is the vacuuming done?", opts: ["Friday", "Monday", "Tuesday", "Wednesday", "Thursday"], ans: 1 },
+            { q: "When does Sally do the dusting?", opts: ["Friday", "Monday", "Tuesday", "Wednesday", "Thursday"], ans: 2 }
+        ]
+    }
+];
+
+let currentGame = 0;
+let currentQuest = 0;
+let selected = null;
+
+function render() {
+    const game = games[currentGame];
+    const quest = game.questions[currentQuest];
+    
+    document.getElementById('game-title').innerText = game.title;
+    document.getElementById('passage-text').innerText = game.passage;
+    document.getElementById('progress').innerText = `Game ${currentGame + 1} of ${games.length} | Question ${currentQuest + 1}`;
+    document.getElementById('question-text').innerText = quest.q;
+    
+    const box = document.getElementById('options-box');
+    box.innerHTML = '';
+    quest.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        box.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function checkAnswer() {
+    if (selected === null) return alert("Please select an answer.");
+    const correct = games[currentGame].questions[currentQuest].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((b, i) => {
+        if (i === correct) b.classList.add('correct');
+        if (i === selected && i !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQuestion() {
+    selected = null;
+    if (currentQuest < games[currentGame].questions.length - 1) {
+        currentQuest++;
+    } else if (currentGame < games.length - 1) {
+        currentGame++;
+        currentQuest = 0;
+        alert("Well done! Next Logic Game starting.");
+    } else {
+        alert("Module Complete! You have finished all analytical puzzles.");
+        return;
+    }
+    render();
+}
+
+render();
+</script>
+</body>
+</html>

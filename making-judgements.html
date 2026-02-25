@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Making Judgments - Logical Reasoning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #34495e;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f2f4f4;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .scenario-box {
+            background: #fff;
+            border: 1px solid #e1e8ed;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            white-space: pre-wrap; /* Preserves the indentation for lists */
+        }
+
+        .scenario-box strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            background: #fafafa;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .opt-btn:hover { border-color: #bdc3c7; background: #fff; }
+        .opt-btn.selected { border-color: var(--primary); background: #ebf2f7; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress { font-weight: bold; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div id="scenario" class="scenario-box"></div>
+        <div id="options" class="options-list"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress">Question 1 of 10</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="verify()">Submit Judgment</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next Scenario →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    {
+        q: "Eileen is planning a special birthday dinner for her husband's 35th birthday. She wants the evening to be memorable, but her husband is a simple man who would rather be in jeans at a baseball game than in a suit at a fancy restaurant. Which restaurant below should Eileen choose?",
+        opts: [
+            "Alfredo's offers fine Italian cuisine and an elegant Tuscan decor. Patrons will feel as though they've spent the evening in a luxurious Italian villa.",
+            "Pancho's Mexican Buffet is an all-you-can-eat family style smorgasbord with the best tacos in town.",
+            "The Parisian Bistro is a four-star French restaurant where guests are treated like royalty. Chef Dilbert Olay is famous for his beef bourguignon.",
+            "Marty's serves delicious, hearty meals in a charming setting reminiscent of a baseball clubhouse in honor of the owner, Marty Lester, a former major league baseball all-star."
+        ],
+        ans: 3
+    },
+    {
+        q: "The film director wants an actress for the lead role of Lucy. The screenplay describes Lucy as an average-sized, forty something redhead, with deep brown eyes, very fair skin, and a brilliant smile.\n\nActress #1: 5'9\", mid-twenties, brown eyes, olive complexion.\nActress #2: 5'5\", mid-forties, red hair, big brown eyes, fair complexion.\nActress #3: 5'4\", medium build, red hair, brown eyes, early forties.\nActress #4: 5', early thirties, blue-eyed redhead, slight build.",
+        opts: ["1, 2", "2, 3", "1, 4", "2, 4"],
+        ans: 1
+    },
+    {
+        q: "The school principal wants to investigate and end bullying in the school yard during recess. Which situation should the recess aides report to the principal?",
+        opts: [
+            "A girl is sitting glumly on a bench reading a book and not interacting with her peers.",
+            "Four girls are surrounding another girl and seem to have possession of her backpack.",
+            "Two boys are playing a one-on-one game of basketball and are arguing over the last basket scored.",
+            "Three boys are huddled over a handheld video game, which isn't supposed to be on school grounds."
+        ],
+        ans: 1
+    },
+    {
+        q: "Mrs. Carson left her tote bag in a taxi. She and her friends noted the license plate:\n#1: Starts with the letter J.\n#2: Ends with 12L (3 of 4 agree).\n#3: Second letter is X (3 think so), Third letter is K (3 think so).\n\nWhich plate is most likely?",
+        opts: ["JXK 12L", "JYK 12L", "JXK 12I", "JXX 12L"],
+        ans: 0
+    },
+    {
+        q: "Four friends try to remember a pizza delivery number:\n#1: All agree the first three are 995.\n#2: Three agree the fourth is 9.\n#3: Three agree the fifth is 2.\n#4: Three agree the sixth is 6; three others agree the seventh is 6.\n\nWhich number is most likely?",
+        opts: ["995-9266", "995-9336", "995-9268", "995-8266"],
+        ans: 0
+    },
+    {
+        q: "Mark is looking for a toy store location that is in or near town center and attracts foot traffic (families/children). Which location is best?",
+        opts: [
+            "A storefront in a new high-rise near the train station; occupants are childless professionals.",
+            "A little shop 3 blocks from main street, across from an elementary school and next to an ice cream store.",
+            "A stand-alone storefront on a quiet residential street ten blocks away from the town's center.",
+            "A storefront in a small strip mall on the outskirts occupied by a pharmacy and dry cleaner."
+        ],
+        ans: 1
+    },
+    {
+        q: "Descriptions of illegal solicitors:\n#1: White male, 20-25, 5'9\", 145 lbs, short brown hair, blue suit, briefcase.\n#2: White male, 25-30, 6'2\", 200 lbs, shaved head, red T-shirt.\n#3: White male, ~23, 5'10\", slight build, short brown hair, blue suit.\n#4 (Reporting now): White male, 22, 140 lbs, 5'10\", short brown hair, briefcase, dark suit.\n\nWho else was likely #4?",
+        opts: ["#1, #2, and #3", "#1, but not #2 and #3", "#1 and #3, but not #2", "#1 and #2, but not #3"],
+        ans: 2
+    },
+    {
+        q: "Rita the pastry chef is famous for wedding cakes, but daily business is slow. Market research says people only visit for special occasions. Which strategy increases daily business?",
+        opts: [
+            "Making coupons available for 25% discount on wedding, anniversary, or birthday cakes.",
+            "Exhibiting at the next Bridal Expo with tasting samples.",
+            "Placing a series of ads in the local newspaper that advertise the wide array of breads.",
+            "Moving the bakery to the other side of town."
+        ],
+        ans: 2
+    },
+    {
+        q: "Dr. Miller needs a hygienist for a pediatric (children's) practice. Which candidate is most suitable?",
+        opts: [
+            "Marilyn: 15 years exp, currently works with wealthy/powerful adult county citizens.",
+            "Lindy: Top graduate, previously spent two years working in a day care center.",
+            "James: 3 years exp in a public health clinic, looking for a private office.",
+            "Kathy: Highly recommended, but finishing a degree to become a preschool teacher soon."
+        ],
+        ans: 1
+    },
+    {
+        q: "Mrs. Jansen needs plants for her Arizona backyard (hot/dry) that has a large tree causing shady conditions. Which seed package should she choose?",
+        opts: [
+            "The Rainbow Collection: Ideal for Northeast; thrives in cool, moist conditions.",
+            "The Greenhouse Collection: Blossoms in brightly lit locations with regular watering.",
+            "The Treehouse Collection: Lush green plants with flowers that thrive in shady and partially shady locations.",
+            "The Oasis Collection: Perennials that thrive in dry climates and bright sunlight."
+        ],
+        ans: 2
+    }
+];
+
+let currentIdx = 0;
+let selected = null;
+
+function render() {
+    const item = data[currentIdx];
+    document.getElementById('progress').innerText = `Question ${currentIdx + 1} of ${data.length}`;
+    document.getElementById('scenario').innerText = item.q;
+    
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    item.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        box.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function verify() {
+    if (selected === null) return alert("Please select a judgment.");
+    const correct = data[currentIdx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((b, i) => {
+        if (i === correct) b.classList.add('correct');
+        if (i === selected && i !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    selected = null;
+    if (currentIdx < data.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        alert("Judgment Module Complete! You have practiced all 10 scenarios.");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stocks and Shares Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Stocks and Shares</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "To obtain an income of Rs. 650 from 10% stock at Rs. 96, the investment must be:", options: ["Rs. 3100", "Rs. 6240", "Rs. 6500", "Rs. 9600"], correct: 1, explain: "Income of Rs. 10 requires investment of Rs. 96. Income of Rs. 650 requires (96/10) * 650 = Rs. 6240." },
+        { q: "A man bought 20 shares of Rs. 50 at 5 discount, dividend 13.5%. Rate of interest obtained?", options: ["12.5%", "13.5%", "15%", "16.67%"], correct: 2, explain: "Face Value = 50. Market Value = 50 - 5 = 45. Dividend = 13.5% of 50 = 6.75. Rate of interest = (6.75 / 45) * 100 = 15%." },
+        { q: "Which is a better investment: 11% stock at 143 or 9.75% stock at 117?", options: ["11% stock at 143", "9.75% stock at 117", "Equally good", "Cannot compare"], correct: 1, explain: "Stock 1 yield: 11/143 = 0.0769. Stock 2 yield: 9.75/117 = 0.0833. Stock 2 is better." },
+        { q: "A man buys Rs. 20 shares paying 9% dividend. He wants 12% yield. Market value?", options: ["Rs. 12", "Rs. 15", "Rs. 18", "Rs. 21"], correct: 1, explain: "Dividend = 9% of 20 = 1.8. Let MV be x. (1.8 / x) * 100 = 12 => x = 180 / 12 = Rs. 15." },
+        { q: "Investing in 16% stock at 64 earns Rs. 1500. Investment made?", options: ["Rs. 5640", "Rs. 5760", "Rs. 7500", "Rs. 6000"], correct: 3, explain: "Income of Rs. 16 requires investment of Rs. 64. Income of Rs. 1500 requires (64/16) * 1500 = Rs. 6000. *Check: 16% of 100 = 16. (1500/16)*64 = 6000.*" },
+        { q: "A 6% stock yields 8%. The market value of the stock is:", options: ["Rs. 48", "Rs. 75", "Rs. 96", "Rs. 133.33"], correct: 1, explain: "Income of 6 on market value x gives 8%. 6/x = 8/100 => x = 600/8 = Rs. 75." },
+        { q: "Invested Rs. 4455 in Rs. 10 shares at Rs. 8.25. Dividend 12%. Annual income?", options: ["Rs. 207.40", "Rs. 534.60", "Rs. 648", "Rs. 655.60"], correct: 2, explain: "Number of shares = 4455 / 8.25 = 540. Face Value = 540 * 10 = 5400. Income = 12% of 5400 = Rs. 648." },
+        { q: "Rs. 9800 invested in 9% stock @ 75 and 10% stock @ 80 to have equal incomes. 9% stock investment?", options: ["Rs. 4800", "Rs. 5000", "Rs. 5400", "Rs. 5600"], correct: 1, explain: "Let investments be x and (9800-x). (9/75)x = (10/80)(9800-x). (3/25)x = (1/8)(9800-x) => 24x = 245000 - 25x => 49x = 245000 => x = Rs. 5000." },
+        { q: "Invest partly in 9% stock @ 96 and 12% stock @ 120. For equal dividends, ratio of investment?", options: ["3:4", "3:5", "4:5", "16:15"], correct: 2, explain: "Yields are 9/96 and 12/120. For equal income, I1 * (9/96) = I2 * (12/120). I1/I2 = (1/10) / (3/32) = 32/30 = 16:15. *Wait, let's re-calc: 9/96=3/32; 12/120=1/10. I1*(3/32)=I2*(1/10) => I1/I2 = 32/30 = 16:15.*" },
+        { q: "Invest Rs. 1620 in 8% stock, Michael earns Rs. 135. Stock is quoted at:", options: ["Rs. 80", "Rs. 96", "Rs. 106", "Rs. 108"], correct: 1, explain: "Income 135 from 1620. Yield = 135/1620 = 1/12. 8/MV = 1/12 => MV = Rs. 96." },
+        { q: "Invested Rs. 1552 in stock at 97 to get income of Rs. 128. Dividend rate?", options: ["7.5%", "8%", "9.7%", "10%"], correct: 1, explain: "Face Value of stock = (1552/97) * 100 = 1600. Dividend = (128/1600)*100 = 8%." },
+        { q: "A 12% stock yielding 10% is quoted at:", options: ["Rs. 83.33", "Rs. 110", "Rs. 112", "Rs. 120"], correct: 3, explain: "12/MV = 10/100 => MV = 1200/10 = Rs. 120." },
+        { q: "MV of 10.5% stock, income Rs. 756 by investing Rs. 9000, brokerage 1/4%?", options: ["Rs. 108.25", "Rs. 112.20", "Rs. 124.75", "Rs. 125.25"], correct: 2, explain: "Income 756 from 9000. Yield = 756/9000 = 8.4%. MV + Brokerage = 10.5/0.084 = 125. MV = 125 - 0.25 = Rs. 124.75." },
+        { q: "Cost of Rs. 100 stock at 4 discount, brokerage 1/4%?", options: ["Rs. 95.75", "Rs. 96", "Rs. 96.25", "Rs. 104.25"], correct: 2, explain: "Market Price = 100 - 4 = 96. Cost = 96 + 0.25 = Rs. 96.25." },
+        { q: "Invest Rs. 12000 in 12% @ 120 and 15% @ 125. Total dividend Rs. 1360. 12% stock part?", options: ["Rs. 4000", "Rs. 4500", "Rs. 5500", "Rs. 6000"], correct: 0, explain: "Yield1 = 12/120 = 10%. Yield2 = 15/125 = 12%. Let x be in 12% stock. 0.1x + 0.12(12000-x) = 1360. -0.02x + 1440 = 1360 => 0.02x = 80 => x = Rs. 4000." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

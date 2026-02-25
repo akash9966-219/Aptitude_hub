@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>One Word Substitution - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #8e44ad;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #fdfefe;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .direction {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .phrase {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .opt-btn {
+            padding: 18px;
+            border: 2px solid #eee;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #f9f4fc; }
+        .opt-btn.selected { border-color: var(--accent); background: #f9f4fc; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: 0.4s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="verbal-ability.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Verbal Ability</a>
+</div>
+
+<div class="container">
+    <div class="progress-bar"><div id="fill" class="progress-fill"></div></div>
+    <div id="counter" style="text-align:right; font-size: 0.9rem; margin-bottom: 10px; color: #666;">Question 1 of 60</div>
+    
+    <div class="card" id="quiz-card">
+        </div>
+</div>
+
+<script>
+const questions = [
+    { p: "Extreme old age when a man behaves like a fool", opts: ["Imbecility", "Senility", "Dotage", "Superannuation"], ans: "Dotage" },
+    { p: "That which cannot be corrected", opts: ["Unintelligible", "Indelible", "Illegible", "Incorrigible"], ans: "Incorrigible" },
+    { p: "The study of ancient societies", opts: ["Anthropology", "Archaeology", "History", "Ethnology"], ans: "Archaeology" },
+    { p: "A person of good understanding knowledge and reasoning power", opts: ["Expert", "Intellectual", "Snob", "Literate"], ans: "Intellectual" },
+    { p: "A person who insists on something", opts: ["Disciplinarian", "Stickler", "Instantaneous", "Boaster"], ans: "Stickler" },
+    { p: "State in which the few govern the many", opts: ["Monarchy", "Oligarchy", "Plutocracy", "Autocracy"], ans: "Oligarchy" },
+    { p: "A style in which a writer makes a display of his knowledge", opts: ["Pedantic", "Verbose", "Pompous", "Ornate"], ans: "Pedantic" },
+    { p: "List of the business or subjects to be considered at a meeting", opts: ["Schedule", "Timetable", "Agenda", "Plan"], ans: "Agenda" },
+    { p: "Leave or remove from a place considered dangerous", opts: ["Evade", "Evacuate", "Avoid", "Exterminate"], ans: "Evacuate" },
+    { p: "A prima facie case is such", opts: ["As it seems at first sight", "As it is made to seem at first sight", "As it turns out to be at the end", "As it seems to the court"], ans: "As it seems at first sight" },
+    { p: "A person pretending to be somebody he is not", opts: ["Magician", "Rogue", "Liar", "Imposter"], ans: "Imposter" },
+    { p: "A person who knows many foreign languages", opts: ["Linguist", "Grammarian", "Polyglot", "Bilingual"], ans: "Polyglot" },
+    { p: "One who has little faith in human sincerity and goodness", opts: ["Egoist", "Fatalist", "Stoic", "Cynic"], ans: "Cynic" },
+    { p: "One who possesses many talents", opts: ["Versatile", "Nubile", "Exceptional", "Gifted"], ans: "Versatile" },
+    { p: "Words inscribed on tomb", opts: ["Epitome", "Epistle", "Epilogue", "Epitaph"], ans: "Epitaph" },
+    { p: "One who eats everything", opts: ["Omnivorous", "Omniscient", "Irrestible", "Insolvent"], ans: "Omnivorous" },
+    { p: "Malafide case is one", opts: ["Undertaken in good faith", "Undertaken in bad faith", "Undertaken after long delay", "Not undertaken at all"], ans: "Undertaken in bad faith" },
+    { p: "The custom or practice of having more than one husband at same time", opts: ["Polygyny", "Polyphony", "Polyandry", "Polychromy"], ans: "Polyandry" },
+    { p: "Tending to move away from the centre or axis", opts: ["Centrifugal", "Centripetal", "Axiomatic", "Awry"], ans: "Centrifugal" },
+    { p: "Teetotaller means", opts: ["Abstains from theft", "Abstains from meat", "Abstains from wine", "Abstains from malice"], ans: "Abstains from wine" },
+    { p: "A person interested in collecting, studying and selling of old things", opts: ["Antiquarian", "Junk-dealer", "Crank", "Archealogist"], ans: "Antiquarian" },
+    { p: "A drawing on transparent paper", opts: ["Red print", "Blue print", "Negative", "Transparency"], ans: "Transparency" },
+    { p: "One who is not easily pleased by anything", opts: ["Maiden", "Mediaeval", "Precarious", "Fastidious"], ans: "Fastidious" },
+    { p: "A remedy for all diseases", opts: ["Stoic", "Marvel", "Panacea", "Recompense"], ans: "Panacea" },
+    { p: "One who is fond of fighting", opts: ["Bellicose", "Aggressive", "Belligerent", "Militant"], ans: "Belligerent" },
+    { p: "A small shop that sells fashionable clothes, cosmetics, etc.", opts: ["Store", "Stall", "Boutique", "Booth"], ans: "Boutique" },
+    { p: "That which cannot be read", opts: ["Negligible", "Illegible", "Ineligible", "Incorrigible"], ans: "Illegible" },
+    { p: "In a state of tension or anxiety or suspense", opts: ["Off balance", "Depressed", "Diffused", "On tenterhooks"], ans: "On tenterhooks" },
+    { p: "That which cannot be seen", opts: ["Insensible", "Intangible", "Invisible", "Unseen"], ans: "Invisible" },
+    { p: "To slap with a flat object", opts: ["Chop", "Hew", "Gnaw", "Swat"], ans: "Swat" },
+    { p: "Habitually silent or talking little", opts: ["Servile", "Unequivocal", "Taciturn", "Synoptic"], ans: "Taciturn" },
+    { p: "One who cannot be corrected", opts: ["Incurable", "Incorrigible", "Hardened", "Invulnerable"], ans: "Incorrigible" },
+    { p: "Be the embodiment or perfect example of", opts: ["Characterise", "Idol", "Personify", "Signify"], ans: "Personify" },
+    { p: "A person not sure of the existence of god", opts: ["Cynic", "Agnostic", "Atheist", "Theist"], ans: "Agnostic" },
+    { p: "A paper written by hand", opts: ["Handicraft", "Manuscript", "Handiwork", "Thesis"], ans: "Manuscript" },
+    { p: "The act of violating the sanctity of the church is", opts: ["Blashphemy", "Heresy", "Sacrilege", "Desecration"], ans: "Sacrilege" },
+    { p: "Something that can be heard", opts: ["Auditory", "Audio-visual", "Audible", "Audition"], ans: "Audible" },
+    { p: "A name adopted by an author in his writings", opts: ["Nickname", "Pseudonym", "Nomenclature", "Title"], ans: "Pseudonym" },
+    { p: "Study of birds", opts: ["Orology", "Optology", "Ophthalmology", "Ornithology"], ans: "Ornithology" },
+    { p: "A place that provides refuge", opts: ["Asylum", "Sanatorium", "Shelter", "Orphanage"], ans: "Asylum" },
+    { p: "A child born after death of his father", opts: ["Posthumous", "Orphan", "Bastard", "Progenitor"], ans: "Posthumous" },
+    { p: "The absence of law and order", opts: ["Rebellion", "Anarchy", "Mutiny", "Revolt"], ans: "Anarchy" },
+    { p: "The raison d'etre of a controversy is", opts: ["Enthusiasm", "Fitness", "Reason of existence", "Unending hostility"], ans: "Reason of existence" },
+    { p: "A place where bees are kept is called", opts: ["An apiary", "A mole", "A hive", "A sanctury"], ans: "An apiary" },
+    { p: "A religious discourse", opts: ["Preach", "Stanza", "Sanctorum", "Sermon"], ans: "Sermon" },
+    { p: "Parts of a country behind the coast or a river's banks", opts: ["Isthmus", "Archipelago", "Hinterland", "Swamps"], ans: "Hinterland" },
+    { p: "Study of the evolution of man as an animal", opts: ["Archaeology", "Anthropology", "Chronology", "Ethnology"], ans: "Anthropology" },
+    { p: "A person who speaks many languages", opts: ["Linguist", "Monolingual", "Polyglot", "Bilingual"], ans: "Polyglot" },
+    { p: "One who does not believe in existence of god", opts: ["Egoist", "Atheist", "Stoic", "Naive"], ans: "Atheist" },
+    { p: "A disease of mind causing an uncontrollable desire to steal", opts: ["Schizophrenia", "Claustrophobia", "Kleptomania", "Magolomania"], ans: "Kleptomania" },
+    { p: "One who sacrifices his life for a cause", opts: ["Patriot", "Martyr", "Revolutionary", "Soldier"], ans: "Martyr" },
+    { p: "A person who brings goods illegally into the country", opts: ["Importer", "Exporter", "Fraud", "Smuggler"], ans: "Smuggler" },
+    { p: "To take secretly in small quantities", opts: ["Robbery", "Pilferage", "Theft", "Defalcation"], ans: "Pilferage" },
+    { p: "To accustom oneself to a foreign climate", opts: ["Adapt", "Adopt", "Accustom", "Acclimatise"], ans: "Acclimatise" },
+    { p: "One who knows everything", opts: ["Literate", "Scholar", "Omnipotent", "Omniscient"], ans: "Omniscient" },
+    { p: "Detailed plan of journey", opts: ["Travelogue", "Travelkit", "Schedule", "Itinerary"], ans: "Itinerary" },
+    { p: "Giving undue favours to one's own kith and kin", opts: ["Nepotism", "Favouritism", "Wordliness", "Corruption"], ans: "Nepotism" },
+    { p: "Hater of learning and knowledge", opts: ["Misologist", "Bibliophile", "Misogynist", "Misanthropist"], ans: "Misologist" },
+    { p: "A person interested in reading books and nothing else", opts: ["Book-keeper", "Scholar", "Book-worm", "Student"], ans: "Book-worm" },
+    { p: "A place where monks live as a secluded community", opts: ["Cathedral", "Diocese", "Convent", "Monastery"], ans: "Monastery" }
+];
+
+let currentIdx = 0;
+let selectedOpt = null;
+
+function render() {
+    const q = questions[currentIdx];
+    const card = document.getElementById('quiz-card');
+    
+    document.getElementById('fill').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+    document.getElementById('counter').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+
+    card.innerHTML = `
+        <span class="direction">Out of the four alternatives, choose the one which can be substituted for the given words/sentence.</span>
+        <div class="phrase">"${q.p}"</div>
+        <div class="options-grid" id="opt-container"></div>
+        <div class="footer">
+            <button class="btn btn-check" onclick="checkAnswer()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">Next Question →</button>
+        </div>
+    `;
+
+    const container = document.getElementById('opt-container');
+    q.opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+            selectedOpt = opt;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        container.appendChild(btn);
+    });
+}
+
+function checkAnswer() {
+    if (!selectedOpt) return alert("Please select an option!");
+    const correct = questions[currentIdx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach(btn => {
+        if (btn.innerText === correct) btn.classList.add('correct');
+        if (btn.innerText === selectedOpt && selectedOpt !== correct) btn.classList.add('wrong');
+        btn.disabled = true;
+    });
+
+    document.getElementById('next-btn').style.display = 'block';
+}
+
+function nextQuestion() {
+    selectedOpt = null;
+    if (currentIdx < questions.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        document.getElementById('quiz-card').innerHTML = "<h2>Practice Complete!</h2><p>You have mastered 60 One Word Substitutions.</p><button class='btn btn-check' onclick='location.reload()'>Restart Practice</button>";
+    }
+}
+
+render();
+</script>
+</body>
+</html>

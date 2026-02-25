@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; white-space: pre-line; }
+        .q-image { max-width: 100%; margin-bottom: 20px; border-radius: 8px; background: white; padding: 10px; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 4</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 4</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Which word does NOT belong with the others?", options: ["wing", "fin", "beak", "rudder"], ans: 2, logic: "Wing, fin, and rudder are all parts used for steering or propulsion in air or water. A beak is a mouthpart used for eating." },
+            { q: "lelibroon = yellow hat\nplekafroti = flower garden\nfrotimix = garden salad\nWhich word could mean 'yellow flower'?", options: ["lelifroti", "lelipleka", "plekabroon", "frotibroon"], ans: 1, logic: "leli = yellow, broon = hat, pleka = flower, froti = garden, mix = salad. Therefore, yellow flower is lelipleka." },
+            { q: "Georgia is older than Marsha. Bart is older than Georgia. Marsha wins more at Monopoly than Georgia.", options: ["Bart often loses", "Georgia is the oldest", "Georgia hates to lose", "Marsha is the youngest"], ans: 3, logic: "Age order: Bart > Georgia > Marsha. Therefore, Marsha is the youngest." },
+            { q: "1. Tom puts on socks before shoes.\n2. He puts on shirt before jacket.\n3. Tom puts on shoes before shirt.", options: ["true", "false", "uncertain"], ans: 2, logic: "The order between footwear and upper-body clothing is not established by the first two statements." },
+            { q: "1. Bookstore selection > newsstand.\n2. Drugstore selection > bookstore.\n3. Drugstore selection > bookstore and newsstand.", options: ["true", "false", "uncertain"], ans: 0, logic: "If Drugstore > Bookstore and Bookstore > Newsstand, then Drugstore is definitely greater than both." },
+            { q: "Fact 1: Islands surrounded by water.\nFact 2: Maui is an island.\nFact 3: Maui was formed by volcano.", options: ["I only", "II only", "II and III only", "None"], ans: 0, logic: "Statement I must be true because Maui is an island and all islands are surrounded by water. Statements II and III are generalizations not supported by the specific facts." },
+            { q: "I. School asked X Std. to attend Sunday classes.\nII. Parents withdrew wards from Sunday private tuitions.", options: ["I is cause, II is effect", "II is cause, I is effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 0, logic: "The school's decision to hold classes (I) made the private tuitions redundant or impossible to attend, leading to the withdrawal (II)." },
+            { q: "Statement: 'Company provides accommodation to only outside candidates if selected.'", options: ["Assumption I implicit", "Assumption II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "The policy assumes local candidates already have a place to stay (I). It does not imply only local candidates will be selected; in fact, it prepares for outsiders." },
+            { q: "Statement: 'To bring punctuality, we must provide conveyance allowance.'", options: ["Assumption I implicit", "Assumption II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "The suggestion implies that rewarding employees (allowance) will lead to discipline (punctuality)." },
+            { q: "Statement: 'Double your money in five months.' - An advertisement.", options: ["Assumption I implicit", "Assumption II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "Advertisements are created based on the assumption that people have a desire for the service offered (growing money)." },
+            { q: "Statement: 'If you want to give any advertisement, give it in newspaper X.'", options: ["Assumption I implicit", "Assumption II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "The advice assumes Newspaper X is effective due to its reach (circulation). It doesn't necessarily assume B *wants* to advertise yet, just provides a destination 'if' they do." },
+            { q: "Statement: 'In my absence, I request you to look after the affairs of our company.'", options: ["Assumption I implicit", "Assumption II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "Requesting someone to manage a company implies you believe they are capable/expert enough to do so (II)." },
+            { q: "Statement: 'Electric supply corp decided to open more collection centres in business district.'", options: ["Assumption I implicit", "Assumption II implicit", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Opening more centers assumes people want the convenience (I) and that it will actually reduce the time spent in queues (II)." },
+            { q: "Statement: Senior police officials suspected of illegal arms sales.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "An investigation (I) is the logical response to suspected crime. Moving to Central control (II) is a massive administrative shift that isn't justified by the actions of two individuals." },
+            { q: "Statement: Teachers are not familiar with population education or their roles in it.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "If teachers lack knowledge, an orientation programme (II) directly addresses the gap. Changing the curriculum (I) doesn't solve the immediate problem of teacher ignorance." },
+            { q: "Statement: Insects destroyed more than 50% of crops for 3 consecutive years.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Seeking control measures (I) addresses the root cause. Increasing support price (II) doesn't solve the insect problem; it only subsidizes the failure." },
+            { q: "Statements: All poles are guns. Some boats are not poles.", options: ["Only I follows", "Only II follows", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "No definite relationship can be established between guns and boats based on the premises." },
+            { q: "Statement: Should there be a cap on the number of contestants in elections?", options: ["Only I strong", "Only II strong", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Both are strong arguments: one focuses on the quality of voter choice (I), the other on the fundamental democratic right to contest (II)." },
+            { q: "Statement: 20 lakh people expected for the festival.", options: ["Only I and II", "Only II and III", "Only I and III", "All follow", "None of these"], ans: 1, logic: "High alert for police (II) and hospitals (III) is necessary for safety. Restricting entry (I) is often impossible or counter-productive for public festivals." },
+            { q: "Statement: State Government suspended two additional district judges.", options: ["None implicit", "Either I or II", "Any one", "Only I and III", "Either I or III"], ans: 1, logic: "Suspension typically occurs due to performance issues (I) or behavioral issues (II). It is logical to assume one of these is the reason."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                ${item.img ? `<img src="${item.img}" class="q-image" alt="Question Image">` : ''}
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Non-Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the visual logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Non-Verbal Reasoning Test 3</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 3</button>
+        <a href="test5.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "Select a figure which will continue the same series.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/series/89.png",
+                options: ["1", "2", "3", "4", "5"], ans: 2, 
+                logic: "The main element rotates 90 degrees clockwise in each step, and the small dots follow a distinct alternating pattern. Figure 3 is the correct continuation." 
+            },
+            { 
+                q: "Select a figure which will continue the same series established by the five Problem Figures.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/series/27.png",
+                options: ["1", "2", "3", "4", "5"], ans: 3, 
+                logic: "The internal lines increase in number and change orientation in a predictable sequence. Figure 4 follows this progression." 
+            },
+            { 
+                q: "Select a suitable figure from the Answer Figures that would replace the question mark (?).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/analogy/60.png",
+                options: ["1", "2", "3", "4", "5"], ans: 1, 
+                logic: "The relationship involves a 180-degree rotation and a shift in the position of internal components. Figure 2 maintains this relationship." 
+            },
+            { 
+                q: "Choose the figure which is different from the rest.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/classification/9.png",
+                options: ["1", "2", "3", "4", "5"], ans: 3, 
+                logic: "In all other figures, the lines intersect at the center point. Figure 4 is the exception." 
+            },
+            { 
+                q: "Choose the figure which is different from the rest.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/classification/100.png",
+                options: ["1", "2", "3", "4", "5"], ans: 4, 
+                logic: "All figures except 5 are composed of simple closed geometric shapes. Figure 5 has an open structure." 
+            },
+            { 
+                q: "Find out the alternative figure which contains figure (X) as its part.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/embedded-images/13.png",
+                options: ["1", "2", "3", "4"], ans: 2, 
+                logic: "The specific 'M' or 'W' shape of (X) is seamlessly integrated into the lattice of Figure 3." 
+            },
+            { 
+                q: "Find out the alternative figure which contains figure (X) as its part.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/embedded-images/11.png",
+                options: ["1", "2", "3", "4"], ans: 3, 
+                logic: "The geometric cross-section of (X) is found hidden in the lines of Figure 4." 
+            },
+            { 
+                q: "Identify the figure that completes the pattern.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/pattern-completion/67.png",
+                options: ["1", "2", "3", "4"], ans: 1, 
+                logic: "Figure 2 completes the quadrant symmetry required for this circular design." 
+            },
+            { 
+                q: "Identify the figure that completes the pattern.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/pattern-completion/69.png",
+                options: ["1", "2", "3", "4"], ans: 3, 
+                logic: "To maintain the diagonal symmetry, Figure 4 provides the necessary line connections." 
+            },
+            { 
+                q: "Select a suitable figure from the four alternatives that would complete the figure matrix.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/figure-matrix/27.png",
+                options: ["1", "2", "3", "4"], ans: 2, 
+                logic: "The third column is a result of overlapping the first two columns and removing shared lines. Figure 3 fits." 
+            },
+            { 
+                q: "Select a suitable figure from the four alternatives that would complete the figure matrix.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/figure-matrix/20.png",
+                options: ["1", "2", "3", "4"], ans: 0, 
+                logic: "In each row, the elements rotate and decrease in complexity. Figure 1 follows the row logic." 
+            },
+            { 
+                q: "Select a suitable figure from the four alternatives that would complete the figure matrix.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/figure-matrix/29.png",
+                options: ["1", "2", "3", "4"], ans: 1, 
+                logic: "The number of sides in the inner shapes follows a mathematical sequence per row. Figure 2 completes this." 
+            },
+            { 
+                q: "How would the pattern appear when the transparent sheet is folded at the dotted line?",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/paper-folding/16.png",
+                options: ["1", "2", "3", "4"], ans: 3, 
+                logic: "The dots and lines on the left mirror over to the right. Figure 4 shows the correct combined overlay." 
+            },
+            { 
+                q: "Choose a figure which would most closely resemble the unfolded form of Figure (Z).",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/paper-cutting/34.png",
+                options: ["1", "2", "3", "4"], ans: 0, 
+                logic: "Folding diagonally then vertically and cutting results in the four-fold symmetrical pattern in Figure 1." 
+            },
+            { 
+                q: "Select the figure which satisfies the same conditions of placement of the dots as in Figure-X.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/dot-situation/10.png",
+                options: ["1", "2", "3", "4"], ans: 3, 
+                logic: "In (X), the dot is in the common region of the Square, Triangle, and Circle. Figure 4 is the only one with this shared region." 
+            },
+            { 
+                q: "Select the figure which satisfies the same conditions of placement of the dots as in Figure-X.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/dot-situation/20.png",
+                options: ["1", "2", "3", "4"], ans: 1, 
+                logic: "There are two dots: one in (Circle + Triangle) and one in (Square + Circle). Figure 2 satisfies both placements." 
+            },
+            { 
+                q: "Select a figure which fits exactly into Figure-X to form a complete square.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/shape-construction/38.png",
+                options: ["1", "2", "3", "4"], ans: 2, 
+                logic: "By matching the serrated edges and depth, Figure 3 completes the geometric boundary of the square." 
+            },
+            { 
+                q: "Find the number of dots on the face opposite the face bearing 3 dots.",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/cubes-and-dice/dice/17.png",
+                options: ["4", "5", "6", "Cannot be determined"], ans: 2, 
+                logic: "By comparing positions 1 and 2, 3 is adjacent to 1, 2, 4, and 5. Therefore, it must be opposite 6." 
+            },
+            { 
+                q: "Which number lies at the bottom face in position X?",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/cubes-and-dice/dice/19.png",
+                options: ["2", "3", "6", "Cannot be determined"], ans: 1, 
+                logic: "Analyzing the common faces across X, Y, and Z, the face opposite 4 (top of X) is determined to be 3." 
+            },
+            { 
+                q: "When 1 is at the top, which number will be at the bottom?",
+                img: "https://www.indiabix.com/_files/images/non-verbal-reasoning/cubes-and-dice/dice/31.png",
+                options: ["2", "3", "4", "6"], ans: 3, 
+                logic: "Face 1 and 4 are common. Rotating the block shows that 2 is opposite 5 and 3 is opposite 1." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.img ? `<img src="${item.img}" class="q-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

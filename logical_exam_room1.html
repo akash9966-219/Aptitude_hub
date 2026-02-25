@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+        .q-image { max-width: 100%; margin-bottom: 20px; border-radius: 8px; border: 1px solid var(--glass-border); }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 1</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 1</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Look at this series: XXIV, XX, __, XII, VIII, ... What number should fill the blank?", options: ["XXII", "XIII", "XVI", "IV"], ans: 2, logic: "The series is in Roman numerals decreasing by 4: 24, 20, 16, 12, 8. 16 is XVI." },
+            { q: "Look carefully at the sequence of symbols to find the pattern. Select correct pattern.", img: "https://www.indiabix.com/_files/images/logical-reasoning/5-93-q-1.png", options: ["1", "2", "3", "4"], ans: 1, logic: "Pattern analysis: The symbols rotate and change based on a specific sequence. Following the logic, Option 2 is the correct next step." },
+            { q: "Choose the picture that would go in the empty box so that the two bottom pictures are related in the same way as the top two are related.", img: "https://www.indiabix.com/_files/images/logical-reasoning/5-213-q-1.png", options: ["1", "2", "3", "4"], ans: 0, logic: "The relationship is 'inverse' or 'container'. Following the logic of the first pair, Option 1 fits." },
+            { q: "SIAMESE : CAT", options: ["type : breed", "dog : puppy", "mark : spot", "romaine : lettuce", "collar : leash"], ans: 3, logic: "A Siamese is a type of cat; Romaine is a type of lettuce." },
+            { q: "VERVE : ENTHUSIASM", options: ["loyalty : duplicity", "devotion : reverence", "intensity : color", "eminence : anonymity", "generosity : elation"], ans: 1, logic: "Verve and Enthusiasm are synonyms; Devotion and Reverence are synonyms." },
+            { q: "Fact 1: All hats have brims. Fact 2: There are black hats and blue hats. Fact 3: Baseball caps are hats. Which must be a fact?", options: ["I only", "II only", "II and III only", "None"], ans: 0, logic: "If all hats have brims and caps are hats, then all caps have brims (I). We don't know the color of the caps specifically, so II is not a 'must'." },
+            { q: "Eligibility: Second class Master's degree OR final year students. Conclusions: I. All final year students selected. II. All 2nd class masters selected.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "Eligibility doesn't guarantee selection; it only guarantees the right to apply." },
+            { q: "Irregularity causes failure. Some regular students fail. Conclusions: I. All failed students are regular. II. All successful students are not regular.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 3, logic: "The statement doesn't support that 'all' failed students are regular, nor does it comment on all successful students." },
+            { q: "Statement: 'Keep your city clean' campaign did not evoke response. Assumptions: I. People don't want clean cities. II. Council failed campaign.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "A lack of response implies the campaign itself failed to reach or motivate (II). We cannot assume people's deep desires (I) from one campaign." },
+            { q: "Statement: Please consult us before making any decision on investment. Assumptions: I. You may take a wrong decision. II. It is important to take right decision.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Advice implies that there is a risk of error (I) and that a correct choice is the priority (II)." },
+            { q: "A tells B: 'Get child examined by specialist.' Assumptions: I. Specialists diagnose better. II. B won't agree.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Giving advice assumes the advised party (specialist) has superior skill (I). One doesn't give advice assuming it will definitely be rejected (II)." },
+            { q: "Supply corp opening more collection centres. Assumptions: I. People may welcome it. II. May take less time for customers.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "New centres are built assuming they satisfy a need (I) and improve efficiency/time (II)." },
+            { q: "Statements: All men are married. Some men are educated. Conclusions: I. Some married are educated. II. Some educated are married.", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 4, logic: "Since all men are married, any 'educated man' is also 'married'. Therefore, both follow." },
+            { q: "Should legislators resign from profession? Arguments: I. Yes (more time for country). II. No (nobody will contest).", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 0, logic: "Argument I is a strong logical point regarding job focus. Argument II is a weak generalization." },
+            { q: "Should UNO be dissolved? Arguments: I. Yes (no role after cold war). II. No (avoids world war).", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "The role of UNO is peace-keeping; suggesting a world war could occur without it is a strong argument for its existence." },
+            { q: "Should there be reservation on communal basis? Arguments: I. Yes (checks bias). II. No (secular state).", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "Argument II is strong as it aligns with the fundamental constitutional principle of a secular state." },
+            { q: "Should oil companies fix prices? Arguments: I. Yes (viability). II. No (hardship to masses).", options: ["Only I", "Only II", "Either I or II", "Neither I nor II", "Both I and II"], ans: 1, logic: "In a social context, the burden on the masses and essential commodities is a stronger logical concern for policy." },
+            { q: "Train derailed near bridge/river, 65 dead. Action: I. Clarify reason. II. Allocate funds. III. Stronger bridge walls.", options: ["I and II", "II and III", "III only", "All", "None"], ans: 3, logic: "All three are logical: finding the cause, assisting victims, and preventing structural recurrence." },
+            { q: "Statement: Let us increase taxes to cover deficit. Assumptions: I. Present taxes low. II. Deficit undesirable. III. Only way is tax hike.", options: ["I and II", "II and III", "I and III", "All", "None"], ans: 1, logic: "Proposing a solution assumes the problem (deficit) is bad (II) and that the proposed solution works (III). It doesn't mean current taxes are 'low' objectively." },
+            { q: "Statements: All benches are desks. Some desks are roads. All roads are pillars. Conclusions: I. Some pillars are benches. II. Some pillars are desks. III. Some roads are benches. IV. No pillar is bench.", options: ["None", "I or IV, and III", "I or IV only", "I or IV, and II", "All"], ans: 3, logic: "Since some desks are roads and all roads are pillars, some pillars are definitely desks (II). Benches and pillars have no definite link, so it's Either I or IV."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                ${item.img ? `<img src="${item.img}" class="q-image" alt="Question Image">` : ''}
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

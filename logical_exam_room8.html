@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; background: white; padding: 10px; }
+        
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Logical Reasoning Test 8</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 8</button>
+        <a href="test3.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                direction: "Look carefully at the sequence of symbols to find the pattern. Select correct pattern.",
+                img: "https://www.indiabix.com/_files/images/logical-reasoning/5-96-q-1.png",
+                q: "Select the correct pattern from the options below:",
+                options: ["1", "2", "3", "4"], ans: 1, 
+                logic: "Option 2 is correct. The symbols follow a rotation and transformation pattern." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 2 - 3): A good way to figure out the relationship is to make a sentence. Use that same sentence for the third word.",
+                q: "Play is to actor as concert is to:",
+                options: ["symphony", "musician", "piano", "percussion"], ans: 1, 
+                logic: "An actor performs in a play; a musician performs in a concert." 
+            },
+            { 
+                q: "Odometer is to mileage as compass is to:",
+                options: ["speed", "hiking", "needle", "direction"], ans: 3, 
+                logic: "An odometer measures mileage; a compass determines direction." 
+            },
+            { 
+                direction: "Direction (Q.No. 4): Choose the picture for the empty box so the two bottom pictures relate like the top two.",
+                img: "https://www.indiabix.com/_files/images/logical-reasoning/5-209-q-1.png",
+                q: "Which picture completes the relationship?",
+                options: ["1", "2", "3", "4"], ans: 0, 
+                logic: "Option 1 is correct based on the visual analogy of the shapes." 
+            },
+            { 
+                direction: "Direction (Q.No. 5): Make a judgment based on the specific situation described.",
+                passage: "Situation: Mark is looking for a toy store location in or near the center of town that attracts child-friendly foot traffic.",
+                q: "Which location is best?",
+                options: ["Storefront near train station (young professionals)", "Shop 3 blocks from main street, across from elementary school & next to ice cream store", "Quiet residential street 10 blocks away", "Outskirts strip mall with pharmacy/dry cleaner"], 
+                ans: 1, logic: "The location near an elementary school and ice cream shop perfectly targets the 'foot traffic' of families with children." 
+            },
+            { 
+                direction: "Direction (Q.No. 6): Choose the conclusion which logically follows from the statement.",
+                passage: "Statement: In the university examination, most of the candidates write in Hindi medium.",
+                q: "Which follows logically?",
+                options: ["Some candidates write in Hindi.", "Mostly candidates with Hindi medium appear.", "No candidates use other languages.", "All candidates write in Hindi."], 
+                ans: 1, logic: "If 'most' candidates write in Hindi, it logically follows that 'mostly' Hindi medium candidates are appearing." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 7 - 8): Determine the Cause and Effect relationship between Statement I and II.",
+                passage: "I. All schools in the area closed for the week. II. Many parents withdrawn children from local schools.",
+                q: "Select the relationship:",
+                options: ["I is cause, II is effect", "II is cause, I is effect", "Independent causes", "Effects of independent causes", "Effects of some common cause"], 
+                ans: 4, logic: "Both are likely effects of a common cause, such as a local health crisis or security threat." 
+            },
+            { 
+                passage: "I. Petrol/Diesel prices unchanged for months. II. International crude oil prices gone up substantially.",
+                q: "Select the relationship:",
+                options: ["I is cause, II is effect", "II is cause, I is effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], 
+                ans: 3, logic: "The international price hike is a fact, while the local price stability is a separate policy decision. They are independent of each other in this context." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 9 - 10): Determine which assumption is implicit in the statement.",
+                passage: "Statement: 'Please do not use lift while going down' - instruction on 5th floor.",
+                q: "Assumptions: I. Lift cannot carry load down. II. Lift is a facility, not a right.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 3, logic: "Neither assumption is necessarily true based only on the instruction; the instruction is likely for efficiency or energy saving." 
+            },
+            { 
+                passage: "Statement: Government decided to disinvest equity in select PSUs for better fiscal management.",
+                q: "Assumptions: I. Disinvestment may reduce fiscal deficits. II. There will be demand for these shares.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 4, logic: "To plan disinvestment, the government must assume it will actually raise money (I) and that people will buy the shares (II)." 
+            },
+            { 
+                direction: "Direction (Q.Nos. 11 - 13): Implicit assumptions check.",
+                passage: "Statement: Nobody can predict how long it will take to contain terrorist activities.",
+                q: "Assumptions: I. Impossible to end terrorism. II. Efforts to control are ongoing.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 1, logic: "The statement implies that efforts are happening (II), but doesn't say it's 'impossible' (I), just that the timing is unpredictable." 
+            },
+            { 
+                passage: "Statement: I cannot contact you on phone from Karshik.",
+                q: "Assumptions: I. Telephone facility not available at Karshik. II. Nowadays phone contact is difficult.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 0, logic: "The specific inability to call from that location implies the facility is missing there (I)." 
+            },
+            { 
+                passage: "Statement: 'To buy X-TV, contact Y, the sole agent.'",
+                q: "Assumptions: I. People prefer sole agents. II. Companies don't sell directly.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 3, logic: "Neither is implicit. This is just a specific business arrangement advertisement." 
+            },
+            { 
+                direction: "Direction (Q.No. 14): Implicit assumptions check.",
+                passage: "Statement: 'Blue tie would help us identify our staff from others.'",
+                q: "Assumptions: I. Company needs to identify staff. II. Blue tie is latest fashion.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 0, logic: "The suggestion only exists because there is a perceived need for identification (I)." 
+            },
+            { 
+                direction: "Direction (Q.No. 15): Implicit assumptions check.",
+                passage: "Statement: 'A visit to forest to widen knowledge of natural resources has been arranged.'",
+                q: "Assumptions: I. Forests have natural resources. II. Children learn from new environments.",
+                options: ["Only I implicit", "Only II implicit", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 4, logic: "The notice assumes the destination is relevant (I) and the method of teaching is effective (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 16): Strong vs. Weak arguments.",
+                passage: "Statement: Should colleges devise their own curriculum for vocational courses?",
+                q: "Arguments: I. Yes (generates employment). II. No (lack of uniformity/quality).",
+                options: ["Only I is strong", "Only II is strong", "Either I or II", "Neither I nor II", "Both I and II"], 
+                ans: 4, logic: "Both are strong: localized curriculum meets local job needs (I), but uniformity ensures standard quality (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 17): Syllogism check.",
+                passage: "Statements: All politicians are honest. All honest are fair.",
+                q: "Conclusions: I. Some honest are politicians. II. No honest is politician. III. Some fair are politicians. IV. All fair are politicians.",
+                options: ["None follows", "Only I", "Only I and II", "Only I and III"], 
+                ans: 3, logic: "If all P are H, then some H are P. If all H are F, and all P are H, then some F are P." 
+            },
+            { 
+                direction: "Direction (Q.No. 18): Implicit assumptions check.",
+                passage: "Statement: Service Sector conference surprisingly attracted many participants and good media coverage.",
+                q: "Assumptions: I. People weren't expecting encouragement. II. Service sector is poorly managed. III. Media is always positive.",
+                options: ["None implicit", "Only I", "All implicit", "Only II and III", "Either I or III"], 
+                ans: 1, logic: "The use of the word 'surprisingly' implies that the response was not expected (I)." 
+            },
+            { 
+                direction: "Direction (Q.No. 19): Implicit assumptions check.",
+                passage: "Statement: Recast educational system toward scientific discovery to improve employment.",
+                q: "Assumptions: I. Students can earn livelihood after. II. Brings meaning to youth. III. State earns more revenue.",
+                options: ["None implicit", "Only I and II", "Only III", "Only I and III", "None of these"], 
+                ans: 1, logic: "Focusing on employment implies the goal is earning (I) and educational relevance (II)." 
+            },
+            { 
+                direction: "Direction (Q.No. 20): Syllogism check.",
+                passage: "Statements: Some blades are hammers. Some hammers are knives. Some knives are axes.",
+                q: "Conclusions: I. Some axes are hammers. II. Some knives are blades. III. Some axes are blades.",
+                options: ["None follows", "Only I", "Only II", "Only III", "None of these"], 
+                ans: 0, logic: "In 'Some A are B' chains, there is no definitive link between the first and last items (Blades and Axes)." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="q-img" alt="Pattern">` : ''}
+                <div class="q-text">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

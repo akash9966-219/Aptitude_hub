@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sports & Athletics Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #064e3b; --bg: #ecfdf5; --card: #ffffff; --accent: #10b981; --correct: #059669; --wrong: #e11d48; --text: #065f46; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 2px solid #d1fae5; }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
+        .q-text { font-size: 1.3rem; line-height: 1.4; margin-bottom: 30px; font-weight: 600; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        .opt { padding: 18px; border: 2px solid #f0fdf4; border-radius: 12px; background: #f9fafb; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.25s; font-weight: 500; }
+        .opt:hover:not(:disabled) { background: #d1fae5; border-color: var(--accent); }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 20px; background: #f0fdf4; border-radius: 12px; border-left: 6px solid var(--accent); display: none; font-style: italic; }
+        .nav { display: flex; justify-content: space-between; margin-top: 35px; gap: 15px; }
+        .btn-nav { padding: 14px 30px; border-radius: 10px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 700; text-transform: uppercase; flex: 1; }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Who won gold in men’s heptathlon at the Asian Indoor Athletics Championships 2026?", opts: ["Tejaswin Shankar", "Tajinderpal Singh Toor", "Ancy Sojan", "Pooja"], ans: 0, exp: "Tejaswin Shankar set a new national indoor record with 5,993 points in Tianjin, China." },
+    { q: "2. Who was named the BBC Indian Sportswoman of the Year 2025?", opts: ["Divya Deshmukh", "Smriti Mandhana", "Preethi Pal", "Anjali Bhagwat"], ans: 1, exp: "Smriti Mandhana won the award following her pivotal role in India's Women's World Cup 2025 triumph." },
+    { q: "3. [Duplicate Question - See Q2]", opts: ["N/A", "N/A", "N/A", "N/A"], ans: 0, exp: "This is a duplicate of the Smriti Mandhana question." },
+    { q: "4. Who won the 2026 FIDE Freestyle Chess World Championship?", opts: ["Fabiano Caruana", "Levon Aronian", "Magnus Carlsen", "Nodirbek Abdusattorov"], ans: 2, exp: "Magnus Carlsen defeated Fabiano Caruana 2.5–1.5 in the final at Weissenhaus." },
+    { q: "5. Silver medalist in 25m pistol at the Asian Shooting Championships 2026?", opts: ["Manu Bhaker", "Esha Singh", "Thuy Trang Nguyen", "Anjali Bhagwat"], ans: 0, exp: "Manu Bhaker clinched silver after a shoot-off with Vietnam's Nguyen Thuy Trang." },
+    { q: "6. Which country won the SAFF U-19 Women’s Championship 2026?", opts: ["India", "Nepal", "Sri Lanka", "Maldives"], ans: 0, exp: "India defeated defending champions Bangladesh 4–0 in the final held in Nepal." },
+    { q: "7. Which state won gold at the National Federation Cup 2026 Para Throwball?", opts: ["Rajasthan", "Andhra Pradesh", "Telangana", "Jharkhand"], ans: 3, exp: "Jharkhand's women's team emerged victorious in the national para throwball tournament." },
+    { q: "8. Host of the Asian Rifle/Pistol Championships 2027?", opts: ["China", "South Korea", "Japan", "India"], ans: 3, exp: "India has been designated as the host for the 2027 continental championships." },
+    { q: "9. Who won the ICC Under-19 Men’s Cricket World Cup 2026?", opts: ["Australia", "South Africa", "New Zealand", "India"], ans: 3, exp: "India defeated England in the final to secure another U-19 World Cup title." },
+    { q: "10. Back-to-back WPL titles winner (2025 and 2026)?", opts: ["RCB", "Delhi Capitals", "Mumbai Indians", "Gujarat Giants"], ans: 0, exp: "Royal Challengers Bangalore (RCB) successfully defended their title in 2026." },
+    { q: "11. India defeated Hertha BSC Frauen in a friendly in which country?", opts: ["Germany", "Australia", "Turkiye", "Romania"], ans: 0, exp: "The Indian women's team toured Germany as part of their international exposure." },
+    { q: "12. First tennis player to achieve 400 Grand Slam singles victories?", opts: ["Novak Djokovic", "Roger Federer", "Rafael Nadal", "Botic van de Zandschulp"], ans: 0, exp: "Novak Djokovic reached this unprecedented milestone during a major tournament." },
+    { q: "13. Location of Assam’s largest multi-sports hub, Khanikar Stadium?", opts: ["Guwahati", "Jorhat", "Silchar", "Dibrugarh"], ans: 3, exp: "Amit Shah inaugurated the massive sports hub in Dibrugarh, Assam." },
+    { q: "14. Scored India’s second-fastest T20I fifty in 14 balls?", opts: ["Abhishek Sharma", "Suryakumar Yadav", "Sanju Samson", "Virat Kohli"], ans: 0, exp: "Abhishek Sharma's explosive innings set new benchmarks for Indian T20 batting." },
+    { q: "15. New head coach of the Indian senior women’s football team?", opts: ["Amelia Valverde", "Sarina Wiegman", "Pia Sundhage", "Anju Tamang"], ans: 2, exp: "AIFF appointed the legendary Pia Sundhage to lead the women's national team." },
+    { q: "16. Location of the National Paralympic Powerlifting Championship 2026?", opts: ["Dehradun", "Haridwar", "Roorkee", "Rishikesh"], ans: 1, exp: "The championship was virtually inaugurated and hosted in Haridwar." },
+    { q: "17. Venue for the 6th Khelo India Winter Games 2026?", opts: ["Shimla", "Srinagar", "Leh/Gulmarg", "Dehradun"], ans: 2, exp: "The games were split between the high-altitude regions of Leh and Gulmarg." },
+    { q: "18. India’s 92nd Chess Grandmaster (Jan 2026)?", opts: ["R. Praggnanandhaa", "Aaryan Varshney", "Nihal Sarin", "D. Gukesh"], ans: 1, exp: "Aaryan Varshney achieved the title after his performance in Armenia." },
+    { q: "19. City hosting the 2026 India Open Badminton Super 750?", opts: ["Mumbai", "Bengaluru", "Hyderabad", "New Delhi"], ans: 3, exp: "The prestigious tournament kicked off at the K.D. Jadhav Indoor Hall in New Delhi." },
+    { q: "20. Australian cricketer retiring after the 2026 series vs India?", opts: ["Meg Lanning", "Alyssa Healy", "Ellyse Perry", "Beth Mooney"], ans: 2, exp: "The legendary all-rounder Ellyse Perry announced her international departure." },
+    { q: "21. 5th LG Cup Ice Hockey Tournament location?", opts: ["Leh", "Drass", "Kargil", "Nubra"], ans: 2, exp: "The tournament was held at the Biamathang rink in Kargil." },
+    { q: "22. Host of the 72nd National Volleyball Tournament?", opts: ["Lucknow", "Varanasi", "Prayagraj", "Kanpur"], ans: 2, exp: "Prayagraj (Allahabad) hosted the event to boost local sports infrastructure." },
+    { q: "23. 4th woman globally to score 10,000 international runs?", opts: ["Mithali Raj", "Harmanpreet Kaur", "Smriti Mandhana", "Jhulan Goswami"], ans: 2, exp: "Smriti Mandhana joined an elite list as the second Indian woman to reach 10k runs." },
+    { q: "24. First bowler in T20I history to take eight wickets in one match?", opts: ["Charles Lachmund", "Sonam Yeshey", "James Minto", "JJ Basson"], ans: 2, exp: "James Minto (Jersey) set this world record in an international match." },
+    { q: "25. Women’s Singles title winner at 87th Senior Nationals?", opts: ["Shikha Gautam", "Ashwini Bhat K", "Surya Charishma", "Radhika Sharma"], ans: 2, exp: "Surya Charishma Tamiri clinched the national title in Vijayawada." },
+    { q: "26. Indian male to win bronze at World Rapid Chess (after Anand)?", opts: ["Praggnanandhaa", "Arjun Erigaisi", "Vidit Gujrathi", "Pentala Harikrishna"], ans: 1, exp: "Arjun Erigaisi secured India's first male podium finish in years at the event." },
+    { q: "27. Female bronze medalist at World Rapid Championship?", opts: ["Harika Dronavalli", "Tania Sachdev", "Vaishali R", "Koneru Humpy"], ans: 2, exp: "R. Vaishali finished on the podium after a stellar performance." },
+    { q: "28. Led Alpine SG Pipers to the 2025 Global Chess League title?", opts: ["Praggnanandhaa/Giri", "Firouzja/Caruana", "Vidit/Wei Yi", "Carlsen/Nakamura"], ans: 1, exp: "Alireza Firouzja and Fabiano Caruana led the team to victory." },
+    { q: "29. First England bowler this century with 5-fer at MCG?", opts: ["James Anderson", "Stuart Broad", "Darren Gough", "Josh Tongue"], ans: 3, exp: "Josh Tongue broke a 27-year drought for England bowlers at the MCG." },
+    { q: "30. Scored 190 off 84 balls in Vijay Hazare Trophy 2025–26?", opts: ["Vaibhav Suryavanshi", "Shubman Gill", "Yashasvi Jaiswal", "Prithvi Shaw"], ans: 0, exp: "Young prodigy Vaibhav Suryavanshi smashed records in the domestic tournament." },
+    { q: "31. Gold in 10m Air Rifle Men at 68th National Shooting?", opts: ["Vania", "Kiran Jadhav", "Onkar Waghamare", "Abhinav Bindra"], ans: 0, exp: "Mohammed Murtaza Vania won gold in a competitive national field." },
+    { q: "32. Winner of inaugural SAFF Women’s Club Championship 2025?", opts: ["Gokulam Kerala", "East Bengal FC", "Odisha FC", "Bengaluru FC"], ans: 1, exp: "East Bengal FC made history by winning the first-ever club championship." },
+    { q: "33. Winner of IGU 124th Amateur Championship of India?", opts: ["Harman Sachdeva", "Sukhman Singh", "Shubhankar Sharma", "Ajeetesh Sandhu"], ans: 1, exp: "Sukhman Singh defeated Harman Sachdeva in the final." },
+    { q: "34. Won the U19 Asia Cup 2025 by defeating India?", opts: ["Pakistan", "Sri Lanka", "Bangladesh", "Afghanistan"], ans: 2, exp: "Bangladesh secured a massive 191-run victory over India in the final." },
+    { q: "35. Maiden Syed Mushtaq Ali Trophy title (2025–26)?", opts: ["Haryana", "Jharkhand", "Tamil Nadu", "Karnataka"], ans: 1, exp: "Jharkhand won their first title in the domestic T20 competition." },
+    { q: "36. India’s doping positivity rate in 2024 WADA Report?", opts: ["3.6%", "1.1%", "0.8%", "0.2%"], ans: 1, exp: "The rate showed significant improvement from previous reporting cycles." },
+    { q: "37. Location of FIFA Best Football Awards 2025?", opts: ["Paris", "Doha", "Zurich", "Madrid"], ans: 2, exp: "The awards were hosted in Zurich, Switzerland, the home of FIFA." },
+    { q: "38. Maiden Tennis Premier League title winner in Ahmedabad?", opts: ["GS Delhi", "Yash Mumbai Eagles", "Bengaluru Blasters", "Pune Strikers"], ans: 1, exp: "Yash Mumbai Eagles clinched their first title in the tournament." },
+    { q: "39. First-time WSF Squash World Cup 2025 winner?", opts: ["Hong Kong", "England", "India", "Egypt"], ans: 0, exp: "Hong Kong won the World Cup for the first time in history." },
+    { q: "40. FIH Men’s Junior Hockey World Cup 2025 winner?", opts: ["India", "France", "Germany", "Belgium"], ans: 2, exp: "Germany defeated Spain in the final to lift the trophy." },
+    { q: "41. Host of first Commonwealth Kho Kho Championship (2026)?", opts: ["India", "Australia", "South Africa", "England"], ans: 0, exp: "India will host the inaugural event in New Delhi in March 2026." },
+    { q: "42. Stadium with stands named after Yuvraj and Harmanpreet?", opts: ["Eden Gardens", "Wankhede", "PCA Mohali", "Mullanpur Stadium"], ans: 3, exp: "The newly built Mullanpur Stadium in Punjab honored the two icons." },
+    { q: "43. Won 2 golds at Asian Youth Para Games 2025 (Butterfly/Backstroke)?", opts: ["Abdul Quadir Indori", "Sumit Antil", "Pranav Soorma", "Nishad Kumar"], ans: 0, exp: "Abdul Quadir Indori dominated the pool on the opening day." },
+    { q: "44. Signed MoU with Indian Olympic Association (IOA) for cooperation?", opts: ["France", "Japan", "Italy", "Germany"], ans: 2, exp: "Italy and India signed an agreement to share sports science and training resources." },
+    { q: "45. Host of Squash World Cup 2025 (3rd consecutive time)?", opts: ["India", "Egypt", "Malaysia", "Australia"], ans: 0, exp: "Chennai, India hosted the world cup for the third straight time." },
+    { q: "46. 6th Indian to hit centuries in all formats (vs SA 2025)?", opts: ["Rohit Sharma", "Yashasvi Jaiswal", "Virat Kohli", "KL Rahul"], ans: 1, exp: "Yashasvi Jaiswal joined the elite club with a ton in South Africa." },
+    { q: "47. 4th Indian to surpass 20,000 international runs?", opts: ["KL Rahul", "Virat Kohli", "Ruturaj Gaikwad", "Rohit Sharma"], ans: 3, exp: "Rohit Sharma reached the milestone during the ODI series in 2025." },
+    { q: "48. 2025 Formula 1 World Champion?", opts: ["Max Verstappen", "Oscar Piastri", "Lewis Hamilton", "Lando Norris"], ans: 0, exp: "Max Verstappen secured another title after a consistent 2025 season." },
+    { q: "49. First-ever Sultan Azlan Shah Cup title winner (2025)?", opts: ["Australia", "South Korea", "New Zealand", "Belgium"], ans: 3, exp: "Belgium defeated India 1-0 in the final to win their maiden title." },
+    { q: "50. Third cricketer to take 600 competitive T20 wickets?", opts: ["Sunil Narine", "Rashid Khan", "Dwayne Bravo", "Trent Boult"], ans: 0, exp: "Sunil Narine achieved the feat in Dec 2025, joining Rashid Khan and Dwayne Bravo." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `ID: SPT_${idx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Sports Fact:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

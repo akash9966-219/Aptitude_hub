@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Deduction - Facts & Statements</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #16a085;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f9f9f9;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--accent);
+        }
+
+        .logic-box {
+            background: #f0f7f4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .logic-line {
+            margin-bottom: 8px;
+            font-weight: 500;
+            display: block;
+        }
+
+        .conclusion-line {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+            font-style: italic;
+            color: var(--primary);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #f4fdfa; }
+        .opt-btn.selected { border-color: var(--accent); background: #e6f5f0; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        .progress { font-weight: bold; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div id="logic-content" class="logic-box"></div>
+        <div id="options" class="options-grid"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress">Question 1</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="verify()">Check Logic</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next Problem →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    // SET 1
+    { premises: ["The Kingston Mall has more stores than the Galleria.", "The Four Corners Mall has fewer stores than the Galleria."], conclusion: "The Kingston Mall has more stores than the Four Corners Mall.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["All the tulips in Zoe's garden are white.", "All the pansies in Zoe's garden are yellow."], conclusion: "All the flowers in Zoe's garden are either white or yellow.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["During the past year, Josh saw more movies than Stephen.", "Stephen saw fewer movies than Darren."], conclusion: "Darren saw more movies than Josh.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["Rover weighs less than Fido.", "Rover weighs more than Boomer."], conclusion: "Of the three dogs, Boomer weighs the least.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["All the offices on the 9th floor have wall-to-wall carpeting.", "No wall-to-wall carpeting is pink."], conclusion: "None of the offices on the 9th floor has pink wall-to-wall carpeting.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["Tanya is older than Eric.", "Cliff is older than Tanya."], conclusion: "Eric is older than Cliff.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["Blueberries cost more than strawberries.", "Blueberries cost less than raspberries."], conclusion: "Raspberries cost more than strawberries and blueberries.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["All the trees in the park are flowering trees.", "Some of the trees in the park are dogwoods."], conclusion: "All dogwoods in the park are flowering trees.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["Mara runs faster than Gail.", "Lily runs faster than Mara."], conclusion: "Gail runs faster than Lily.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["Apartments in the Riverdale Manor cost less than apartments in The Gaslight Commons.", "Apartments in the Livingston Gate cost more than apartments in the The Gaslight Commons."], conclusion: "Of the three apartment buildings, the Livingston Gate costs the most.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["Class A has a higher enrollment than Class B.", "Class C has a lower enrollment than Class B."], conclusion: "Class A has a lower enrollment than Class C.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["A fruit basket contains more apples than lemons.", "There are more lemons in the basket than there are oranges."], conclusion: "The basket contains more apples than oranges.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["The Shop and Save Grocery is south of Greenwood Pharmacy.", "Rebecca's house is northeast of Greenwood Pharmacy."], conclusion: "Rebecca's house is west of the Shop and Save Grocery.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["Joe is younger than Kathy.", "Mark was born after Joe."], conclusion: "Kathy is older than Mark.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["Jenna weighs more than Jason.", "Jason weighs less than Jasmine."], conclusion: "Of the three babies, Jasmine weighs the most.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["The temperature on Monday was lower than on Tuesday.", "The temperature on Wednesday was lower than on Tuesday."], conclusion: "The temperature on Monday was higher than on Wednesday.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["Oat cereal has more fiber than corn cereal but less fiber than bran cereal.", "Corn cereal has more fiber than rice cereal but less fiber than wheat cereal."], conclusion: "Of the three kinds of cereal, rice cereal has the least amount of fiber.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["Martina is sitting in the desk behind Jerome.", "Jerome is sitting in the desk behind Bryant."], conclusion: "Bryant is sitting in the desk behind Martina.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["Battery X lasts longer than Battery Y.", "Battery Y doesn't last as long as Battery Z."], conclusion: "Battery Z lasts longer than Battery X.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["Spot is bigger than King and smaller than Sugar.", "Ralph is smaller than Sugar and bigger than Spot."], conclusion: "King is bigger than Ralph.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["Middletown is north of Centerville.", "Centerville is east of Penfield."], conclusion: "Penfield is northwest of Middletown.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["All spotted Gangles have long tails.", "Short-haired Gangles always have short tails."], conclusion: "Long-tailed Gangles never have short hair.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["All Lamels are Signots with buttons.", "No yellow Signots have buttons."], conclusion: "No Lamels are yellow.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["The hotel is two blocks east of the drugstore.", "The market is one block west of the hotel."], conclusion: "The drugstore is west of the market.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["A toothpick is useful.", "Useful things are valuable."], conclusion: "A toothpick is valuable.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["Tom puts on his socks before he puts on his shoes.", "He puts on his shirt before he puts on his jacket."], conclusion: "Tom puts on his shoes before he puts on his shirt.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["Three pencils cost the same as two erasers.", "Four erasers cost the same as one ruler."], conclusion: "Pencils are more expensive than rulers.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["Taking the train across town is quicker than taking the bus.", "Taking the bus across town is slower than driving a car."], conclusion: "Taking the train across town is quicker than driving a car.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["Cloudy days tend to be more windy than sunny days.", "Foggy days tend to be less windy than cloudy days."], conclusion: "Sunny days tend to be less windy than foggy days.", opts: ["true", "false", "uncertain"], ans: 2 },
+    { premises: ["A sedan is parked to the right of a pickup and to the left of an SUV.", "A minivan is parked to the left of the pickup."], conclusion: "The minivan is parked between the pickup and the sedan.", opts: ["true", "false", "uncertain"], ans: 1 },
+    { premises: ["The bookstore has a better selection of postcards than the newsstand.", "The selection at the drugstore is better than at the bookstore."], conclusion: "The drugstore has a better selection of postcards than the bookstore or the newsstand.", opts: ["true", "false", "uncertain"], ans: 0 },
+    { premises: ["A jar of jelly beans contains more red beans than green.", "There are more yellow beans than red."], conclusion: "The jar contains fewer yellow jelly beans than green ones.", opts: ["true", "false", "uncertain"], ans: 1 },
+    
+    // FACT SETS
+    { premises: ["Fact 1: All dogs like to run.", "Fact 2: Some dogs like to swim.", "Fact 3: Some dogs look like their masters."], conclusion: "Which of the following must also be a fact?", opts: ["I: All dogs who swim look like masters", "II: Dogs who swim also like to run", "III: Dogs who run do not look like masters", "None of the above"], ans: 1 },
+    { premises: ["Fact 1: Jessica has four children.", "Fact 2: Two have blue eyes and two have brown eyes.", "Fact 3: Half of the children are girls."], conclusion: "Which must also be a fact?", opts: ["I: At least one girl has blue eyes", "II: Two of the children are boys", "III: The boys have brown eyes", "None of the above"], ans: 1 },
+    { premises: ["Fact 1: All drink mixes are beverages.", "Fact 2: All beverages are drinkable.", "Fact 3: Some beverages are red."], conclusion: "Which must also be a fact?", opts: ["I and II only", "II only", "I and III only", "III only", "None"], ans: 3 },
+    { premises: ["Fact 1: All chickens are birds.", "Fact 2: Some chickens are hens.", "Fact 3: Female birds lay eggs."], conclusion: "Which must also be a fact?", opts: ["I only", "II only", "II and III only", "None"], ans: 2 },
+    { premises: ["Fact 1: All hats have brims.", "Fact 2: Black hats and blue hats exist.", "Fact 3: Baseball caps are hats."], conclusion: "Which must also be a fact?", opts: ["I: All caps have brims", "II only", "II and III only", "None"], ans: 0 },
+    { premises: ["Fact 1: Eyeglass frames cost $35 to $350.", "Fact 2: Some are titanium.", "Fact 3: Some are plastic."], conclusion: "Which must also be a fact?", opts: ["I only", "II only", "II and III only", "None of the statements"], ans: 3 },
+    { premises: ["Fact 1: Most stuffed toys use beans.", "Fact 2: Bears and tigers exist.", "Fact 3: Some chairs use beans."], conclusion: "Which must also be a fact?", opts: ["I only", "II only", "II and III only", "None"], ans: 3 },
+    { premises: ["Fact 1: Mary says 'Ann and I have cats'.", "Fact 2: Ann says 'I don't have a cat'.", "Fact 3: Mary always tells the truth; Ann sometimes lies."], conclusion: "Which must also be a fact?", opts: ["I only", "II only", "I and II only", "All statements"], ans: 3 },
+    { premises: ["Fact 1: Pictures tell stories.", "Fact 2: All storybooks have pictures.", "Fact 3: Some storybooks have words."], conclusion: "Which must also be a fact?", opts: ["I only", "II only", "III: Some have both words and pictures", "None"], ans: 2 },
+    { premises: ["Fact 1: Some pens don't write.", "Fact 2: All blue pens write.", "Fact 3: Some writing utensils are pens."], conclusion: "Which must also be a fact?", opts: ["I only", "I and II only", "II and III only", "None"], ans: 0 },
+    { premises: ["Fact 1: Islands are surrounded by water.", "Fact 2: Maui is an island.", "Fact 3: Maui was formed by a volcano."], conclusion: "Which must also be a fact?", opts: ["I: Maui is surrounded by water", "II only", "II and III only", "None"], ans: 0 },
+    { premises: ["Fact 1: Robert has four vehicles.", "Fact 2: Two are red.", "Fact 3: One is a minivan."], conclusion: "Which must also be a fact?", opts: ["I only", "II only", "II and III only", "None of the statements"], ans: 3 }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `Question ${idx + 1} of ${data.length}`;
+    
+    const box = document.getElementById('logic-content');
+    box.innerHTML = item.premises.map(p => `<span class="logic-line">${p}</span>`).join('') + 
+                    `<div class="conclusion-line"><strong>If the above is true, the following is:</strong> ${item.conclusion}</div>`;
+    
+    const optBox = document.getElementById('options');
+    optBox.innerHTML = '';
+    item.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        optBox.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function verify() {
+    if (selected === null) return alert("Select an answer.");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((b, i) => {
+        if (i === correct) b.classList.add('correct');
+        if (i === selected && i !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Logical Deduction practice complete!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Science & Health Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #0f172a; --bg: #f8fafc; --card: #ffffff; --accent: #3b82f6; --correct: #22c55e; --wrong: #ef4444; --text: #334155; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: relative; overflow: hidden; }
+        .quiz-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--accent); }
+        .q-header { font-size: 0.9rem; color: var(--accent); font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .q-text { font-size: 1.2rem; font-weight: 600; line-height: 1.6; margin-bottom: 25px; color: var(--primary); }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .opt { padding: 14px 20px; border: 2px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s ease; }
+        .opt:hover:not(:disabled) { border-color: var(--accent); background: #eff6ff; }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 15px; background: #f1f5f9; border-radius: 8px; font-size: 0.95rem; border-left: 4px solid var(--accent); display: none; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; }
+        .btn-nav { padding: 10px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Back</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which vaccine was prequalified by WHO to strengthen the response against cVDPV2 poliovirus?", opts: ["nOPV2", "IPV", "bOPV", "mOPV1"], ans: 0, exp: "The novel Oral Polio Vaccine type 2 (nOPV2) is specifically designed to be more genetically stable to prevent vaccine-derived outbreaks." },
+    { q: "2. Which organization is leading Phase I trials for the improved Kyasanur Forest Disease (KFD) vaccine?", opts: ["ICMR", "NIV", "CDSCO", "Indian Immunologicals Limited"], ans: 0, exp: "ICMR, in collaboration with Indian Immunologicals, initiated Phase I human clinical trials for the indigenous KFD vaccine in February 2026." },
+    { q: "3. Which company received USFDA tentative approval for generic cancer drug Erdafitinib?", opts: ["Sun Pharma", "Natco Pharma", "Cipla", "Dr Reddy’s"], ans: 1, exp: "Natco Pharma received tentative approval for Erdafitinib tablets, a generic version of Balversa, in February 2026." },
+    { q: "4. In which state was the rare mushroom Hemileccinum indicum discovered?", opts: ["Himachal Pradesh", "Arunachal Pradesh", "Sikkim", "Uttarakhand"], ans: 3, exp: "Discovered in the high-altitude oak (Quercus) forests of Uttarakhand by the Botanical Survey of India." },
+    { q: "5. Which company launched NEXIPOX PLUS®, a next-gen Varicella vaccine in India?", opts: ["Serum Institute", "Novo Medi Sciences", "Bharat Biotech", "Zydus Cadila"], ans: 1, exp: "Novo Medi Sciences launched NEXIPOX PLUS in early 2026, featuring a gelatin-free trehalose stabilizer system." },
+    { q: "6. FDA approved Zycubo as a treatment for which rare condition?", opts: ["Infectious disease", "Rare genetic disorder", "Nutritional deficiency", "Autoimmune condition"], ans: 1, exp: "Menkes disease is a rare genetic disorder affecting copper metabolism." },
+    { q: "7. Which organization launched the Bengaluru Centre of Excellence for aesthetic care?", opts: ["VCare", "DermaPlus", "SkinNova", "AestheticOne"], ans: 0, exp: "VCare's new center features advanced Single-Day Facial Architecture technology." },
+    { q: "8. The 'Asha Van' mobile unit in Gandhinagar primarily focuses on:", opts: ["Maternal Health", "Cardiac Care", "Diabetes", "Cancer Care"], ans: 3, exp: "Launched in Jan 2026, 'Asha Van' provides early cancer screening in remote villages of Gujarat." },
+    { q: "9. Which organization released the first clinical guideline for GLP-1 drugs for obesity?", opts: ["UNICEF", "WHO", "World Bank", "UNESCO"], ans: 1, exp: "WHO released guidelines for GLP-1 receptor agonists (like semaglutide) to manage chronic obesity." },
+    { q: "10. Which banned industrial dye is often detected in Indian sweets and spices?", opts: ["Auramine O", "Tartrazine", "Sunset yellow", "Rhodamine-B"], ans: 3, exp: "Rhodamine-B (often categorized under Auramine/dyes in tests) is a common toxic adulterant repeatedly flagged by FSSAI." },
+    { q: "11. Which organization partnered with UNICEF for an affordable malaria vaccine deal?", opts: ["WHO", "Gavi", "IFFIm", "CDC"], ans: 1, exp: "Gavi, the Vaccine Alliance, partnered with UNICEF to roll out the R21 and RTS,S vaccines." },
+    { q: "12. Which subcutaneous treatment combines trastuzumab and pertuzumab?", opts: ["Herceptin", "Kadcyla", "Phesgo", "Enhertu"], ans: 2, exp: "Phesgo is a fixed-dose combination used for HER2-positive breast cancer." },
+    { q: "13. Which DNA repair protein shows potential for treating BRCA-mutated cancers?", opts: ["RAD52", "PARP1", "BRCA1", "p53"], ans: 0, exp: "University of Iowa researchers found that inhibiting RAD52 is lethal to cancer cells lacking BRCA2." },
+    { q: "14. Which university’s researchers discovered Sinapic acid for diabetic wounds?", opts: ["Manipur University", "Mizoram University", "Nagaland University", "Assam University"], ans: 1, exp: "Mizoram University researchers published findings on Sinapic acid's role in accelerating wound healing." },
+    { q: "15. Which country unveiled a colon cancer vaccine at EEF 2025?", opts: ["Germany", "China", "Russia", "Japan"], ans: 2, exp: "Russia announced a breakthrough mRNA-based cancer vaccine scheduled for 2025 rollout." },
+    { q: "16. Which type of hepatitis was reclassified by WHO as carcinogenic?", opts: ["Hepatitis C", "Hepatitis D", "Hepatitis B", "Hepatitis E"], ans: 1, exp: "Hepatitis D (Delta) has been specifically highlighted for its high risk of liver cancer." },
+    { q: "17. Deficiency of which nutrient is linked to neurodevelopmental conditions?", opts: ["Vitamin D", "Vitamin C", "Iron", "Calcium"], ans: 0, exp: "New studies emphasize Vitamin D's role in brain development and psychological health." },
+    { q: "18. Name of India's multi-stage malaria vaccine candidate?", opts: ["FalciGuard", "AdFalciVax", "Malarivax", "PlasmoShield"], ans: 1, exp: "AdFalciVax is a recombinant chimeric vaccine developed by ICMR and DBT-NII." },
+    { q: "19. Which country approved the first malaria medicine for small babies in 2025?", opts: ["Switzerland", "France", "Nigeria", "Kenya"], ans: 0, exp: "Swiss regulators approved the first child-friendly formulation of Coartem for newborns." },
+    { q: "20. Name of the world’s first malaria treatment for newborns?", opts: ["Coartem", "Malarone", "Quinine", "Chloroquine"], ans: 0, exp: "Coartem (dispersible) is the gold standard for treating P. falciparum in infants." },
+    { q: "21. Scientists in which country discovered the EMM-negative (Gwada negative) blood type?", opts: ["Germany", "France", "Canada", "Italy"], ans: 1, exp: "French scientists identified this extremely rare blood group in a patient from Guadeloupe." },
+    { q: "22. Which institution organized a rally for World Sickle Cell Day 2025?", opts: ["AIIMS Bhopal", "AIIMS Raipur", "AIIMS Mangalagiri", "AIIMS Nagpur"], ans: 1, exp: "AIIMS Raipur is a leading center for Sickle Cell awareness and treatment in Chhattisgarh." },
+    { q: "23. Where was the new parasitic wasp 'Losgna Occidentalis' discovered?", opts: ["Shimla", "Chandigarh", "Dehradun", "Jaipur"], ans: 1, exp: "Discovered in an urban dry scrub forest in Chandigarh, not seen since 1965." },
+    { q: "24. TR1 cells play a dominant role in fighting reinfections of which disease?", opts: ["Tuberculosis", "Dengue Fever", "HIV/AIDS", "Malaria"], ans: 3, exp: "Type 1 regulatory T cells (TR1) are crucial in the immune memory against malaria." },
+    { q: "25. In which country was the world’s first in-human bladder transplant performed?", opts: ["United Kingdom", "Germany", "Canada", "United States"], ans: 3, exp: "The procedure was performed by surgeons at the University of Southern California (USC)." },
+    { q: "26. Percentage of Indian CRGN patients receiving appropriate antibiotics?", opts: ["7.8%", "6.9%", "10.4%", "3.5%"], ans: 1, exp: "A study revealed that only 6.9% of patients with highly resistant infections received the correct targeted treatment." },
+    { q: "27. Name of the electricity-conducting bacterium discovered in 2025?", opts: ["Ca. Electrothrix yaqonensis", "B. subtilis", "E. coli", "P. aeruginosa"], ans: 0, exp: "Discovered in mud flats, this 'cable bacterium' uses nickel-based fibers to conduct electricity." },
+    { q: "28. Which theory explained malaria as being caused by 'bad air'?", opts: ["Germ theory", "Humoral theory", "Contagion theory", "Miasma theory"], ans: 3, exp: "Miasma theory held that diseases were caused by noxious vapors from decomposing organic matter." },
+    { q: "29. Which country launched its first-in-human gene therapy trial for Haemophilia?", opts: ["China", "India", "UK", "USA"], ans: 1, exp: "The trial showed a 60-70% correction rate without bleeding episodes, as reported by the Science Minister in 2025." },
+    { q: "30. Which institution performed the first Swap Kidney Transplant in its region?", opts: ["AIIMS Bhopal", "AIIMS Raipur", "AIIMS Delhi", "AIIMS Patna"], ans: 1, exp: "AIIMS Raipur successfully conducted the state's first kidney swap transplant." },
+    { q: "31. HEALD initiative primarily focuses on:", opts: ["Heart", "Liver", "Neurological", "Respiratory"], ans: 1, exp: "HEALD stands for Healthy Liver Education and Alcohol-associated Liver Disease Prevention." },
+    { q: "32. Gepotidacin was initially approved for which condition?", opts: ["UTI", "Respiratory", "Skin", "Gastro"], ans: 0, exp: "Gepotidacin is the first new oral antibiotic for uncomplicated UTIs in 30 years (approved Aug 2025)." },
+    { q: "33. Virus spreading via rodent urine, droppings, and saliva?", opts: ["Ebola", "Hantavirus", "Zika", "Influenza"], ans: 1, exp: "Hantaviruses cause severe respiratory disease and are contracted from rodent excreta." },
+    { q: "34. What bacteria could play a role in treating vitiligo?", opts: ["Gut bacteria", "Skin bacteria", "Mouth bacteria", "Lung bacteria"], ans: 1, exp: "Research into Bacillus subtilis-derived compounds shows potential for skin repigmentation." },
+    { q: "35. In which country did a 500-kg metal object (space debris) crash?", opts: ["Brazil", "India", "Russia", "Kenya"], ans: 1, exp: "Reports in 2025/26 tracked significant space debris incidents in rural India." },
+    { q: "36. Where was the new bat coronavirus HKU5-CoV-2 discovered?", opts: ["South Africa", "China", "United States", "Brazil"], ans: 1, exp: "Chinese researchers identified this virus, which uses the same cell entry protein as SARS-CoV-2." },
+    { q: "37. Primary health hazard in Ganga at Prayagraj during Maha Kumbh?", opts: ["E. coli", "Faecal Bacteria", "Salmonella", "Coliform Bacteria"], ans: 1, exp: "High levels of faecal coliform/bacteria are a major monitoring focus during mass gatherings." },
+    { q: "38. % of global population potentially exposed to zoonotic diseases?", opts: ["40%", "50%", "30%", "44%"], ans: 3, exp: "Recent modeling studies estimate that 44% of people live in zones at risk of spillover." },
+    { q: "39. Company that developed world’s first DIVA vaccine for LSD?", opts: ["Biovet", "Serum Institute", "Bharat Biotech", "Cadila"], ans: 0, exp: "Biovet's DIVA vaccine allows researchers to Differentiate Infected from Vaccinated Animals." },
+    { q: "40. Where were Jurassic-era bird fossils recently discovered?", opts: ["USA", "Brazil", "China", "Canada"], ans: 2, exp: "China's fossil beds continue to yield critical intermediate species in bird evolution." },
+    { q: "41. Researchers in which country created the first-ever kangaroo embryo via IVF?", opts: ["Australia", "Canada", "USA", "New Zealand"], ans: 0, exp: "Australian scientists achieved this milestone to aid conservation of rare macropod species." },
+    { q: "42. First clinical trial for Sudan ebolavirus vaccine launched in:", opts: ["Uganda", "DRC", "Sierra Leone", "Liberia"], ans: 0, exp: "Uganda launched the trial in Feb 2025 in response to a localized outbreak." },
+    { q: "43. WHO daily sodium intake recommendation?", opts: ["2g", "3g", "5g", "1g"], ans: 0, exp: "WHO recommends less than 2g of sodium (approx 5g of salt) per day." },
+    { q: "44. Year FDA approved first gene therapy for blindness (Luxturna)?", opts: ["2015", "2016", "2018", "2017"], ans: 3, exp: "Luxturna was approved in 2017 for RPE65-related retinal dystrophy." },
+    { q: "45. Institution leading study on climate change and dengue warning?", opts: ["NIV", "NCDC", "ICMR", "IITM"], ans: 3, exp: "The Indian Institute of Tropical Meteorology (IITM) developed the early warning models." },
+    { q: "46. % of Indian women (25-49) having undergone hysterectomy?", opts: ["4%", "5%", "6%", "7%"], ans: 0, exp: "NFHS data (updated in 2024-25 cycles) shows rates around 4-5%." },
+    { q: "47. Injectable HIV prevention drug reaching low-income countries in 2025?", opts: ["Lenacapavir", "Truvada", "Bictegravir", "Descovy"], ans: 0, exp: "Lenacapavir is a twice-yearly injectable showing near 100% efficacy in trials." },
+    { q: "48. City where India’s first diabetes biobank was established?", opts: ["Chennai", "Mumbai", "Hyderabad", "Bengaluru"], ans: 0, exp: "Established at the Madras Diabetes Research Foundation (MDRF) in Chennai." },
+    { q: "49. NCL initiative for free treatment of life-threatening diseases?", opts: ["AYUSHMAN", "SANJEEVANI", "CHARAK", "AROGYA"], ans: 1, exp: "Project Sanjeevani provides specialized medical support for mining community dependents." },
+    { q: "50. Name of India’s first indigenous macrolide antibiotic?", opts: ["Nafithromycin", "Azithromycin", "Erythromycin", "Clarithromycin"], ans: 0, exp: "Nafithromycin, developed by Wockhardt and DBT, was highlighted by the Science Minister in 2025." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `ID: SCI_${idx + 1}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

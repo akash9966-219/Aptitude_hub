@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Full Seating Arrangement Bank</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --accent: #2563eb;
+            --correct: #16a34a;
+            --wrong: #dc2626;
+            --text: #334155;
+            --dir-bg: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .direction-box {
+            background: var(--dir-bg);
+            border-left: 5px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            white-space: pre-line;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #f8faff; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .logic-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .nav-btns {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="counter">Loading...</span>
+</div>
+
+<div class="container">
+    <div class="main">
+        <div id="direction" class="direction-box"></div>
+        <div class="quiz-card">
+            <div id="question" class="question-text"></div>
+            <div id="options" class="options-grid"></div>
+            <div id="logic" class="logic-box">
+                <strong>Solution Logic:</strong><br>
+                <span id="logicText"></span>
+            </div>
+            <div class="nav-btns">
+                <button class="btn" id="prevBtn" onclick="prev()">Previous</button>
+                <button class="btn" id="nextBtn" onclick="next()" style="display:none">Next</button>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar" style="background:white; padding:15px; border-radius:10px; height:fit-content;">
+        <h4 style="margin-top:0">Instructions</h4>
+        <p style="font-size:0.8rem">Follow the text in the shaded box above the question to understand the specific arrangement constraints.</p>
+    </div>
+</div>
+
+<script>
+const data = [
+    {
+        dir: "SET 1: A, P, R, X, S and Z are in a row. S and Z are in the centre. A and P are at the ends. R is sitting to the left of A.",
+        qs: [
+            { q: "Who is to the right of P?", opts: ["A", "X", "S", "Z"], ans: 1, logic: "Order: P - X - S - Z - R - A." }
+        ]
+    },
+    {
+        dir: "SET 2: 8 houses in a line. Jack not neighbour of Siman. Harry next to left of Larry (at least one left of Larry). Paul in middle. Mike between Paul and Larry. If at least one lives right of Robert and Harry not between Taud and Larry...",
+        qs: [
+            { q: "Which statement is not correct?", opts: ["Robert is not at the left end.", "Robert is in between Simon and Taud.", "Taud is in between Paul and Jack.", "There are three persons to the right of Paul."], ans: 1, logic: "By testing layouts, Robert cannot be placed between Simon and Taud while fulfilling all conditions." }
+        ]
+    },
+    {
+        dir: "SET 3: A, B, C, D, E on a bench. A next to B. C next to D. D not with E (at left end). C is 2nd from right. A right of B and E. A and C together.",
+        qs: [
+            { q: "In which position A is sitting?", opts: ["Between B and D", "Between B and C", "Between E and D", "Between C and E"], ans: 1, logic: "Order: E - B - A - C - D." }
+        ]
+    },
+    {
+        dir: "SET 4: P, Q, R, S, T, U, V, W around circle facing centre. P 2nd right of T (neighbour of R and V). S not neighbour of P. V neighbour of U. Q not between S/W. W not between U/S.",
+        qs: [
+            { q: "Which two are not neighbours?", opts: ["RV", "UV", "RP", "QW"], ans: 2, logic: "Layout: T between R/V. P 2nd right of T. R and P are separated." },
+            { q: "Which one is immediate right to the V?", opts: ["P", "U", "R", "T"], ans: 3, logic: "T is to the right of V in this circle setup." },
+            { q: "What is the position of S?", opts: ["Between U and V", "Second to the right of P", "To the immediate right of W", "Data inadequate"], ans: 1, logic: "Counting positions from P." }
+        ]
+    },
+    {
+        dir: "SET 5: Five girls. Seema left of Rani, right of Bindu. Mary right of Rani. Reeta between Rani and Mary.",
+        qs: [
+            { q: "Who is sitting immediate right to Reeta?", opts: ["Bindu", "Rani", "Mary", "Seema"], ans: 2, logic: "Order: Bindu - Seema - Rani - Reeta - Mary." },
+            { q: "Who is in the middle of the photograph?", opts: ["Bindu", "Rani", "Reeta", "Seema"], ans: 1, logic: "Rani is the 3rd girl in 5." },
+            { q: "Who is second from the right?", opts: ["Mary", "Rani", "Reeta", "Bindu"], ans: 2, logic: "Reeta is 2nd from right." },
+            { q: "Who is second from the left in photograph?", opts: ["Reeta", "Mary", "Bindu", "Seema"], ans: 3, logic: "Seema is 2nd from left." }
+        ]
+    },
+    {
+        dir: "SET 6: Six friends in circle facing centre. Deepa between Prakash and Pankaj. Priti between Mukesh and Lalit. Prakash and Mukesh opposite.",
+        qs: [
+            { q: "Who is sitting right to Prakash?", opts: ["Mukesh", "Deepa", "Pankaj", "Lalit"], ans: 1, logic: "Layout: Prakash, Deepa, Pankaj, Mukesh, Priti, Lalit." },
+            { q: "Who is just right to Pankaj?", opts: ["Deepa", "Lalit", "Prakash", "Priti"], ans: 1, logic: "Based on circle rotation, Lalit is right of Pankaj." },
+            { q: "Who are the neighbours of Mukesh?", opts: ["Prakash and Deepa", "Deepa and Priti", "Priti and Pankaj", "Lalit and Priti"], ans: 2, logic: "Mukesh is between Pankaj and Priti." },
+            { q: "Who is sitting opposite to Priti?", opts: ["Prakash", "Deepa", "Pankaj", "Lalit"], ans: 1, logic: "Deepa is opposite Priti." }
+        ]
+    },
+    {
+        dir: "SET 7: Seven cars (Cadillac, Amba, Fiat, Maru, Merc, Bed, Fargo) facing East. Cadillac right of Fargo. Fargo 4th right of Fiat. Maruti between Amba and Bed. Fiat 3rd left of Amba, is at one end.",
+        qs: [
+            { q: "Which cars are on both sides of cadillac?", opts: ["Ambassador and Maruti", "Maruti and Fiat", "Fargo and Mercedes", "Ambassador and Fargo"], ans: 2, logic: "Order: Fiat, Bed, Maru, Amba, Fargo, Cad, Merc." },
+            { q: "Which statement is correct? (Maruti/Amba)", opts: ["Maruti next left of Amba", "Bedford next left of Fiat", "Bedford at end", "Fiat 2nd right of Maruti"], ans: 0, logic: "Maruti is directly left of Ambassador." },
+            { q: "Which statement is correct? (Fargo/Mercedes)", opts: ["Fargo between Amba/Fiat", "Cadillac next left to Mercedes", "Fargo next right of Cadillac", "Maruti 4th right of Mercedes"], ans: 1, logic: "Cadillac is to the left of Mercedes." },
+            { q: "Which cars are to the right of Ambassador?", opts: ["Cad, Fargo, Maru", "Merc, Cad, Fargo", "Maru, Bed, Fiat", "Bed, Cad, Fargo"], ans: 1, logic: "Fargo, Cad, Merc are to the right." },
+            { q: "Correct position of Mercedes?", opts: ["Left of Cadillac", "Left of Bedford", "Between Bed/Fargo", "4th right of Maruti"], ans: 3, logic: "Maruti... (Amba, Fargo, Cad, Merc) - 4 steps." }
+        ]
+    },
+    {
+        dir: "SET 8: Six friends P, Q, R, S, T, U around hexagonal table. P 2nd left of U. Q neighbour of R and S. T 2nd left of S.",
+        qs: [
+            { q: "Which one is sitting opposite to P?", opts: ["R", "Q", "T", "S"], ans: 3, logic: "Layout: P-T-R-U-S-Q." },
+            { q: "Who is the fourth person to the left of Q?", opts: ["P", "U", "R", "Data inadequate"], ans: 0, logic: "Counting clockwise from Q." },
+            { q: "Which are the neighbours of P?", opts: ["U and P", "T and R", "U and R", "Data inadequate"], ans: 2, logic: "Based on the hexagon edges." },
+            { q: "Which one is sitting opposite to T?", opts: ["R", "Q", "Cannot be determined", "S"], ans: 1, logic: "Q is opposite T." }
+        ]
+    },
+    {
+        dir: "SET 9: Men (A-E) face South, Ladies (M-Q) face North. B left of D opposite Q. C/N diagonally opposite. E opposite O (right of M). P left of Q opposite D. M at end.",
+        qs: [
+            { q: "Who is sitting third to the right of O?", opts: ["Q", "N", "M", "Data inadequate"], ans: 1, logic: "Ladies: M-O-P-Q-N. Third right of O is N." },
+            { q: "If B shifts to E, E to Q, Q to B... 2nd left of person opposite O?", opts: ["Q", "P", "E", "D"], ans: 1, logic: "After swapping, trace the relative position of P." },
+            { q: "Diagonally opposite pair?", opts: ["EQ", "BO", "AN", "AM"], ans: 0, logic: "C-N and E-Q are the diagonal ends." },
+            { q: "If O/P, A/E, B/Q interchange... 2nd right of person opposite person 2nd right of P?", opts: ["D", "A", "E", "O"], ans: 1, logic: "Carefully trace the 3-step logic after swapping positions." },
+            { q: "Who is sitting just opposite to N?", opts: ["B", "A", "C", "D"], ans: 0, logic: "B is opposite N." }
+        ]
+    },
+    {
+        dir: "SET 10: A-G face North. F right of E. E 4th right of G. C neighbour of B/D. 3rd left of D is at end.",
+        qs: [
+            { q: "Who are to the left of C?", opts: ["Only B", "G, B and D", "G and B", "D, E, F and A"], ans: 2, logic: "Order: G - B - C - D - E - F - A." },
+            { q: "Which statement is not true?", opts: ["E is immediate left of D", "A is at one of ends", "G is immediate left of B", "F is 2nd right of D"], ans: 0, logic: "E is to the right of D." },
+            { q: "Who are the neighbours of B?", opts: ["C and D", "C and G", "G and F", "C and E"], ans: 1, logic: "B is between G and C." },
+            { q: "What is the position of A?", opts: ["Between E and D", "Extreme left", "Centre", "Extreme right"], ans: 3, logic: "A is at the far right." }
+        ]
+    },
+    {
+        dir: "SET 11: 8 persons (E-L) on square table. J between L/F. G between I/F. H (lady) 2nd left of J. F (male) opposite E (lady). Lady between F/I.",
+        qs: [
+            { q: "Immediate left of F?", opts: ["G", "I", "J", "H"], ans: 2, logic: "J is to the left of F." },
+            { q: "What is true about J and K?", opts: ["J male, K female", "J female, K male", "Both female", "Both male"], ans: 3, logic: "J and K are both males based on lady count." },
+            { q: "How many persons between K and F?", opts: ["1", "2", "3", "4"], ans: 2, logic: "Three people separate them in a square of 8." },
+            { q: "Who among following are three lady members?", opts: ["E, H and J", "E, F and G", "E, H and G", "C, H and J"], ans: 2, logic: "E, H, and G are the three ladies." },
+            { q: "Who is seated between E and H?", opts: ["F", "I", "K", "Data inadequate"], ans: 2, logic: "K is seated there." }
+        ]
+    },
+    {
+        dir: "SET 12: 7 students (A-G) on 3 benches. F (boy) only with B. A on Bench I. G on Bench III. E is brother of C. C (girl) not with A, E, D.",
+        qs: [
+            { q: "How many girls out of 7 students?", opts: ["3", "3 or 4", "4", "Data inadequate"], ans: 1, logic: "B, C, and one of A/D/E are girls." },
+            { q: "Which of following is group of girls?", opts: ["BAC", "BFC", "BCD", "CDF"], ans: 0, logic: "B, A (as the girl on I), and C." },
+            { q: "Who sits with C?", opts: ["B", "D", "G", "E"], ans: 2, logic: "G sits with C on Bench III." },
+            { q: "On which bench there are three students?", opts: ["Bench I", "Bench II", "Bench III", "Bench I or II"], ans: 0, logic: "Bench I has A, D, and E." }
+        ]
+    }
+];
+
+let sIdx = 0, qIdx = 0;
+
+function render() {
+    const s = data[sIdx], q = s.qs[qIdx];
+    document.getElementById('direction').innerText = s.dir;
+    document.getElementById('question').innerText = q.q;
+    document.getElementById('counter').innerText = `Set ${sIdx+1} - Q ${qIdx+1} (Total: 40+)`;
+    
+    const optsCont = document.getElementById('options');
+    optsCont.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => check(i, btn);
+        optsCont.appendChild(btn);
+    });
+
+    document.getElementById('logic').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('prevBtn').disabled = (sIdx === 0 && qIdx === 0);
+}
+
+function check(idx, btn) {
+    const q = data[sIdx].qs[qIdx];
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    if(idx === q.ans) btn.classList.add('correct');
+    else {
+        btn.classList.add('wrong');
+        btns[q.ans].classList.add('correct');
+    }
+    document.getElementById('logicText').innerText = q.logic;
+    document.getElementById('logic').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    if(qIdx < data[sIdx].qs.length - 1) qIdx++;
+    else if(sIdx < data.length - 1) { sIdx++; qIdx = 0; }
+    else alert("Full Bank Completed!");
+    render();
+}
+
+function prev() {
+    if(qIdx > 0) qIdx--;
+    else if(sIdx > 0) { sIdx--; qIdx = data[sIdx].qs.length - 1; }
+    render();
+}
+
+render();
+</script>
+</body>
+</html>

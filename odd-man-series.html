@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Series & Odd Man Out Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 900px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .question-meta { color: #888; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; }
+        .question-text { font-size: 1.15rem; font-weight: 600; line-height: 1.5; margin-bottom: 25px; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .option:hover { border-color: var(--primary); background: #f8f9ff; }
+        .option.selected { border-color: var(--primary); background: #eef2ff; font-weight: bold; }
+
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+
+        @media (min-width: 600px) { .options-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Odd Man Out & Series Completion</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="q-count" class="question-meta">Question 1</div>
+        <div id="q-text" class="question-text">Loading...</div>
+        <div id="options-container" class="options-grid"></div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div id="explanation-content" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // PART 1
+        { q: "Odd man out: 3, 5, 11, 14, 17, 21", options: ["21", "17", "14", "3"], correct: 2, explain: "All numbers are odd except 14." },
+        { q: "Odd man out: 8, 27, 64, 100, 125, 216, 343", options: ["27", "100", "125", "343"], correct: 1, explain: "All are perfect cubes (2^3, 3^3, etc.) except 100, which is a square (10^2)." },
+        { q: "Odd man out: 10, 25, 45, 54, 60, 75, 80", options: ["10", "45", "54", "75"], correct: 2, explain: "All are multiples of 5 except 54." },
+        { q: "Odd man out: 396, 462, 572, 427, 671, 264", options: ["396", "427", "671", "264"], correct: 1, explain: "In all others, the middle digit is the sum of the first and third digits. 4+7 is not 2." },
+        { q: "Odd man out: 6, 9, 15, 21, 24, 28, 30", options: ["28", "21", "24", "30"], correct: 0, explain: "All are multiples of 3 except 28." },
+        { q: "Odd man out: 1, 4, 9, 16, 23, 25, 36", options: ["9", "23", "25", "36"], correct: 1, explain: "All are perfect squares except 23." },
+        { q: "Odd man out: 1, 4, 9, 16, 20, 36, 49", options: ["1", "9", "20", "49"], correct: 2, explain: "All are perfect squares except 20." },
+        { q: "Odd man out: 2, 5, 10, 17, 26, 37, 50, 64", options: ["50", "26", "37", "64"], correct: 3, explain: "Pattern is n^2 + 1. 8^2 + 1 = 65, not 64." },
+        { q: "Odd man out: 10, 14, 16, 18, 21, 24, 26", options: ["26", "24", "21", "18"], correct: 2, explain: "All are even numbers except 21." },
+        { q: "Odd man out: 16, 25, 36, 72, 144, 196, 225", options: ["36", "72", "196", "225"], correct: 1, explain: "All are perfect squares except 72." },
+        { q: "Odd man out: 331, 482, 551, 263, 383, 362, 284", options: ["263", "383", "331", "551"], correct: 1, explain: "In all others, first digit * last digit = middle digit. 3 * 3 = 9 (not 8)." },
+        { q: "Odd man out: 835, 734, 642, 751, 853, 981, 532", options: ["751", "853", "981", "532"], correct: 0, explain: "In all others, first digit - last digit = middle digit. 7 - 1 is not 5." },
+        { q: "Odd man out: 41, 43, 47, 53, 61, 71, 73, 81", options: ["61", "71", "73", "81"], correct: 3, explain: "All are prime numbers except 81." },
+        { q: "Odd man out: 3, 5, 7, 12, 17, 19", options: ["19", "17", "5", "12"], correct: 3, explain: "All are prime numbers except 12." },
+        
+        // PART 2
+        { q: "Odd man out: 582, 605, 588, 611, 634, 617, 600", options: ["634", "611", "605", "600"], correct: 0, explain: "Alternating series: +6, -17. 611 + 6 = 617, 617 + 6 = 623. So 634 is wrong." },
+        { q: "Odd man out: 22, 33, 66, 99, 121, 279, 594", options: ["33", "121", "279", "594"], correct: 2, explain: "All are multiples of 11 except 279." },
+        { q: "Odd man out: 8, 13, 21, 32, 47, 63, 83", options: ["47", "63", "32", "83"], correct: 0, explain: "Pattern of differences: +5, +8, +11, +14, +17, +20. 32 + 14 = 46. So 47 is wrong." },
+        { q: "Odd man out: 1, 8, 27, 64, 124, 216, 343", options: ["8", "27", "64", "124"], correct: 3, explain: "Cubes: 1, 8, 27, 64, 125. 124 is wrong." },
+        { q: "Odd man out: 1, 2, 6, 15, 31, 56, 91", options: ["31", "91", "56", "15"], correct: 1, explain: "Pattern: +1^2, +2^2, +3^2... 56 + 6^2 = 92. 91 is wrong." },
+        { q: "Odd man out: 52, 51, 48, 43, 34, 27, 16", options: ["27", "34", "43", "48"], correct: 0, explain: "Differences: -1, -3, -5, -9, -11. Should be -7 after 43. 43 - 7 = 36. So 34 and 27 are affected, but 27 is the clear outlier." },
+        { q: "Odd man out: 4, 6, 8, 9, 10, 11, 12", options: ["10", "11", "12", "9"], correct: 1, explain: "All are composite numbers except 11 (prime)." },
+        { q: "Odd man out: 105, 85, 60, 30, 0, -45, -90", options: ["0", "85", "-45", "60"], correct: 0, explain: "Pattern: -20, -25, -30, -35, -40. 30 - 35 = -5. So 0 is wrong." },
+        { q: "Odd man out: 5, 16, 6, 16, 7, 16, 9", options: ["9", "7", "6", "None"], correct: 0, explain: "Alternating series: 5, 6, 7, 8. 9 should be 8." },
+        { q: "Odd man out: 125, 127, 130, 135, 142, 153, 165", options: ["130", "142", "153", "165"], correct: 3, explain: "Diffs: 2, 3, 5, 7, 11, 13 (primes). 153 + 13 = 166. 165 is wrong." },
+        { q: "Odd man out: 46080, 3840, 384, 48, 24, 2, 1", options: ["1", "2", "24", "384"], correct: 2, explain: "Divide by 12, 10, 8, 6, 4, 2. 48 / 6 = 8. So 24 is wrong." },
+        { q: "Odd man out: 6, 13, 18, 25, 30, 37, 40", options: ["25", "30", "37", "40"], correct: 3, explain: "Pattern: +7, +5, +7, +5. 37 + 5 = 42. So 40 is wrong." },
+        { q: "Odd man out: 36, 54, 18, 27, 9, 18.5, 4.5", options: ["4.5", "18.5", "54", "18"], correct: 1, explain: "Pattern: x 1.5, / 3. 9 * 1.5 = 13.5. So 18.5 is wrong." },
+        { q: "Odd man out: 56, 72, 90, 110, 132, 150", options: ["72", "110", "132", "150"], correct: 3, explain: "Pattern: 7*8, 8*9, 9*10, 10*11, 11*12, 12*13. 12*13 = 156. 150 is wrong." },
+        { q: "Odd man out: 25, 36, 49, 81, 121, 169, 225", options: ["36", "49", "121", "169"], correct: 0, explain: "All are squares of odd numbers except 36 (6^2)." },
+
+        // PART 3 - Completion
+        { q: "16, 33, 65, 131, 261, (....)", options: ["523", "521", "613", "721"], correct: 0, explain: "Pattern: x2+1, x2-1. 261 * 2 + 1 = 523." },
+        { q: "10, 5, 13, 10, 16, 20, 19, (....)", options: ["22", "40", "38", "23"], correct: 1, explain: "Two series: (10, 13, 16, 19) and (5, 10, 20, 40)." },
+        { q: "1, 4, 9, 16, 25, 36, 49, (....)", options: ["54", "56", "64", "81"], correct: 2, explain: "Squares: 1^2, 2^2... 8^2 = 64." },
+        { q: "2, 4, 12, 48, 240, (....)", options: ["960", "1440", "1080", "1920"], correct: 1, explain: "Pattern: x2, x3, x4, x5, x6. 240 * 6 = 1440." },
+        { q: "8, 7, 11, 12, 14, 17, 17, 22, (....)", options: ["27", "20", "22", "24"], correct: 1, explain: "Two series: (8, 11, 14, 17, 20) and (7, 12, 17, 22)." },
+        { q: "11, 13, 17, 19, 23, 29, 31, 37, 41, (....)", options: ["43", "47", "53", "51"], correct: 0, explain: "Consecutive prime numbers. Next is 43." },
+        { q: "8, 24, 12, 36, 18, 54, (....)", options: ["27", "108", "68", "72"], correct: 0, explain: "Pattern: x3, /2. 54 / 2 = 27." },
+        { q: "2, 6, 12, 20, 30, 42, 56, (....)", options: ["61", "64", "72", "70"], correct: 2, explain: "Pattern: 1*2, 2*3, 3*4, 4*5, 5*6, 6*7, 7*8, 8*9 = 72." },
+        { q: "4, -8, 16, -32, 64, (....)", options: ["128", "-128", "192", "-192"], correct: 1, explain: "Pattern: x (-2). 64 * -2 = -128." },
+        { q: "7, 26, 63, 124, 215, 342, (....)", options: ["481", "511", "391", "421"], correct: 1, explain: "Pattern: n^3 - 1. 8^3 - 1 = 511." },
+        { q: "5, 10, 13, 26, 29, 58, 61, (....)", options: ["122", "64", "125", "128"], correct: 0, explain: "Pattern: x2, +3. 61 * 2 = 122." },
+        { q: "15, 31, 63, 127, 255, (....)", options: ["513", "511", "517", "523"], correct: 1, explain: "Pattern: x2 + 1. 255 * 2 + 1 = 511." },
+        { q: "1, 8, 27, 64, 125, 216, (....)", options: ["354", "343", "392", "245"], correct: 1, explain: "Cubes: 1^3 to 7^3 = 343." },
+        { q: "3, 7, 6, 5, 9, 3, 12, 1, 15, (....)", options: ["18", "13", "-1", "3"], correct: 2, explain: "Two series: (3, 6, 9, 12, 15) and (7, 5, 3, 1, -1)." },
+
+        // PART 4 - Wrong Number in Series
+        { q: "Wrong number: 7, 8, 18, 57, 228, 1165, 6996", options: ["8", "18", "57", "228"], correct: 3, explain: "Pattern: x1+1, x2+2, x3+3... 57*4+4 = 232. 228 is wrong." },
+        { q: "Wrong number: 1, 1, 2, 6, 24, 96, 720", options: ["720", "96", "24", "6"], correct: 1, explain: "Pattern: x1, x2, x3, x4, x5. 24*5 = 120. 96 is wrong." },
+        { q: "Wrong number: 196, 169, 144, 121, 100, 80, 64", options: ["169", "144", "121", "80"], correct: 3, explain: "Descending squares: 14^2... 9^2 = 81. 80 is wrong." },
+        { q: "Wrong number: 445, 221, 109, 46, 25, 11, 4", options: ["221", "109", "46", "25"], correct: 2, explain: "Pattern: (n-3)/2. (109-3)/2 = 53. 46 is wrong." },
+        { q: "Wrong number: 190, 166, 145, 128, 112, 100, 91", options: ["100", "166", "145", "128"], correct: 0, explain: "Pattern: -24, -21, -17... Should be -15, -12, -9. 112 - 9 = 103. 100 is wrong." },
+        { q: "Wrong number: 19, 26, 33, 46, 59, 74, 91", options: ["26", "33", "46", "59"], correct: 1, explain: "Diffs: +7, +9, +11... 19+7=26, 26+9=35. 33 is wrong." },
+        { q: "Wrong number: 1, 3, 10, 21, 64, 129, 356, 777", options: ["10", "21", "64", "356"], correct: 3, explain: "Pattern: x2+1, x3+1, x2+1, x3+1... 129*3+1 = 388. 356 is wrong." },
+        { q: "Wrong number: 6, 12, 48, 100, 384, 768, 3072", options: ["768", "384", "100", "48"], correct: 2, explain: "Pattern: x2, x4, x2, x4... 48*2 = 96. 100 is wrong." },
+        { q: "Wrong number: 40960, 10240, 2560, 640, 200, 40, 10", options: ["640", "40", "200", "2560"], correct: 2, explain: "Pattern: /4. 640 / 4 = 160. 200 is wrong." },
+        { q: "Wrong number: 3, 7, 15, 39, 63, 127, 255, 511", options: ["7", "15", "39", "63"], correct: 2, explain: "Pattern: 2^n - 1. 2^2-1=3, 2^3-1=7... 2^5-1 = 31. 39 is wrong." },
+        { q: "Wrong number: 64, 71, 80, 91, 104, 119, 135, 155", options: ["71", "80", "104", "135"], correct: 3, explain: "Diffs: +7, +9, +11, +13, +15, +17... 119+17 = 136. 135 is wrong." },
+        { q: "Wrong number: 15, 16, 34, 105, 424, 2124, 12756", options: ["16", "34", "105", "2124"], correct: 3, explain: "Pattern: x1+1, x2+2, x3+3... 424*5+5 = 2125. 2124 is wrong." },
+        { q: "Wrong number: 10, 26, 74, 218, 654, 1946, 5834", options: ["26", "74", "218", "654"], correct: 3, explain: "Pattern: x3 - 4. 218*3-4 = 650. 654 is wrong." },
+        { q: "Wrong number: 2880, 480, 92, 24, 8, 4, 4", options: ["480", "92", "24", "8"], correct: 1, explain: "Pattern: /6, /5, /4, /3... 480/5 = 96. 92 is wrong." },
+        { q: "Wrong number: 3, 7, 15, 27, 63, 127, 255", options: ["7", "15", "27", "63"], correct: 2, explain: "Pattern: 2^n - 1. 2^5 - 1 = 31. 27 is wrong." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = opt;
+            btn.onclick = () => {
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                btn.classList.add('selected');
+            };
+            container.appendChild(btn);
+        });
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Select an answer!");
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            document.getElementById('result-title').innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            document.getElementById('result-title').innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        document.getElementById('explanation-content').innerHTML = "<b>Explanation:</b> " + q.explain;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            selectedIdx = null;
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `<h2>Quiz Complete!</h2><p style='font-size:1.5rem'>Final Score: ${score} / ${questions.length}</p><button class='btn btn-check' onclick='location.reload()'>Restart</button>`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
