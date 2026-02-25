@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Java Progrraming Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Java Programming Test 1</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 1</button>
+        <a href="test6.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+      const questions = [
+  {
+    q: "What will be the output of the program if executed with the command line: java F0091 world?",
+    options: ["Hello", "Hello Foo91", "Hello world", "The code does not run."],
+    ans: 3,
+    logic: "The main method is missing the 'static' modifier (public static void main). Therefore, the Java Virtual Machine cannot find the entry point to run the program."
+  },
+  {
+    q: "What will be the output of the program with the command-line invocation: java CommandArgsThree 1 2 3?",
+    options: ["0 0", "1 2", "0 0 0", "1 2 3"],
+    ans: 3,
+    logic: "The code assigns the 'args' array (which contains 1, 2, 3) to argCopy[0]. The length is 3, so the loop prints all three elements: 1 2 3."
+  },
+  {
+    q: "What is the widest valid returnType for methodA: return (long)x / y * 2; ?",
+    options: ["int", "byte", "long", "double"],
+    ans: 3,
+    logic: "Because 'y' is a double, the entire expression is promoted to a double. Therefore, the return type must be double to accommodate the result."
+  },
+  {
+    q: "What is the most restrictive access modifier that allows members of one class access to members of another class in the same package?",
+    options: ["public", "abstract", "protected", "default access"],
+    ans: 3,
+    logic: "Default access (also known as package-private) allows classes within the same package to access each other's members without any keyword."
+  },
+  {
+    q: "What will be the output of the program? (Method void A() inside Class A)",
+    options: ["Class A", "Compilation fails.", "An exception is thrown", "The code executes with no output."],
+    ans: 3,
+    logic: "void A() is a regular method, not a constructor (constructors have no return type). Since the method is never called, no output is produced."
+  },
+  {
+    q: "What will be the output of the program? (Loop with if (( ++x > 2 ) && (++y > 2)))",
+    options: ["5 2", "5 3", "6 3", "6 4"],
+    ans: 0,
+    logic: "Due to the short-circuit && operator, ++y only executes when ++x > 2 is true. This happens 3 times, but ++y > 2 only becomes true once, resulting in x=5 and y=2."
+  },
+  {
+    q: "Which two statements are equivalent? 1: 16*4, 2: 16>>2, 3: 16/2^2, 4: 16>>>2",
+    options: ["1 and 2", "2 and 4", "3 and 4", "1 and 3"],
+    ans: 1,
+    logic: "16 >> 2 and 16 >>> 2 both shift the bits of 16 to the right by two places, which is equivalent to dividing by 4. Both result in 4."
+  },
+  {
+    q: "Which statement is true for: if(odd) where odd is an int?",
+    options: ["Compilation fails.", "'odd' will always be output.", "'even' will always be output.", "Depends on x."],
+    ans: 0,
+    logic: "In Java, an 'if' statement requires a boolean expression. An integer (1) cannot be converted to a boolean automatically, so it fails to compile."
+  },
+  {
+    q: "What will be the output of the Switch2 program?",
+    options: ["0 def 1", "2 1 0 def 1", "2 1 0 def def", "2 1 0 def 1 def 1"],
+    ans: 3,
+    logic: "The loop iterates 0-3. Based on the case values (x=2, x-1=1, x-2=0), the cases and fall-throughs result in: 2 (for z=0), 1 (for z=1), 0 def 1 (for z=2), and def 1 (for z=3)."
+  },
+  {
+    q: "What will be the output? (badMethod throws Error)",
+    options: ["ABCD", "Compilation fails.", "C is printed before error", "BC is printed before error"],
+    ans: 2,
+    logic: "An 'Error' is not caught by 'catch (Exception ex)'. However, the 'finally' block always executes before the program terminates with the error message."
+  },
+  {
+    q: "Which collection class allows key-value association and provides synchronization?",
+    options: ["SortedMap", "TreeMap", "TreeSet", "Hashtable"],
+    ans: 3,
+    logic: "Hashtable is a legacy collection that allows key-value pairs and is thread-safe (synchronized), unlike HashMap."
+  },
+  {
+    q: "What will be the output of the AbstractTest program?",
+    options: ["57 22", "45 38", "45 57", "Runtime exception"],
+    ans: 0,
+    logic: "The anonymous inner classes override getNum(). The inner class 'Bar' returns 57 and the AbstractTest instance returns 22."
+  },
+  {
+    q: "Which two are valid constructors for Thread?",
+    options: ["1 and 3", "2 and 4", "1 and 2", "2 and 5"],
+    ans: 2,
+    logic: "Thread(Runnable r, String name) and Thread() are valid. There are no constructors that take only an 'int priority'."
+  },
+  {
+    q: "What will be the output of the ThreadDemo program?",
+    options: ["0 to 19 sequentially", "1 to 20 sequentially", "1 to 20 unordered", "Compilation fails."],
+    ans: 1,
+    logic: "Since doSomething() is synchronized on the same 'demo' object, the threads execute one after the other, printing 1 to 10 and then 11 to 20."
+  },
+  {
+    q: "How can you ensure the integrity of 'data' in the SyncTest code?",
+    options: ["Sync run method", "Sync around increase()", "Existing code is an error", "Synchronize the increase() method"],
+    ans: 3,
+    logic: "To prevent multiple threads from interfering with the same variable, the method modifying that variable (increase) should be synchronized."
+  },
+  {
+    q: "What will be the output of the MyThread program? (Calling t.run())",
+    options: ["Not compile line 5", "Not compile line 6", "1..2..", "1..2..3.."],
+    ans: 2,
+    logic: "Calling run() directly executes the code in the current thread like a normal method call. It does not start a new thread (start() would do that)."
+  },
+  {
+    q: "What will be the output of the Runnable 's' program?",
+    options: ["DeadLock", "It print 12 12 12 12", "Compilation Error", "Cannot determine output."],
+    ans: 1,
+    logic: "Both threads update and then print the same shared variables. They will eventually both finish and print '12 12'."
+  },
+  {
+    q: "What will be the output of the Test program with the assertion?",
+    options: ["finished", "Compilation fails.", "AssertionError and finished", "AssertionError with message"],
+    ans: 1,
+    logic: "The syntax for an assertion is 'assert expression1 : expression2;'. Expression1 must be a boolean. Here, the ternary operator is used incorrectly, so it fails to compile."
+  },
+  {
+    q: "What will be the output of the Forest1 program?",
+    options: ["Pine", "Tree", "Forest", "Oops"],
+    ans: 0,
+    logic: "Since the 'tree' object was instantiated as a 'new Pine()', the 'instanceof Pine' check returns true immediately."
+  },
+  {
+    q: "What will be the output of: String s = 'ABC'; s.toLowerCase(); s += 'def';?",
+    options: ["ABC", "abc", "ABCdef", "Compile Error"],
+    ans: 2,
+    logic: "Strings are immutable. Calling s.toLowerCase() creates a new string but doesn't change 's'. Therefore, 's' remains 'ABC' before 'def' is added."
+  }
+];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nature & Wildlife Quiz 2025-26</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e3a8a; --bg: #f8fafc; --card: #ffffff; --accent: #3b82f6; --correct: #10b981; --wrong: #ef4444; --text: #1e293b; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 15px 25px -5px rgba(0,0,0,0.1); border-top: 10px solid var(--primary); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 30px; font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+        .q-text { font-size: 1.3rem; line-height: 1.4; margin-bottom: 30px; font-weight: 600; }
+        .options-grid { display: grid; gap: 15px; }
+        .opt-btn { padding: 18px; border: 2px solid #e2e8f0; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font-size: 1.1rem; transition: all 0.2s; color: var(--text); }
+        .opt-btn:hover:not(:disabled) { background: #f1f5f9; border-color: var(--accent); }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .explanation { margin-top: 30px; padding: 25px; background: #eff6ff; border-radius: 12px; border-left: 6px solid var(--primary); display: none; line-height: 1.6; }
+        .nav { display: flex; justify-content: space-between; margin-top: 40px; gap: 20px; }
+        .btn-nav { padding: 15px 30px; border-radius: 10px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 700; flex: 1; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header">
+            <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+            <span id="q-counter"></span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-list" class="options-grid"></div>
+        <div id="exp-area" class="explanation"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="change(-1)">Back</button>
+            <button class="btn-nav" id="next" onclick="change(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Endangered mammal protected by Sangtam Naga tribal ban in Nagaland?", opts: ["Red Panda", "Clouded Leopard", "Pangolin", "Hoolock Gibbon"], ans: 2, exp: "The Sangtam Naga tribal body imposed a strict ban on hunting and trade of the Pangolin to prevent its local extinction." },
+    { q: "2. Identified as the world’s oldest continuously flowing river (300-400M years)?", opts: ["Finke River", "Murray River", "Darling River", "Gascoyne River"], ans: 0, exp: "Australia's Finke River is believed to be the oldest river system in the world." },
+    { q: "3. Renamed as Kerala’s first butterfly sanctuary in 2025?", opts: ["Silent Valley", "Periyar", "Aralam", "Wayanad"], ans: 2, exp: "Aralam Wildlife Sanctuary was officially renamed Aralam Butterfly Sanctuary to highlight its 266+ butterfly species." },
+    { q: "4. Where was a rare Eastern Imperial Eagle recently sighted in 2025?", opts: ["Bandipur", "Mudumalai", "Periyar", "Nagarhole"], ans: 1, exp: "The rare eagle was confirmed visiting the Mudumalai Tiger Reserve (MTR) during the winter migration." },
+    { q: "5. Rare Eastern Imperial Eagle recently sighted in Tamil Nadu?", opts: ["Mudumalai Tiger Reserve", "Bandipur", "Sathyamangalam", "Anamalai"], ans: 0, exp: "Spotted in Mudumalai, this bird is native to Eurasia and migrates to India in winter." },
+    { q: "6. Country that granted legal rights to Amazonian stingless bees?", opts: ["Brazil", "Peru", "Ecuador", "Colombia"], ans: 1, exp: "Peru (Satipo Municipality) granted rights to stingless bees, the first insect to receive such legal status." },
+    { q: "7. Bird sanctuary in UP declared an Eco-Sensitive Zone recently?", opts: ["Okhla", "Nawabganj", "Sandi", "Parvati Arga"], ans: 2, exp: "Sandi Bird Sanctuary in Hardoi, UP, was declared an ESZ to enhance biodiversity protection." },
+    { q: "8. Site where 35 captive-reared vultures were approved for release?", opts: ["Manas", "Gir", "Corbett", "Kaziranga"], ans: 3, exp: "Approved for release from the Rani Breeding Centre into the wild at Kaziranga." },
+    { q: "9. Name of the rare November 2025 cyclone that hit Sumatra?", opts: ["Cyclone Vamei", "Cyclone Senyar", "Cyclone Higos", "Cyclone Nivar"], ans: 1, exp: "Cyclone Senyar made a devastating landfall in Sumatra on Nov 25, 2025." },
+    { q: "10. Number of new Raorchestes bush frog species discovered in NE India?", opts: ["13", "11", "9", "7"], ans: 0, exp: "13 new species of bush frogs were recently described across the Northeast." },
+    { q: "11. Cyclonic storm approaching TN and Puducherry in late 2025?", opts: ["Senyar", "Pottuvil", "Ditwah", "Kadapa"], ans: 1, exp: "Cyclone Pottuvil was the major threat to the TN/Puducherry coast in late 2025." },
+    { q: "12. State directed by SC to declare Saranda Forest as a sanctuary?", opts: ["Jharkhand", "Odisha", "Chhattisgarh", "West Bengal"], ans: 0, exp: "The Supreme Court directed the Jharkhand government to protect the Saranda Forest area." },
+    { q: "13. Country India set to receive 8 cheetahs from under Project Cheetah?", opts: ["Botswana", "Namibia", "South Africa", "Kenya"], ans: 0, exp: "India finalized an agreement with Botswana to expand its cheetah reintroduction program." },
+    { q: "14. Host country for the 2027 U.N. Climate Change Conference (COP32)?", opts: ["Brazil", "Australia", "Turkey", "Ethiopia"], ans: 3, exp: "Ethiopia was selected to host COP32 in 2027 during the COP30 proceedings." },
+    { q: "15. Highway where solar power plants will be installed (SECI and NHAI)?", opts: ["Mumbai–Pune", "Delhi–Dehradun", "Chennai–Bengaluru", "Jaipur–Agra"], ans: 1, exp: "The Delhi-Dehradun Highway was selected for green energy integration." },
+    { q: "16. New butterfly species discovered in Arunachal's Siang Valley?", opts: ["Four", "Six", "Eight", "Ten"], ans: 1, exp: "Six new species, including the Litin Onyx and Tibetan Duke, were recently reported." },
+    { q: "17. Global campaign launched by UPL for climate resilience?", opts: ["#AFarmerCan", "#GrowGreen", "#ClimateChampions", "#FarmersForFuture"], ans: 0, exp: "#AFarmerCan focuses on farmers as primary agents in the fight against climate change." },
+    { q: "18. EU target year for 90% reduction in emissions?", opts: ["2030", "2035", "2050", "2040"], ans: 3, exp: "The European Union set an ambitious 90% reduction target for the year 2040." },
+    { q: "19. Year of the next All India Tiger Estimation (AITE)?", opts: ["2022", "2024", "2025", "2026"], ans: 3, exp: "The next major census, AITE-26, officially launched in early 2026." },
+    { q: "20. Bird species vanished from 72% of historical nesting sites in India?", opts: ["Eagles", "Owls", "Vultures", "Falcons"], ans: 2, exp: "A WII report highlighted a drastic loss of habitat for India's vultures." },
+    { q: "21. Country affected by Typhoon Kalmaegi (Tino) in Nov 2025?", opts: ["Philippines", "Indonesia", "Vietnam", "Thailand"], ans: 0, exp: "The Philippines faced severe destruction from Typhoon Kalmaegi in November 2025." },
+    { q: "22. State imposing a green tax on outside vehicles from Dec 2025?", opts: ["Himachal Pradesh", "Uttarakhand", "Sikkim", "Arunachal"], ans: 1, exp: "Uttarakhand implemented this tax to fund conservation in its fragile hill ecosystems." },
+    { q: "23. Cyclone approaching Andhra Pradesh prompting high alert?", opts: ["Titli", "Fani", "Montha", "Hudhud"], ans: 2, exp: "Cyclone Montha approached the Andhra/Odisha coast in October 2025." },
+    { q: "24. India's wild elephant population decline percentage (SAIEE 2025)?", opts: ["18%", "12%", "22%", "25%"], ans: 0, exp: "The census indicated an 18% decline compared to previous figures." },
+    { q: "25. City declaring 41 sq km of Southern Ridge as reserved forest?", opts: ["New Delhi", "Gurugram", "Chandigarh", "Jaipur"], ans: 0, exp: "The Delhi government declared this area protected to curb urban pollution." },
+    { q: "26. Organization that signed MoU with IRENA for fossil fuel transition?", opts: ["UNEP", "WWF", "IUCN", "UNESCO"], ans: 0, exp: "UNEP (UN Environment Programme) and IRENA are collaborating on renewable transitions." },
+    { q: "27. State where the Cold Desert Biosphere Reserve (UNESCO) is located?", opts: ["Himachal Pradesh", "Uttarakhand", "Jammu & Kashmir", "Sikkim"], ans: 0, exp: "Himachal Pradesh's Cold Desert was recently inducted into the UNESCO network." },
+    { q: "28. Country where Typhoon Mitag made landfall?", opts: ["Japan", "Philippines", "China", "Vietnam"], ans: 2, exp: "Typhoon Mitag impacted the Chinese coast in its most severe phase." },
+    { q: "29. State containing the Sahyadri Tiger Reserve?", opts: ["Maharashtra", "Karnataka", "Madhya Pradesh", "Goa"], ans: 0, exp: "Sahyadri is located in Maharashtra; it is part of a major tiger translocation plan." },
+    { q: "30. Totality length of the September 2025 Blood Moon?", opts: ["82 Minutes", "60 Minutes", "70 Minutes", "90 Minutes"], ans: 0, exp: "The total lunar eclipse in Sept 2025 will feature 82 minutes of totality." },
+    { q: "31. Region where Crocothemis erythraea dragonfly was reconfirmed?", opts: ["Western Ghats", "Eastern Himalayas", "Aravalli Hills", "Sundarbans"], ans: 0, exp: "Reconfirmed in the highlands of the Western Ghats (Kerala/TN) after decades." },
+    { q: "32. State partnered with BNHS for Ujani reservoir restoration?", opts: ["Gujarat", "Karnataka", "Maharashtra", "Madhya Pradesh"], ans: 2, exp: "Maharashtra and BNHS are working on eco-restoration and native fishery development." },
+    { q: "33. First major Atlantic hurricane of 2025?", opts: ["Alice", "Diana", "Maria", "Erin"], ans: 0, exp: "Hurricane Alice was the first major storm of the 2025 Atlantic season." },
+    { q: "34. Institute developing biodegradable plastic for NE Railways?", opts: ["IIT Guwahati", "IIT Delhi", "IIT Kanpur", "IIT Madras"], ans: 0, exp: "IIT Guwahati partnered with NFR for sustainable packaging solutions." },
+    { q: "35. Country terminating NASA's OCO-2 and OCO-3 satellites?", opts: ["Russia", "United States", "China", "India"], ans: 1, exp: "The US directed the early termination of these carbon-monitoring satellites." },
+    { q: "36. Headquarter city of Birbal Sahni Institute of Palaeosciences?", opts: ["Chandigarh", "Pune", "Lucknow", "Indore"], ans: 2, exp: "BSIP is based in Lucknow and recently collaborated with IGNCA." },
+    { q: "37. Theme of the Equator Prize 2025?", opts: ["Restoring Our Planet", "Climate Solutions for All", "Nature for Climate Action", "Green Earth"], ans: 2, exp: "UNDP's 2025 prize focused on local nature-based solutions for climate action." },
+    { q: "38. District of flash floods after Kheer Ganga cloudburst?", opts: ["Chamoli", "Uttarkashi", "Rudraprayag", "Pithoragarh"], ans: 1, exp: "Uttarkashi experienced severe floods following intense cloudburst activity." },
+    { q: "39. Village in Uttarkashi affected by flash flood in late 2025?", opts: ["Bhatwari", "Harsil", "Dharali", "Barkot"], ans: 2, exp: "Dharali Village saw significant infrastructure damage from the flood." },
+    { q: "40. Country of the Krasheninnikov Volcano (erupted after 600 yrs)?", opts: ["Russia", "Japan", "Indonesia", "Chile"], ans: 0, exp: "Located on the Kamchatka Peninsula, Russia, this volcano erupted after six centuries." },
+    { q: "41. Klyuchevskoy volcano eruption (July 2025) country?", opts: ["Japan", "Iceland", "Indonesia", "Russia"], ans: 3, exp: "Russia's Klyuchevskoy erupted following a massive 8.8 magnitude earthquake." },
+    { q: "42. Site of the first-ever Grassland Bird Census in Assam?", opts: ["Manas", "Dibru-Saikhowa", "Nameri", "Kaziranga"], ans: 3, exp: "Kaziranga National Park conducted this specialized census to track grassland health." },
+    { q: "43. Lakshadweep coral cover decline percentage (1998-2022)?", opts: ["37%", "50%", "75%", "19%"], ans: 3, exp: "Studies showed a 19% decline, largely due to rising sea temperatures and bleaching." },
+    { q: "44. State setting up Hornbill Conservation at Anamalai?", opts: ["Kerala", "Tamil Nadu", "Karnataka", "Maharashtra"], ans: 1, exp: "Tamil Nadu launched this initiative at the Pollachi division of ATR." },
+    { q: "45. Implementation year for CAFE-III norms in India?", opts: ["2027", "2037", "2030", "2040"], ans: 0, exp: "CAFE-III standards for vehicle emissions are set to start in 2027." },
+    { q: "46. State where India’s first Aqua Tech Park was inaugurated?", opts: ["Kerala", "Assam", "Andhra Pradesh", "West Bengal"], ans: 2, exp: "Andhra Pradesh launched the park to boost sustainable aquaculture." },
+    { q: "47. India’s net-zero carbon emissions target year?", opts: ["2050", "2070", "2065", "2045"], ans: 1, exp: "India aims for Net Zero by 2070, supported by green transportation subsidies." },
+    { q: "48. Where did Asia’s oldest elephant, ‘Vatsala’, pass away?", opts: ["Kaziranga", "Panna", "Mudumalai", "Bandhavgarh"], ans: 1, exp: "Vatsala, estimated to be over 100, passed away at Panna Tiger Reserve in MP." },
+    { q: "49. City banning fuel for old vehicles starting July 1, 2025?", opts: ["Mumbai", "Bengaluru", "New Delhi", "Hyderabad"], ans: 2, exp: "New Delhi enforces this to phase out end-of-life diesel and petrol cars." },
+    { q: "50. Body of water whose mud crab fishery seeks MSC certification?", opts: ["Loktak", "Vembanad", "Chilika", "Ashtamudi"], ans: 3, exp: "Ashtamudi Lake in Kerala is seeking this prestigious sustainable seafood mark." },
+    { q: "51. First butterfly sanctuary established in India (2025)?", opts: ["Sikkim", "Karnataka", "Tamil Nadu", "Kerala"], ans: 3, exp: "Aralam in Kerala became India's first exclusive butterfly sanctuary." },
+    { q: "52. State High Court banning single-use plastic in hills?", opts: ["Tamil Nadu", "Maharashtra", "Kerala", "Karnataka"], ans: 0, exp: "The Madras High Court (TN) imposed the ban for destinations like Ooty and Kodaikanal." },
+    { q: "53. Name of the unified global bird species checklist?", opts: ["BirdTaxa", "OrniList", "AviList", "GlobalBirds"], ans: 3, exp: "GlobalBirds was launched to provide a standardized taxonomic reference for all bird species." },
+    { q: "54. Migratory bird Tamil Nadu protected at Dhanushkodi (2025)?", opts: ["Pelican", "Flamingo", "Spoonbill", "Stork"], ans: 1, exp: "Tamil Nadu declared Dhanushkodi as a Flamingo Sanctuary on World Environment Day 2025." },
+    { q: "55. Country where Mount Etna is located?", opts: ["Italy", "Greece", "Spain", "France"], ans: 0, exp: "Mount Etna is Europe's most active volcano, located on the island of Sicily, Italy." }
+];
+
+let curr = 0;
+function load() {
+    const itm = data[curr];
+    document.getElementById('q-counter').innerText = `Question ${curr + 1} of ${data.length}`;
+    document.getElementById('q-text').innerText = itm.q;
+    const list = document.getElementById('opt-list');
+    list.innerHTML = '';
+    itm.opts.forEach((o, i) => {
+        const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
+        b.onclick = () => {
+            const all = document.querySelectorAll('.opt-btn'); all.forEach(x => x.disabled = true);
+            if(i === itm.ans) b.classList.add('correct');
+            else { b.classList.add('wrong'); all[itm.ans].classList.add('correct'); }
+            document.getElementById('exp-area').innerHTML = `<strong>Insight:</strong> ${itm.exp}`;
+            document.getElementById('exp-area').style.display = 'block';
+        };
+        list.appendChild(b);
+    });
+    document.getElementById('exp-area').style.display = 'none';
+    document.getElementById('prev').disabled = curr === 0;
+    document.getElementById('next').disabled = curr === data.length - 1;
+}
+function change(v) { curr += v; load(); }
+load();
+</script>
+</body>
+</html>

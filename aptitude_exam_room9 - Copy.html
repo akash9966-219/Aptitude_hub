@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptitude Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Aptitude Test 9</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 9</button>
+        <a href="test1.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "The product of two numbers is 2028 and their H.C.F. is 13. The number of such pairs is:", options: ["1", "2", "3", "4"], ans: 1, logic: "Let numbers be 13a and 13b. 13a * 13b = 2028 => 169ab = 2028 => ab = 12. Co-prime pairs: (1,12) and (3,4). So, 2 pairs." },
+            { q: "What will be the least number which when doubled will be exactly divisible by 12, 18, 21 and 30?", options: ["196", "630", "1260", "2520"], ans: 1, logic: "LCM(12, 18, 21, 30) = 1260. Since the number *doubled* is 1260, the number is 1260 / 2 = 630." },
+            { q: "The sum of the digits of a two-digit number is 15 and the difference between the digits is 3. What is the two-digit number?", options: ["69", "78", "96", "Cannot be determined", "None"], ans: 3, logic: "x+y=15, |x-y|=3. Digits are 9 and 6. The number could be 96 or 69. Without knowing which digit is greater, it cannot be determined." },
+            { q: "A number consists of two digits. If the digits interchange places and the new number is added to the original number, the result is divisible by:", options: ["3", "5", "9", "11"], ans: 3, logic: "(10x + y) + (10y + x) = 11x + 11y = 11(x + y). Always divisible by 11." },
+            { q: "Difference between a 2-digit number and its interchange is 36. Difference between the digits is:", options: ["3", "4", "9", "Cannot be determined"], ans: 1, logic: "(10x + y) - (10y + x) = 36 => 9(x - y) = 36 => x - y = 4." },
+            { q: "If m and n are whole numbers such that m^n = 121, the value of (m - 1)^(n + 1) is:", options: ["1", "10", "121", "1000"], ans: 3, logic: "11^2 = 121, so m=11, n=2. (11 - 1)^(2 + 1) = 10^3 = 1000." },
+            { q: "A shopkeeper sells toys at Rs. 250 each. To find profit percent, which info is necessary?", options: ["Only I", "Only II", "Both I and II", "Either I or II", "None"], ans: 1, logic: "Profit% = [(SP-CP)/CP]*100. We have SP, we only need CP (Statement II). Number of toys (I) is irrelevant for percentage." },
+            { q: "270m train (120 kmph) crosses another (opp. dir, 80 kmph) in 9s. Length of other train?", options: ["230 m", "240 m", "260 m", "320 m"], ans: 0, logic: "Rel speed = 120+80 = 200 kmph = 200 * 5/18 = 500/9 m/s. Dist = Speed * Time = (500/9) * 9 = 500m. Other train = 500 - 270 = 230m." },
+            { q: "108m train (50 km/hr) crosses 112m train (opp. dir) in 6s. Speed of second train?", options: ["48 km/hr", "54 km/hr", "66 km/hr", "82 km/hr"], ans: 3, logic: "Total Dist = 108+112 = 220m. Rel Speed = 220/6 m/s = (220/6) * 18/5 = 132 km/hr. Speed2 = 132 - 50 = 82 km/hr." },
+            { q: "Length of train crossing another 180m train (opp. dir)? I. Rel Speed 150 kmph. II. Time 9s.", options: ["A", "B", "C", "D", "E"], ans: 4, logic: "Dist = Speed * Time. 150 * 5/18 * 9 = 375m. Length1 + 180 = 375 => Length1 = 195m. Both statements are necessary." },
+            { q: "Which of the following statements is not correct?", options: ["log10 10 = 1", "log (2 + 3) = log (2 x 3)", "log10 1 = 0", "log (1+2+3) = log1+log2+log3"], ans: 1, logic: "log(2+3) = log(5), while log(2*3) = log(2)+log(3). They are not equal. Option D is a special case: log(6) = log(1*2*3) = log1+log2+log3." },
+            { q: "Perimeter:Breadth = 5:1. Area = 216 sq. cm. Length of rectangle?", options: ["16 cm", "18 cm", "24 cm", "Data inadequate"], ans: 1, logic: "2(L+B)/B = 5/1 => 2L+2B = 5B => 2L = 3B => B = 2L/3. Area = L * (2L/3) = 216 => L^2 = 324 => L = 18." },
+            { q: "Park 60mx40m. Area of lawn (rest) is 2109 sq. m. Width of crossroad?", options: ["2.91 m", "3 m", "5.82 m", "None"], ans: 1, logic: "Area of roads = Total - Lawn = 2400 - 2109 = 291. Formula: w(L+B-w) = 291 => w(100-w) = 291. If w=3, 3(97) = 291." },
+            { q: "Boat 3mx2m. Sinks 1cm when man gets on. Mass of man?", options: ["12 kg", "60 kg", "72 kg", "96 kg"], ans: 1, logic: "Mass = Volume of water displaced * Density. Vol = 3 * 2 * 0.01 = 0.06 m^3. Mass = 0.06 * 1000 kg/m^3 = 60 kg." },
+            { q: "A runs 22.5m while B runs 25m. In 1km race, B beats A by:", options: ["100 m", "111 1/9 m", "25 m", "50 m"], ans: 0, logic: "When B runs 25, A is 2.5 behind. When B runs 1000, A is (2.5/25)*1000 = 100m behind." },
+            { q: "Arrange letters of 'CORPORATION' so vowels always come together:", options: ["810", "1440", "2880", "50400", "5760"], ans: 3, logic: "Vowels: O,O,A,I,O (5). Consonants: C,R,P,R,T,N (6). Treat vowels as 1 block. Total units = 6+1 = 7. Arrangements = (7!/2!) * (5!/3!) = 2520 * 20 = 50400." },
+            { q: "8 Red, 7 Blue, 6 Green. Pick 1. Probability it is neither red nor green?", options: ["1/3", "3/4", "7/19", "8/21", "9/21"], ans: 0, logic: "Total = 8+7+6 = 21. Neither red nor green = Blue = 7. Prob = 7/21 = 1/3." },
+            { q: "Odd man out: 3, 5, 7, 12, 17, 19", options: ["19", "17", "5", "12"], ans: 3, logic: "All are prime numbers except 12, which is composite." },
+            { q: "Wrong number in sequence: 6, 13, 18, 25, 30, 37, 40", options: ["25", "30", "37", "40"], ans: 3, logic: "Pattern: +7, +5, +7, +5, +7... 30 + 7 = 37. 37 + 5 should be 42, not 40." },
+            { q: "Wrong number in series: 3, 7, 15, 39, 63, 127, 255, 511", options: ["7", "15", "39", "63", "127"], ans: 2, logic: "Pattern: (Previous * 2) + 1. 3*2+1=7; 7*2+1=15; 15*2+1=31. So 39 is wrong." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

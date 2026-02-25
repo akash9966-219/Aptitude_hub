@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptitude Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Aptitude Test 7</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 7</button>
+        <a href="test1.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "If the sum of two numbers is 55 and the H.C.F. and L.C.M. are 5 and 120, the sum of the reciprocals is:", options: ["55/601", "601/55", "11/120", "120/11"], ans: 2, logic: "Sum of reciprocals = (a+b)/ab. We know a+b = 55. Product ab = HCF * LCM = 5 * 120 = 600. So, 55/600 = 11/120." },
+            { q: "The greatest number of four digits which is divisible by 15, 25, 40 and 75 is:", options: ["9000", "9400", "9600", "9800"], ans: 2, logic: "LCM(15, 25, 40, 75) = 600. Greatest 4-digit number is 9999. 9999 / 600 leaves remainder 399. 9999 - 399 = 9600." },
+            { q: "If a = 0.1039, then the value of √(4a² - 4a + 1) + 3a is:", options: ["0.1039", "0.2078", "1.1039", "2.1039"], ans: 2, logic: "√(4a² - 4a + 1) = √((1-2a)²) = |1-2a|. Since 2a is approx 0.2, it's 1-2a. 1-2a + 3a = 1 + a = 1.1039." },
+            { q: "Product of two numbers is 9375 and quotient (larger/smaller) is 15. The sum of the numbers is:", options: ["380", "395", "400", "425"], ans: 2, logic: "x*y = 9375, x/y = 15 => x = 15y. 15y² = 9375 => y² = 625 => y = 25. x = 15*25 = 375. Sum = 375 + 25 = 400." },
+            { q: "What is the two-digit number? I. Diff between num and reversed is 27. II. Diff between digits is 3. III. Unit digit < Ten's digit by 3.", options: ["I and II only", "I and III only", "All I, II and III", "I, and either II or III", "Answer cannot be given"], ans: 4, logic: "All statements lead to x-y = 3. Possible numbers are 41, 52, 63, 74, 85, 96. A unique number cannot be determined." },
+            { q: "Sameer:Anand are 5:4. Three years hence, ratio is 11:9. Anand's present age?", options: ["24", "27", "40", "Cannot be determined", "None"], ans: 0, logic: "(5x+3)/(4x+3) = 11/9 => 45x+27 = 44x+33 => x=6. Anand's age = 4*6 = 24." },
+            { q: "What is Sonia's present age? I. Sonia is 5x Deepak. II. 5 years ago, she was 25x Deepak.", options: ["A", "B", "C", "D", "E"], ans: 4, logic: "S=5D and (S-5)=25(D-5). Two equations with two variables. Solving gives D=6, S=30. Both are necessary." },
+            { q: "If 3^(x-y) = 27 and 3^(x+y) = 243, then x is:", options: ["0", "2", "4", "6"], ans: 2, logic: "x-y = 3, x+y = 5. Adding both: 2x = 8 => x = 4." },
+            { q: "Articles bought at 6 for Rs. 5 and sold at 5 for Rs. 6. Gain percent is:", options: ["30%", "33 1/3%", "35%", "44%"], ans: 3, logic: "CP of 1 = 5/6. SP of 1 = 6/5. Gain = 6/5 - 5/6 = 11/30. Gain% = (11/30 / 5/6)*100 = 44%." },
+            { q: "Length of train? I. Crosses man in 9s. II. Crosses 240m platform in 24s.", options: ["A", "B", "C", "D", "E"], ans: 4, logic: "L/V = 9 and (L+240)/V = 24. Two equations, two variables. Both are needed to find L (144m)." },
+            { q: "Time train reaches X from Y? I. Crosses 200m train (opp) in 15s. II. Leaves Y at 7:15 am, dist 558km. III. 200m train crosses pole in 10s.", options: ["I only", "II only", "III only", "II and III only", "All required"], ans: 4, logic: "II gives start time and distance. We need speed. I and III together give the train's speed. All 3 are required." },
+            { q: "Speed of boat in still water? I. Downstream 12 kmph. II. Upstream 4 kmph. III. Avg speed 6 kmph.", options: ["I and II only", "All I, II and III", "III, and either I or II", "Any two of the three", "None"], ans: 3, logic: "Any two statements will suffice. I and II give V = (12+4)/2 = 8. I and III or II and III also allow calculation of V." },
+            { q: "Rs. 13900 in A (14%) and B (11%). Total SI in 2 yrs is Rs. 3508. Amount in Scheme B?", options: ["Rs. 6400", "Rs. 6500", "Rs. 7200", "Rs. 7500"], ans: 0, logic: "Let B = x, A = 13900-x. [x*11*2/100] + [(13900-x)*14*2/100] = 3508. Solving for x gives Rs. 6400." },
+            { q: "What is the principal sum? I. Amounts to 690 in 3 yrs. II. Amounts to 750 in 5 yrs. III. Rate is 5%.", options: ["I and III only", "II and III only", "I and II only", "I and III or II and III", "Any two of the three"], ans: 4, logic: "Any two statements provide enough data to solve for Principal (P) using the SI formula." },
+            { q: "66 cm³ silver drawn into 1mm diameter wire. Length in metres?", options: ["84", "90", "168", "336"], ans: 0, logic: "Volume = πr²h. 66 = (22/7) * (0.05)² * L. L = (66 * 7) / (22 * 0.0025) = 8400 cm = 84m." },
+            { q: "How many times in a day are hands in straight line but opposite direction?", options: ["20", "22", "24", "48"], ans: 1, logic: "This happens once every hour except between 5 and 7 (only once at 6:00). So 11 times in 12 hours = 22 times a day." },
+            { q: "Cost of Rs. 100 stock at 4 discount, brokerage 1/4%:", options: ["Rs. 95.75", "Rs. 96", "Rs. 96.25", "Rs. 104.25"], ans: 2, logic: "Market Price = 100 - 4 = 96. CP = MP + Brokerage = 96 + 0.25 = Rs. 96.25." },
+            { q: "Group of 7 men, 6 women. Select 5 with at least 3 men. Number of ways?", options: ["564", "645", "735", "756"], ans: 3, logic: "(7C3*6C2) + (7C4*6C1) + (7C5*6C0) = (35*15) + (35*6) + (21*1) = 525 + 210 + 21 = 756." },
+            { q: "True discount on bill due 9 months hence at 16% is Rs. 189. Bill amount?", options: ["Rs. 1386", "Rs. 1764", "Rs. 1575", "Rs. 2268"], ans: 1, logic: "PW = (100 * TD) / (R * T) = (100 * 189) / (16 * 0.75) = 1575. Bill = PW + TD = 1575 + 189 = Rs. 1764." },
+            { q: "Find the odd man out: 41, 43, 47, 53, 61, 71, 73, 81", options: ["61", "71", "73", "81"], ans: 3, logic: "All numbers in the sequence are prime except 81 (9 * 9)." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Average Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Average Practice</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading question...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Completed!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "In 10 overs, run rate was 3.2. What should be the run rate in remaining 40 overs to reach 282?", options: ["6.25", "6.5", "6.75", "7"], correct: 0, explain: "Runs in 10 overs = 3.2 * 10 = 32. Remaining = 282 - 32 = 250. Required Rate = 250 / 40 = 6.25." },
+        { q: "Avg age: 2 Grandparents (67), 2 Parents (35), 3 Grandchildren (6). Avg age of family?", options: ["28 4/7", "31 5/7", "32 1/7", "None"], correct: 1, explain: "Total sum = (2*67) + (2*35) + (3*6) = 134 + 70 + 18 = 222. Total people = 7. Avg = 222/7 = 31 5/7." },
+        { q: "Sales: 6435, 6927, 6855, 7230, 6562. Sale needed in 6th month for average of 6500?", options: ["Rs. 4991", "Rs. 5991", "Rs. 6001", "Rs. 6991"], correct: 0, explain: "Total 6 month target = 6500 * 6 = 39000. Sum of 5 months = 34009. 6th month = 39000 - 34009 = 4991." },
+        { q: "Average of 20 numbers is zero. At most, how many may be greater than zero?", options: ["0", "1", "10", "19"], correct: 3, explain: "If 19 numbers are positive, 1 number can be a large negative value to make the sum zero. So, max 19." },
+        { q: "Avg weight of 8 persons increases by 2.5kg when one weighing 65kg is replaced. New person weight?", options: ["76 kg", "76.5 kg", "85 kg", "Data inadequate"], correct: 2, explain: "Total weight increase = 8 * 2.5 = 20 kg. New weight = 65 + 20 = 85 kg." },
+        { q: "Captain (26), Keeper (29). Exclude them, remaining 9 players' avg is 1 less than team avg. Team average?", options: ["23 years", "24 years", "25 years", "None"], correct: 0, explain: "Let team avg be X. (11X - 55) / 9 = X - 1 => 11X - 55 = 9X - 9 => 2X = 46 => X = 23." },
+        { q: "Avg income P,Q = 5050. Q,R = 6250. P,R = 5200. Income of P is:", options: ["3500", "4000", "4050", "5000"], correct: 1, explain: "P+Q=10100, Q+R=12500, P+R=10400. Sum: 2(P+Q+R)=33000 => P+Q+R=16500. P = 16500 - (Q+R) = 16500 - 12500 = 4000." },
+        { q: "3 yrs ago H,W,C avg = 27. 5 yrs ago W,C avg = 20. Present age of Husband?", options: ["35 years", "40 years", "50 years", "None"], correct: 1, explain: "Present total (H+W+C) = (27*3) + (3*3) = 90. Present total (W+C) = (20*2) + (5*2) = 50. H = 90 - 50 = 40." },
+        { q: "Petrol at 7.5, 8, 8.5 per litre. Spends 4000 each year. Approximate avg cost?", options: ["Rs. 7.98", "Rs. 8", "Rs. 8.50", "Rs. 9"], correct: 0, explain: "Harmonic mean approach: Total spent 12000. Total litres = 4000/7.5 + 4000/8 + 4000/8.5 ≈ 1503.9. Avg = 12000/1503.9 ≈ 7.98." },
+        { q: "Probable weight: Arun(65-72), Brother(60-70), Mother(<=68). Avg of valid integer weights?", options: ["67 kg", "68 kg", "69 kg", "None"], correct: 0, explain: "Valid integers within 65 < W <= 68 are 66, 67, 68. Avg = (66+67+68)/3 = 67." },
+        { q: "Avg weight A,B,C = 45kg. A,B = 40kg. B,C = 43kg. Weight of B?", options: ["17 kg", "20 kg", "26 kg", "31 kg"], correct: 3, explain: "Sum A+B+C=135. A+B=80, B+C=86. (A+B) + (B+C) = A+2B+C = 166. B = 166 - 135 = 31." },
+        { q: "16 boys avg 50.25kg, 8 boys avg 45.15kg. Avg for all boys?", options: ["47.55 kg", "48 kg", "48.55 kg", "49.25 kg"], correct: 2, explain: "Total = (16 * 50.25) + (8 * 45.15) = 804 + 361.2 = 1165.2. Avg = 1165.2 / 24 = 48.55." },
+        { q: "Library: 510 on Sundays, 240 others. Month of 30 days starts with Sunday. Avg visitors?", options: ["250", "276", "280", "285"], correct: 3, explain: "5 Sundays (1, 8, 15, 22, 29). Total = (5 * 510) + (25 * 240) = 2550 + 6000 = 8550. Avg = 8550 / 30 = 285." },
+        { q: "Avg marks for batches of 55, 60, 45 students are 50, 55, 60. Overall average?", options: ["53.33", "54.68", "55", "None"], correct: 1, explain: "Total = (55*50) + (60*55) + (45*60) = 2750 + 3300 + 2700 = 8750. Avg = 8750 / 160 = 54.6875." },
+        { q: "Marks 83 entered instead of 63. Class average increased by 0.5. Number of pupils?", options: ["10", "20", "40", "73"], correct: 2, explain: "Total error = 83 - 63 = 20. 20 / 0.5 = 40 pupils." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

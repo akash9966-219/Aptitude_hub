@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Completing Sentences - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #f39c12;
+            --secondary: #d35400;
+            --dark: #2c3e50;
+            --bg: #fdfaf5;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .instructions {
+            background: #fff3e0;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .question-meta { color: #aaa; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; }
+        
+        .sentence-stem {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #eee;
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .option {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            transition: 0.2s;
+            line-height: 1.4;
+        }
+
+        .option:hover { border-color: var(--primary); background: #fffcf5; }
+        .option.selected { border-color: var(--primary); background: #fff8e1; border-width: 2px; }
+
+        .feedback { margin-top: 25px; padding: 15px; border-radius: 8px; display: none; }
+        .feedback.correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .feedback.wrong { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 30px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--secondary); color: white; display: none; }
+        
+        .back-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Completing Sentences</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='verbal-ability.html'">⬅ Back</button>
+
+    <div class="instructions">
+        <strong>Direction:</strong> Choose the most logical phrase to complete the given sentence or interpret its meaning.
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="q-count" class="question-meta">Question 1 of 33</div>
+        
+        <div class="sentence-stem" id="stem-text">
+            </div>
+        
+        <div id="options-container" class="options-list">
+            </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <p id="full-sentence" style="margin-top: 10px;"></p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { s: "Despite his best efforts to conceal his anger ......", opts: ["we could detect that he was very happy", "he failed to give us an impression of his agony", "he succeeded in camouflaging his emotions", "he could succeed in doing it easily", "people came to know that he was annoyed"], correct: 4 },
+        { s: "Even if it rains I shall come means ......", opts: ["if I come it will not rain", "if it rains I shall not come", "I will certainly come whether it rains or not", "whenever there is rain I shall come", "I am less likely to come if it rains"], correct: 2 },
+        { s: "His appearance is unsmiling but ......", opts: ["his heart is full of compassion for others", "he looks very serious on most occasions", "people are afraid of him", "he is uncompromising on matters of task performance", "he is full of jealousy towards his colleagues"], correct: 0 },
+        { s: "She never visits any zoo because she is strong opponent of the idea of ......", opts: ["setting the animals free into forest", "feeding the animals while others are watching", "watching the animals in their natural abode", "going out of the house on a holiday", "holding the animals in captivity for our joy"], correct: 4 },
+        { s: "I felt somewhat more relaxed ......", opts: ["but tense as compared to earlier", "and tense as compared to earlier", "as there was already no tension at all", "and tension-free as compared to earlier", "because the worry had already captured by mind"], correct: 3 },
+        { s: "It is not easy to remain tranquil when those around you ......", opts: ["behave in a socially acceptable manner", "exhibit pleasant mannerism", "are losing their heads", "agree to whatever you say", "exhibit generous and magnanimous gestures"], correct: 2 },
+        { s: "\"The food in this hotel is no match to what we were served at late hours in Hotel Kohinoor\" means ......", opts: ["The food in this hotel is quite good compared to what we ate at kohinoor", "Hotel kohinoor served us good quality food than what we get here", "Both hotels have maintained good quality of food", "Both hotels serve poor quality of food", "it is better to eat food than remain hungry"], correct: 1 },
+        { s: "Although initial investigations pointed towards him ......", opts: ["the preceding events corroborated his involvement in the crime", "the additional information confirmed his guilt", "the subsequent events established that he was guilt", "the subsequent events proved that he was innocent", "he gave an open confession of his crime"], correct: 3 },
+        { s: "The weather outside was extremely pleasant and hence we decided to ......", opts: ["utilise our time in watching the television", "refrain from going out for a morning walk", "enjoy a morning ride in the open", "employ this rare opportunity for writing letters", "remain seated in our rooms in the bungalow"], correct: 2 },
+        { s: "\"It is an uphill task but you will have to do it\" means ......", opts: ["The work is above the hill and you will have to do it", "It is a very easy task but you must do it", "It is very difficult task but you have to do it", "This work is not reserved for you but you will have to do it", "It is almost impossible for others but you can do it"], correct: 2 },
+        { s: "\"You are thinking very highly about Ravi but he is not so\" means ......", opts: ["Ravi is as good as you think about him", "You have a good opinion about Ravi but he is not as good as you think", "Your view about Ravi is philosophical, keep it up", "Ravi is much better, than what you think of him", "You have a good opinion about Ravi but he does not have a good opinion about you"], correct: 1 },
+        { s: "\"Anand stuck up a friendship with Mahesh in just 2 days\" means ......", opts: ["Anand friendship with Mahesh came to an end recently", "Anand found out the other friends of Mahesh", "Anand fixed a deal with Mahesh in 2 days", "Anand's friendship with Mahesh lasted for 2 years", "Anand became a friend of Mahesh in less than 2 days"], correct: 4 },
+        { s: "Although, he is reputed for making very candid statements ......", opts: ["his today speech was not fairly audible", "his promises had always been realistic", "his speech was very interesting", "people follow whatever he instructs to them", "his today's statements were very ambiguous"], correct: 4 },
+        { s: "The manager would like you to help Dhiraj, means ......", opts: ["the manager would like you if you help Dhiraj", "the manager desires you to help Dhiraj", "the manager likes you because you help Dhiraj", "Dhiraj expects the manager to tell you to help him", "it will be a help to the manager if you like Dhiraj"], correct: 1 },
+        { s: "Owing to the acute power shortage, the people of our locality have decided to ......", opts: ["dispense with other non-conventional energy sources", "resort to abundant use of electricity for illumination", "off-switch the electrical appliance while not in use", "explore other avenues for utilising the excess power", "resort to use of electricity only when it is inevitable"], correct: 4 },
+        { s: "He has no money now ......", opts: ["although he was very poor once", "as he has given up all his wealth", "because he was very rich once", "because he has received huge donation", "because he was very greedy about wealth"], correct: 1 },
+        { s: "He is so lazy that he ......", opts: ["cannot depend on others for getting his work done", "cannot delay the schedule of completing the work", "can seldom complete his work on time", "dislike to postpone the work that he undertakes to do", "always help others to complete their work"], correct: 2 },
+        { s: "Dinesh is as stupid as he is lazy means ......", opts: ["Dinesh is stupid because he is lazy", "Dinesh is lazy because he is stupid", "Dinesh is either stupid or lazy", "Dinesh is hardly stupid but he is lazy", "Dinesh is equally stupid and lazy"], correct: 4 },
+        { s: "Practically, very little work could be completed in the last week as it was ......", opts: ["full of working days", "a very hectic week", "full of holidays", "a very busy week", "loaded with work"], correct: 2 },
+        { s: "Because he believes in democratic principles, he always ......", opts: ["decides all the matters himself", "listen to others views and enforces his own", "shown respect to others opinions if they match his own", "reconciles with the majority views and gives us his own", "imposes his own views on others"], correct: 3 },
+        { s: "With great efforts his son succeeded in convincing him not to donate his entire wealth to an orphanage ......", opts: ["and lead the life of a wealthy merchant", "but to a home for the forsaken children", "and make an orphan of himself", "as the orphanage needed a lot of donations", "as the orphanage had been set up by him"], correct: 2 },
+        { s: "The employer appeared to be in such an affable mood that Rohit ......", opts: ["decided to ask for a raise in his salary", "was scared to talk to him about his leave", "felt very guilty for his inadvertent slip", "promised him that he would not commit mistake again", "was pained to press his demand for a new flat."], correct: 0 },
+        { s: "He always stammers in public meetings, but his today's speech ......", opts: ["was fairly audible to everyone present in the hall", "was not received satisfactorily", "could not be understood properly", "was not liked by the audience", "was free from that defect"], correct: 4 },
+        { s: "Even though it is very large house, ......", opts: ["there is a lot of space available in it for children", "there is hardly any space available for children", "there is no dearth of space for children", "the servants take a long time to clean it", "the municipal taxes on it are very happy"], correct: 1 },
+        { s: "It was an extremely pleasant surprise for the hutment-dweller when the Government officials told him that ......", opts: ["he had to vacate hutment which he had been unauthorisedly occupying", "he had been gifted with a furnished apartment in a multi-storeyed building", "he would be arrested for wrongfully encroaching on the pavement outside his dwelling", "they would not accede to his request", "they had received the orders from the court to take possession of all his belongings"], correct: 1 },
+        { s: "In order to help the company attain its goal of enhancing profit, all the employees ......", opts: ["urged the management to grant paid leave", "appealed the management to implement new welfare schemes", "voluntarily offered to work overtime with lucrative compensation", "voluntarily offered to render additional services in lieu of nothing", "decided to enhance production at the cost of quality of the product"], correct: 3 },
+        { s: "\"Whatever Dev uttered was without rhyme or reason\" means ......", opts: ["Dev could not recite any poem or speech", "Dev said something which has no meaning, it was totally baseless", "Dev was talking something which was beyond our experience", "Dev spoke flatly without any emotion or reason", "Dev did not refer to any poem to support his statements"], correct: 1 },
+        { s: "He tames animals because he ......", opts: ["is fond of them", "hates them", "is afraid of them", "want to set them free", "seldom loves them"], correct: 0 },
+        { s: "Mahesh need not have purchased the bag, means ......", opts: ["it was not necessary for Mahesh to purchase the bag but he has purchased it", "it was necessary for Mahesh to purchase the bag and he has not purchased it", "it was not necessary for Mahesh to purchase the bag and he has not purchased it", "it was necessary for Mahesh to purchase the bag but he has not purchased it", "Mahesh already has a bag but still he purchased another one"], correct: 0 },
+        { s: "In order to raise company's profit, the employees ......", opts: ["demanded two additional increments", "decided to go on paid holidays", "requested the management to implement new welfare schemes", "offered to work overtime without any compensation", "decided to raise the cost of raw material"], correct: 3 },
+        { s: "The officer who had neglected to files his income tax returns had to ......", opts: ["return the files", "pay a fine", "be rewarded", "play mischief", "give warning"], correct: 1 },
+        { s: "Unless you work harder you will fail, means ......", opts: ["if you fail you will work harder", "you must at least plan well than you will not fail", "hardly you will fail if you do not desire so", "if you do not put more efforts, then you will fail", "if you only work and work alone, you will fail"], correct: 3 },
+        { s: "His behaviour is so unpredictable that he ......", opts: ["never depends upon others for getting his work done", "is seldom trusted by others", "always finds it difficult to keep his word", "always insists on getting the work completed on time", "seldom trusts others as far as the work schedule is concerned."], correct: 1 }
+    ];
+
+    let currentIdx = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('stem-text').innerText = q.s;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.opts.forEach((opt, i) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = opt;
+            div.onclick = () => {
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                div.classList.add('selected');
+            };
+            container.appendChild(div);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        selectedIdx = null;
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select the best completion!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        feedback.style.display = 'block';
+
+        if (selectedIdx === q.correct) {
+            document.getElementById('result-title').innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            document.getElementById('result-title').innerText = "Incorrect";
+            feedback.className = "feedback wrong";
+        }
+
+        document.getElementById('full-sentence').innerHTML = `<strong>Answer:</strong> ${q.opts[q.correct]}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `<h2>Well Done!</h2><p>You have completed the sentence logic module.</p><button class="btn btn-check" onclick="location.reload()">Restart</button>`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

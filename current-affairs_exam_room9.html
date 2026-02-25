@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 9</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 9</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+     
+    const questions = [
+    { q: "Who became the first artist with a learning disability to win the prestigious Turner Prize?", options: ["Tracey Emin", "Lubaina Himid", "Nnena Kalu", "Grayson Perry"], ans: 2, logic: "Nnena Kalu won the 2025 Turner Prize for her sculptures made from found materials, marking a historic moment for artists with learning disabilities." },
+    { q: "Which bank signed an MoU with TCIL to enhance IT infrastructure and accelerate digital banking services?", options: ["State Bank of India", "Punjab National Bank", "Bank of Baroda", "Canara Bank"], ans: 1, logic: "Punjab National Bank (PNB) partnered with TCIL in September 2025 to modernize its IT framework and customer-centric digital services." },
+    { q: "In which country did TVS Motor Company recently launch its iQube electric scooter, marking its entry into the local EV market?", options: ["Indonesia", "Vietnam", "Thailand", "Malaysia"], ans: 1, logic: "TVS Motor expanded its global EV footprint by launching the iQube in Vietnam in 2025." },
+    { q: "Which country signed its first defence Memorandum of Understanding with India through the JCBL Group in April 2025?", options: ["Hungary", "Slovakia", "Poland", "Czech Republic"], ans: 1, logic: "Slovakia and India's JCBL Group (Airbornics) signed an MoU to co-develop combat vehicles like Light Tanks." },
+    { q: "What is the name of the first ship launched under the Indian Navy's Multi-Purpose Vessel project?", options: ["Sahyadri", "Vikrant", "Samarthak", "Arighat"], ans: 2, logic: "The first Multi-Purpose Vessel, named 'Samarthak' (meaning Supporter), was launched at L&T Shipyard, Kattupalli, in October 2024." },
+    { q: "Which country is the dodo, a flightless bird, native to?", options: ["Fiji", "Madagascar", "Mauritius", "Seychelles"], ans: 2, logic: "The dodo was endemic to the island of Mauritius in the Indian Ocean." },
+    { q: "Which regulatory body is considering changes to short-selling norms to expand access and address settlement challenges?", options: ["RBI", "IRDAI", "SEBI", "PFRDA"], ans: 2, logic: "SEBI (Securities and Exchange Board of India) clarifies and manages the regulatory framework for short-selling in India." },
+    { q: "On which date will India observe National Epilepsy Day in 2025?", options: ["November 15", "November 19", "November 17", "November 21"], ans: 2, logic: "National Epilepsy Day is observed annually in India on November 17 to create awareness about the brain disorder." },
+    { q: "On which date is World Animal Day observed each year?", options: ["September 25", "November 10", "October 4", "December 1"], ans: 2, logic: "World Animal Day is celebrated globally on October 4, the feast day of Francis of Assisi, the patron saint of animals." },
+    { q: "In which country was Telugu Language Day 2025 celebrated with the P4 awareness programme?", options: ["United Arab Emirates", "United States", "Saudi Arabia", "United Kingdom"], ans: 2, logic: "The Telugu community in Saudi Arabia celebrated the day in 2025 with events focused on culture and heritage." },
+    { q: "Where will the First Asian Buddhist Summit, themed 'Role of Buddha Dhamma in Strengthening Asia,' take place?", options: ["Kathmandu", "New Delhi", "Thimphu", "Colombo"], ans: 1, logic: "The First Asian Buddhist Summit was organized by the Ministry of Culture in New Delhi in November 2024." },
+    { q: "From which country did India withdraw its High Commissioner and senior diplomats in 2024 due to diplomatic tensions?", options: ["Israel", "Canada", "Pakistan", "China"], ans: 1, logic: "Tensions escalated between India and Canada in late 2024, leading to the withdrawal of high-level diplomatic staff." },
+    { q: "What is India’s global rank in the clean industrial project pipeline according to the 2025 ITA report?", options: ["Second", "Third", "Fourth", "Fifth"], ans: 1, logic: "India ranks 3rd globally with 65 clean energy industrial projects, following China and the USA." },
+    { q: "Who was the former world's oldest person, who passed away recently at age 116?", options: ["Tomiko Itooka", "Maria Branyas", "Jiroemon Kimura", "Kane Tanaka"], ans: 1, logic: "Maria Branyas Morera (117) passed away in August 2024; she was succeeded as the oldest living person by Tomiko Itooka." },
+    { q: "Where was the PADH-AI Conclave on Artificial Intelligence in education held?", options: ["Mumbai", "Bengaluru", "New Delhi", "Hyderabad"], ans: 2, logic: "The PADH-AI Conclave was held in New Delhi to discuss the integration of AI in the Indian education sector." },
+    { q: "In which city will MAHE host the MAHE Global Health Summit 2026?", options: ["Dubai", "Manipal", "New Delhi", "Bengaluru"], ans: 1, logic: "While the event begins in Dubai, the main Global Health Summit 2026 culminates at the Manipal campus in February 2026." },
+    { q: "Who assumed office as the President of Moldova for a second term in late 2024?", options: ["Maia Sandu", "Igor Dodon", "Vladimir Voronin", "Natalia Gavrilița"], ans: 0, logic: "Maia Sandu won the 2024 presidential runoff and was sworn in for her second term on December 24, 2024." },
+    { q: "Which state launched four beneficiary schemes, including Rythu Bharosa and Indiramma Atmiya Bharosa?", options: ["Andhra Pradesh", "Karnataka", "Telangana", "Tamil Nadu"], ans: 2, logic: "The Telangana government launched these welfare schemes in 2025 to provide financial aid to farmers and families." },
+    { q: "What is the primary purpose of the WHO's newly launched MeDevIS platform?", options: ["Medical Device Information", "Disease Tracking", "Health Insurance Management", "Medical Training Programs"], ans: 0, logic: "MeDevIS (Medical Devices Information System) is an online clearinghouse for information on medical devices." },
+    { q: "Which institution collaborated with MeitY to launch AgriHub, an AI-driven Center of Excellence for agriculture?", options: ["IIT Delhi", "IIT Indore", "IIT Bombay", "IIT Kanpur"], ans: 1, logic: "The Ministry of Electronics and IT (MeitY) launched AgriHub at IIT Indore in January 2025." }
+];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

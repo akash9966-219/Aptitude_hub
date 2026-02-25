@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Java Progrraming Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Java Programming Test 3</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 3</button>
+        <a href="test6.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+     const questions = [
+  {
+    q: `Which of the following class level (nonlocal) variable declarations will not compile?`,
+    options: ["protected int a;", "transient int b = 3;", "private synchronized int e;", "volatile int d;"],
+    ans: 2,
+    logic: `Explanation: The 'synchronized' keyword is an access modifier for methods and blocks, not for variables. It cannot be used in a variable declaration.`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class ArrayTest { 
+    public static void main(String[ ] args) { 
+        float f1[ ], f2[ ]; 
+        f1 = new float[10]; 
+        f2 = f1; 
+        System.out.println("f2[0] = " + f2[0]); 
+    } 
+}`,
+    options: ["It prints f2[0] = 0.0", "It prints f2[0] = NaN", "An error at f2 = f1; causes compile to fail.", "It prints the garbage value."],
+    ans: 0,
+    logic: `Explanation: In Java, when an array of primitives is initialized, its elements are automatically assigned default values. For float, the default value is 0.0.`
+  },
+  {
+    q: `class A { 
+    A( ) { } 
+} 
+class B extends A { }
+
+Which statement is true?`,
+    options: ["Class B's constructor is public.", "Class B's constructor has no arguments.", "Class B's constructor includes a call to this().", "None of these."],
+    ans: 1,
+    logic: `Explanation: Since class B does not define a constructor, the compiler provides a default constructor. This default constructor has no arguments and includes a call to 'super()'.`
+  },
+  {
+    q: `/* Missing statements ? */
+public class NewTreeSet extends java.util.TreeSet {
+    public static void main(String [] args) {
+        java.util.TreeSet t = new java.util.TreeSet();
+        t.clear();
+    }
+    public void clear() {
+        TreeMap m = new TreeMap();
+        m.clear();
+    }
+}
+
+Which two statements, added independently at the beginning, allow the code to compile?
+1. No statement is required
+2. import java.util.*;
+3. import java.util.Tree*;
+4. import java.util.TreeSet;
+5. import java.util.TreeMap;`,
+    options: ["1 only", "2 and 5", "3 and 4", "3 and 5"],
+    ans: 1,
+    logic: `Explanation: To use 'TreeMap' without a fully qualified name, you must import it. Option 2 (wildcard import) or Option 5 (specific import) would both satisfy the compiler.`
+  },
+  {
+    q: `What will be the output of the program?
+
+class Two {
+    byte x;
+}
+class PassO {
+    public static void main(String [] args) {
+        PassO p = new PassO();
+        p.start();
+    }
+    void start() {
+        Two t = new Two();
+        System.out.print(t.x + " ");
+        Two t2 = fix(t);
+        System.out.println(t.x + " " + t2.x);
+    }
+    Two fix(Two tt) {
+        tt.x = 42;
+        return tt;
+    }
+}`,
+    options: ["null null 42", "0 0 42", "0 42 42", "0 0 0"],
+    ans: 2,
+    logic: `Explanation: Primitive instance variables (like byte x) default to 0. When 't' is passed to 'fix()', the method modifies the actual object reference. Thus, both t.x and t2.x reflect the new value of 42.`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class If1 {
+    static boolean b;
+    public static void main(String [] args) {
+        short hand = 42;
+        if ( hand < 50 && !b )
+            hand++;
+        if ( hand > 50 );
+        else if ( hand > 40 ) {
+            hand += 7;
+            hand++;    
+        }
+        else
+            --hand;
+        System.out.println(hand);
+    }
+}`,
+    options: ["41", "42", "50", "51"],
+    ans: 3,
+    logic: `Explanation: b defaults to false, so '!b' is true. 'hand' becomes 43. The second if statement has a semicolon immediately after it, making it an empty statement. The 'else if' then executes because 43 > 40, adding 7 then 1, totaling 51.`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class If2 {
+    static boolean b1, b2;
+    public static void main(String [] args) {
+        int x = 0;
+        if ( !b1 ) {
+            if ( !b2 ) {
+                b1 = true;
+                x++;
+                if ( 5 > 6 ) { x++; }
+                if ( !b1 ) 
+                    x = x + 10;
+                else if ( b2 = true ) 
+                    x = x + 100;
+                else if ( b1 | b2 ) 
+                    x = x + 1000;
+            }
+        }
+        System.out.println(x);
+    }
+}`,
+    options: ["0", "1", "101", "111"],
+    ans: 2,
+    logic: `Explanation: x starts at 0. It increments to 1 inside the inner if. Then, 'b2 = true' is an assignment that returns true, so 'x = x + 100' executes, making x = 101.`
+  },
+  {
+    q: `What will be the output of the program?
+
+int I = 0;
+label:
+    if (I < 2) {
+    System.out.print("I is " + I);
+    I++;
+    continue label;}`,
+    options: ["I is 0", "I is 0 I is 1", "Compilation fails.", "None of the above"],
+    ans: 2,
+    logic: `Explanation: The 'continue' statement can only be used within loops (for, while, do-while). Using 'continue' with a label on an 'if' statement is invalid syntax.`
+  },
+  {
+    q: `What will be the output of the program?
+
+int i = 0; 
+while(1) {
+    if(i == 4) { break; } 
+    ++i; 
+} 
+System.out.println("i = " + i);`,
+    options: ["i = 0", "i = 3", "i = 4", "Compilation fails."],
+    ans: 3,
+    logic: `Explanation: In Java, the condition for a 'while' loop must be a boolean. Unlike C++, '1' is an integer and does not represent 'true'.`
+  },
+  {
+    q: `What will be the output of the program?
+
+int i = 0, j = 5; 
+tp: for (;;) {
+        i++;  
+        for (;;) {
+            if(i > --j) { break tp; } 
+        } 
+        System.out.println("i =" + i + ", j = " + j);
+    }`,
+    options: ["i = 1, j = 0", "i = 1, j = 4", "i = 3, j = 4", "Compilation fails."],
+    ans: 0,
+    logic: `Explanation: The code enters the inner loop. 'j' is decremented repeatedly until 'i > --j' is true (1 > 0). 'break tp' exits both loops, and the final print shows i=1, j=0.`
+  },
+  {
+    q: `What will be the output of the program?
+
+try { 
+    int x = 0; 
+    int y = 5 / x; 
+} catch (Exception e) {
+    System.out.println("Exception"); 
+} catch (ArithmeticException ae) {
+    System.out.println(" Arithmetic Exception"); 
+} 
+System.out.println("finished");`,
+    options: ["finished", "Exception", "Compilation fails.", "Arithmetic Exception"],
+    ans: 2,
+    logic: `Explanation: Catch blocks must be ordered from most specific to most general. Since 'Exception' is a superclass of 'ArithmeticException', the second catch block is unreachable, causing a compile error.`
+  },
+  {
+    q: `Which statement is true regarding Java exception handling?`,
+    options: ["A try must have at least one catch.", "Multiple catch blocks can catch the same class.", "Errors must be declared as thrown.", "VM shutdown aside, finally always executes."],
+    ans: 3,
+    logic: `Explanation: The 'finally' block is guaranteed to execute after the 'try' and 'catch' blocks finish, unless the Virtual Machine is terminated during execution.`
+  },
+  {
+    q: `class Test1 {
+    public int value;
+    public int hashCode() { return 42; }
+}
+class Test2 {
+    public int value;
+    public int hashcode() { return (int)(value^5); }
+}
+
+Which statement is true?`,
+    options: ["class Test1 will not compile.", "Test1 is more efficient.", "Test1 is less efficient.", "class Test2 will not compile."],
+    ans: 1,
+    logic: `Explanation: Test1 is more efficient because it returns a constant, but it is functionally poor because all instances will collide in a HashMap. Note: 'hashcode' in Test2 is misspelled (lowercase 'c'), so it doesn't override the Object method.`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class Foo {
+    Foo() { System.out.print("foo"); }
+    class Bar {
+        Bar() { System.out.print("bar"); }
+        public void go() { System.out.print("hi"); }
+    }
+    public static void main (String [] args) {
+        Foo f = new Foo();
+        f.makeBar();
+    }
+    void makeBar() {
+        (new Bar() {}).go();
+    }
+}`,
+    options: ["Compilation fails.", "An error occurs at runtime.", "It prints foobarhi", "It prints barhi"],
+    ans: 2,
+    logic: `Explanation: 'new Foo()' prints 'foo'. Then 'makeBar' creates an anonymous subclass of Bar, which calls the Bar constructor (printing 'bar') and then the 'go()' method (printing 'hi').`
+  },
+  {
+    q: `public class X {
+    public static void main(String [] args) {
+        X x = new X();
+        X x2 = m1(x); 
+        X x4 = new X();
+        x2 = x4; 
+        doComplexStuff();
+    }
+    static X m1(X mx) {
+        mx = new X();
+        return mx;
+    }
+}
+
+After line 8 runs, how many objects are eligible for garbage collection?`,
+    options: ["0", "1", "2", "3"],
+    ans: 1,
+    logic: `Explanation: The object created inside 'm1' was assigned to 'x2'. On line 8, 'x2' is reassigned to 'x4'. Since nothing else points to the 'm1' object, it becomes eligible for GC.`
+  },
+  {
+    q: `class Test {  
+    private Demo d; 
+    void start() {  
+        d = new Demo(); 
+        this.takeDemo(d); 
+    } 
+    void takeDemo(Demo demo) { 
+        demo = null;  
+        demo = new Demo(); 
+    } 
+}
+
+When is the first Demo object created eligible for garbage collection?`,
+    options: ["After line 7", "After line 8", "After start() completes", "When the Test instance is eligible for GC."],
+    ans: 3,
+    logic: `Explanation: The object is assigned to the instance variable 'd'. It remains reachable as long as the 'Test' instance is alive.`
+  },
+  {
+    q: `class Bar { } 
+class Test {  
+    Bar doBar() {
+        Bar b = new Bar(); 
+        return b; 
+    } 
+    public static void main (String args[]) { 
+        Test t = new Test(); 
+        Bar newBar = t.doBar(); 
+        newBar = new Bar(); 
+        System.out.println("finishing"); 
+    } 
+}
+
+At what point is the Bar object created in doBar() eligible for GC?`,
+    options: ["after line 12", "after line 14", "after doBar() completes", "after main() completes"],
+    ans: 1,
+    logic: `Explanation: The object is returned and held by 'newBar'. Once 'newBar' is reassigned to a different object on line 14, the first object has no references and is eligible for GC.`
+  },
+  {
+    q: `What will cause compilation to fail?
+
+public void bar() {
+    while(true) {
+        assert false; 
+    } 
+    assert false;  /* Line 14 */
+}`,
+    options: ["Line 5", "Line 6", "Line 12", "Line 14"],
+    ans: 3,
+    logic: `Explanation: Java detects that any code after an infinite loop (while(true)) is unreachable, which is a compile-time error.`
+  },
+  {
+    q: `What will be the output of the program?
+
+String a = "newspaper";
+a = a.substring(5,7);
+char b = a.charAt(1);
+a = a + b;
+System.out.println(a);`,
+    options: ["apa", "app", "apea", "apep"],
+    ans: 1,
+    logic: `Explanation: substring(5,7) takes indices 5 and 6, which is "pa". charAt(1) of "pa" is 'p'. Adding 'p' to "pa" results in "app".`
+  },
+  {
+    q: `What will be the output of the program?
+
+public class SqrtExample {
+    public static void main(String [] args) {
+        double value = -9.0;
+        System.out.println(Math.sqrt(value));
+    }
+}`,
+    options: ["3.0", "-3.0", "NaN", "Compilation fails."],
+    ans: 2,
+    logic: `Explanation: The square root of a negative number is not a real number. In Java, 'Math.sqrt' returns 'NaN' (Not a Number) for negative inputs.`
+  }
+];
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

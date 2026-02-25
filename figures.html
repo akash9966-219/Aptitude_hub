@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Non-Verbal Reasoning Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #8b5cf6;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .topic-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: #f5f3ff;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .topic-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .topic-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .back-nav {
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="index.html" class="btn-back">← Back to Main Menu</a>
+    </div>
+
+    <div class="header">
+        <h1>Non-Verbal Reasoning</h1>
+        <p>Master visual logic and spatial intelligence</p>
+    </div>
+
+    <div class="topics-grid">
+        <a href="mirror-images.html" class="topic-card">
+            <div class="icon-box">🪞</div>
+            <h3>Mirror Images</h3>
+            <p>Identify horizontal reflections of figures and letters.</p>
+        </a>
+
+        <a href="water-images.html" class="topic-card">
+            <div class="icon-box">💧</div>
+            <h3>Water Images</h3>
+            <p>Find the vertical (inverted) reflection of objects.</p>
+        </a>
+
+        <a href="embedded-images.html" class="topic-card">
+            <div class="icon-box">🧩</div>
+            <h3>Embedded Images</h3>
+            <p>Locate a hidden figure within a complex diagram.</p>
+        </a>
+
+        <a href="pattern-completion.html" class="topic-card">
+            <div class="icon-box">🏁</div>
+            <h3>Pattern Completion</h3>
+            <p>Select the missing part to complete the design.</p>
+        </a>
+
+        <a href="figure-matrix.html" class="topic-card">
+            <div class="icon-box">🧱</div>
+            <h3>Figure Matrix</h3>
+            <p>Solve 2x2 or 3x3 grids of changing shapes.</p>
+        </a>
+
+        <a href="paper-folding.html" class="topic-card">
+            <div class="icon-box">📂</div>
+            <h3>Paper Folding</h3>
+            <p>Predict the look of a transparent sheet after folding.</p>
+        </a>
+
+        <a href="paper-cutting.html" class="topic-card">
+            <div class="icon-box">✂️</div>
+            <h3>Paper Cutting</h3>
+            <p>Visualize the pattern after folding, cutting, and unfolding.</p>
+        </a>
+
+        <a href="rule-detection.html" class="topic-card">
+            <div class="icon-box">🔍</div>
+            <h3>Rule Detection</h3>
+            <p>Identify the set follows a specific transformation rule.</p>
+        </a>
+
+        <a href="grouping-images.html" class="topic-card">
+            <div class="icon-box">🏷️</div>
+            <h3>Grouping of Images</h3>
+            <p>Classify figures into groups based on common properties.</p>
+        </a>
+
+        <a href="dot-situation.html" class="topic-card">
+            <div class="icon-box">📍</div>
+            <h3>Dot Situation</h3>
+            <p>Analyze the common region shared by dots in figures.</p>
+        </a>
+
+        <a href="image-analysis.html" class="topic-card">
+            <div class="icon-box">📊</div>
+            <h3>Image Analysis</h3>
+            <p>Synthesize and decompose figures into constituent parts.</p>
+        </a>
+    </div>
+
+</body>
+</html>

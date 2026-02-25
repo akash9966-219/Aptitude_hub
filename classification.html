@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Classification Complete</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --accent: #3498db;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--primary);
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #f1f5f9;
+            border: 2px solid transparent;
+            padding: 16px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            background: #e2e8f0;
+            border-color: var(--accent);
+        }
+
+        .opt-btn.correct { background: var(--correct) !important; color: white; }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; }
+
+        .sidebar {
+            background: var(--card);
+            padding: 24px;
+            border-radius: 16px;
+            height: fit-content;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 100px;
+        }
+
+        .logic-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            display: none;
+        }
+
+        .btn-next {
+            margin-top: 30px;
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="counter">0 / 0</span>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <div class="question-text">Choose the word which is different from the rest.</div>
+        <div class="options-grid" id="options-container"></div>
+        <button class="btn-next" id="next-btn" onclick="nextQuestion()">Next Question &rarr;</button>
+    </div>
+
+    <div class="sidebar">
+        <h3 style="margin-top:0">Analysis</h3>
+        <div id="logic-box" class="logic-box">
+            <strong>Reasoning:</strong><br>
+            <span id="logic-text"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // SET 1
+        { opts: ["Chicken", "Snake", "Swan", "Crocodile", "Frog"], ans: 0, logic: "All except Chicken can live in water (aquatic/amphibious/reptilian). Chicken is a purely terrestrial bird." },
+        { opts: ["Cap", "Turban", "Helmet", "Veil", "Hat"], ans: 3, logic: "All except Veil are headgears for protection or fashion; Veil is for covering the face." },
+        { opts: ["Kiwi", "Eagle", "Emu", "Ostrich"], ans: 1, logic: "Eagle can fly; others are flightless birds." },
+        { opts: ["Rigveda", "Yajurveda", "Atharvaveda", "Ayurveda", "Samveda"], ans: 3, logic: "All except Ayurveda are the four holy Vedas. Ayurveda is medical science." },
+        { opts: ["Curd", "Butter", "Oil", "Cheese", "Cream"], ans: 2, logic: "All except Oil are dairy products." },
+        { opts: ["Potassium", "Silicon", "Zirconium", "Gallium", "Germanium"], ans: 0, logic: "Potassium is a highly reactive alkali metal; others are transition metals or metalloids used in tech." },
+        { opts: ["Tea", "Cinchona", "Rubber", "Cardamom", "Chalk"], ans: 4, logic: "Chalk is a mineral; others are plant products." },
+        { opts: ["Hangar", "Platform", "Dock", "Park", "Bus stand"], ans: 3, logic: "All except Park are specialized stations for vehicles." },
+        { opts: ["Sparrow", "Swan", "Parrot", "Koel"], ans: 1, logic: "Swan is aquatic; others are land birds." },
+        { opts: ["Tall", "Huge", "Thin", "Sharp", "Small"], ans: 3, logic: "Sharp refers to an edge; others refer to dimensions/size." },
+        { opts: ["Pear", "Apple", "Litchi", "Guava", "Orange"], ans: 4, logic: "Orange is a citrus fruit." },
+        { opts: ["Dagger", "Hammer", "Knife", "Sword", "Blade"], ans: 1, logic: "Hammer is a blunt tool; others are sharp-edged weapons/tools." },
+        { opts: ["Kanpur", "Allahabad", "Varanasi", "Mathura"], ans: 3, logic: "Mathura is on Yamuna; others are on Ganga." },
+        { opts: ["Oyster", "Clam", "Scallop", "Mussel"], ans: 0, logic: "Oyster is the only one known for pearl production." },
+        { opts: ["Deck", "Quay", "Stern", "Bow", "Mast"], ans: 1, logic: "Quay is a landing place; others are parts of a ship." },
+        { opts: ["Producer", "Director", "Investor", "Financier", "Entrepreneur"], ans: 1, logic: "Director is a creative role; others are financial/business roles." },
+        { opts: ["Tricycle", "Trident", "Trifle", "Tricolour", "Trilogy"], ans: 2, logic: "All others represent 'three' via the prefix 'Tri'." },
+        { opts: ["Chameleon", "Crocodile", "Alligator", "Locust", "Salamander"], ans: 3, logic: "Locust is an insect; others are reptiles/amphibians." },
+        { opts: ["Calendar", "Year", "Date", "Month", "Day"], ans: 0, logic: "Calendar is the container; others are units of time within it." },
+        { opts: ["Mumbai", "Cochin", "Kandla", "Mysore", "Vishakhapatnam"], ans: 3, logic: "Mysore is inland; others are port cities." },
+        { opts: ["Cumin", "Groundnut", "Cinnamon", "Pepper", "Clove"], ans: 1, logic: "Groundnut is an oilseed; others are spices." },
+        { opts: ["Biscuits", "Chocolate", "Cake", "Bread", "Pastry"], ans: 1, logic: "Chocolate is a confection; others are bakery/flour products." },
+        { opts: ["Sweep", "Wipe", "Scrub", "Wash", "Stain"], ans: 4, logic: "Stain is a mark of dirt; others are cleaning actions." },
+        { opts: ["Coat", "Shirt", "Blouse", "Trousers", "Sweater"], ans: 3, logic: "Trousers are for the lower body; others are for the upper body." },
+        { opts: ["Asia", "Argentina", "Africa", "Australia", "Antarctica"], ans: 1, logic: "Argentina is a country; others are continents." },
+        { opts: ["Japan", "India", "Sri Lanka", "New Zealand"], ans: 1, logic: "India is part of a mainland; others are island nations." },
+        { opts: ["Spectacles", "Goggles", "Binoculars", "Microphone", "Telescope"], ans: 3, logic: "Microphone is for sound; others are for vision." },
+        { opts: ["Shehnai", "Bagpipe", "Flute", "Sitar", "Harmonica"], ans: 3, logic: "Sitar is a string instrument; others are wind instruments." },
+        { opts: ["Cheetah", "Lion", "Bear", "Tiger", "Leopard"], ans: 2, logic: "Bear is not part of the cat family." },
+        { opts: ["Sheep", "Gazelle", "Ibex", "Shrew", "Tapir"], ans: 3, logic: "Shrew is an insectivore; others are herbivores." },
+        { opts: ["Flood", "Hurricane", "Avalanche", "Earthquake", "Explosion"], ans: 4, logic: "Explosion is man-made; others are natural disasters." },
+        { opts: ["Ant", "Bee", "Moth", "Midge", "Spider"], ans: 4, logic: "Spider is an arachnid (8 legs); others are insects (6 legs)." },
+        { opts: ["Flute", "Guitar", "Sitar", "Violin", "Veena"], ans: 0, logic: "Flute is a wind instrument; others are strings." },
+        { opts: ["Treachery", "Fraud", "Deceit", "Swindle", "Morbid"], ans: 4, logic: "Morbid means unhealthy/gloomy; others are synonyms for cheating." },
+        { opts: ["Lima", "Algiers", "New York", "Tokyo", "Beijing"], ans: 2, logic: "New York is not a capital city." },
+        { opts: ["Reader", "Writer", "Printer", "Publisher", "Reporter"], ans: 0, logic: "Reader consumes the work; others create/produce it." },
+        { opts: ["Arrow", "Axe", "Knife", "Dagger", "Sword"], ans: 0, logic: "Arrow is a projectile; others are used by hand." },
+        { opts: ["Feathers", "Tentacles", "Scales", "Pseudopodia", "Flagella"], ans: 0, logic: "Feathers are for birds; others are primitive/microscopic movement organs." },
+        { opts: ["Dog", "Horse", "Goat", "Cat", "Fox"], ans: 4, logic: "Fox is wild; others are domestic." },
+        { opts: ["House", "Cottage", "School", "Palace", "Hut"], ans: 2, logic: "School is an institution; others are dwellings." },
+        { opts: ["Physics", "Chemistry", "Geography", "Botany", "Zoology"], ans: 2, logic: "Geography is social science; others are natural sciences." },
+        { opts: ["Football", "Volleyball", "Cricket", "Chess", "Hockey"], ans: 3, logic: "Chess is indoor; others are outdoor." },
+        { opts: ["Trunk", "Tree", "Fruit", "Leaf", "Flower"], ans: 1, logic: "Tree is the whole; others are parts." },
+        { opts: ["Giraffe", "Hyena", "Deer", "Rhinoceros", "Zebra"], ans: 1, logic: "Hyena is a carnivore; others are herbivores." },
+        { opts: ["Poland", "Greece", "Spain", "Italy", "Korea"], ans: 4, logic: "Korea is Asian; others are European." },
+        { opts: ["Bajra", "Mustard", "Rice", "Wheat", "Barley"], ans: 1, logic: "Mustard is an oilseed; others are cereals." },
+        { opts: ["Cot", "Sheet", "Quilt", "Pillow", "Blanket"], ans: 0, logic: "Cot is furniture; others are bedclothes." },
+        { opts: ["Assassinate", "Kill", "Kidnap", "Stab", "Murder"], ans: 2, logic: "Kidnap is abduction; others mean ending life." },
+        { opts: ["Doe", "Bitch", "Sorceress", "Drone", "Mare"], ans: 3, logic: "Drone is male (bee); others are female." },
+
+        // SET 2
+        { opts: ["Gangtok", "Singhbhum", "Hyderabad", "Chennai", "Bhubaneshwar"], ans: 1, logic: "Singhbhum is a district; others are state capitals." },
+        { opts: ["Turtle", "Lamb", "Colt", "Bitch", "Farrow"], ans: 3, logic: "Bitch is an adult female; others are young ones of animals." },
+        { opts: ["Raid", "Attack", "Assault", "Defence", "Ambush"], ans: 3, logic: "Defence is protective; others are aggressive actions." },
+        { opts: ["Tomato", "Carrot", "Ginger", "Potato", "Turmeric"], ans: 0, logic: "Tomato is a fruit (above ground); others are underground roots/stems." },
+        { opts: ["Car", "Scooter", "Helicopter", "Aeroplane", "Cycle"], ans: 4, logic: "Cycle is the only non-motorized vehicle." },
+        { opts: ["Mother", "Friend", "Sister", "Father", "Brother"], ans: 1, logic: "Friend is not a blood relation." },
+        { opts: ["Beaker", "Glass", "Mug", "Saucer", "Cup"], ans: 3, logic: "Saucer is flat; others are deep vessels for liquid." },
+        { opts: ["Feeling", "Joy", "Anxiety", "Anger", "Sorrow"], ans: 0, logic: "Feeling is the category; others are specific emotions." },
+        { opts: ["Nanak", "Christ", "Buddha", "Gandhi", "Mahavira"], ans: 3, logic: "Gandhi was a political leader; others were religious founders." },
+        { opts: ["Book", "Paper", "Pencil", "Pen", "Sharpener"], ans: 0, logic: "Book is used for reading; others are for writing/preparing to write." },
+        { opts: ["Pound", "Yen", "Ounce", "Franc", "Dollar"], ans: 2, logic: "Ounce is weight; others are currency." },
+        { opts: ["Brick", "Heart", "Bridge", "Spade", "Club"], ans: 2, logic: "Bridge is not a suit in playing cards (Brick/Diamond, Heart, Spade, Club)." },
+        { opts: ["Tomato", "Cucumber", "Brinjal", "Carrot", "Gourd"], ans: 3, logic: "Carrot is a root; others are fruits of plants." },
+        { opts: ["Coarse", "Unrefined", "Vulgar", "Oafish", "Blunt"], ans: 4, logic: "Blunt refers to sharpness; others refer to lack of refinement." },
+        { opts: ["Seal", "Scorpion", "Fish", "Lion"], ans: 1, logic: "Scorpion is an invertebrate; others are vertebrates." },
+        { opts: ["Month", "Year", "Fortnight", "Season", "week"], ans: 3, logic: "Season is a climatic division; others are strictly chronological calendar units." },
+        { opts: ["Kennel", "House", "Stable", "Aviary", "Aquarium"], ans: 1, logic: "House is for humans; others are for animals/birds/fish." },
+        { opts: ["Tortoise", "Duck", "Snake", "Whale", "Crow"], ans: 3, logic: "Whale is a mammal; others lay eggs." },
+        { opts: ["Cliff", "Canyon", "Gulch", "Gorge", "Ravine"], ans: 0, logic: "Cliff is a vertical rock face; others are valley-like depressions." },
+        { opts: ["Actor", "Artist", "Musician", "Dancer", "Poet"], ans: 4, logic: "Poet creates literature; others are performers/visual artists." },
+        { opts: ["Sketch", "Diagram", "Poster", "Chart", "Paper"], ans: 4, logic: "Paper is the medium; others are things drawn on it." },
+        { opts: ["Mew", "Howl", "Bark", "Grunt", "Shout"], ans: 4, logic: "Shout is by humans; others are animal sounds." },
+        { opts: ["Hostel", "Hotel", "Inn", "Club", "Motel"], ans: 3, logic: "Club is for social activity; others are for lodging." },
+        { opts: ["Blue", "Green", "White", "Yellow"], ans: 2, logic: "White is not a spectral color of the rainbow." },
+        { opts: ["Fox", "Yak", "Bear", "Kangaroo", "Sheep"], ans: 3, logic: "Kangaroo is a marsupial; others are placental mammals." },
+        { opts: ["Trigger", "Muzzle", "Pallete", "Barrel", "Bullet"], ans: 2, logic: "Pallete (Palette) is for painting; others are parts of a gun." },
+        { opts: ["Cigar", "Cigarette", "Tobacco", "Pipe", "Hookah"], ans: 2, logic: "Tobacco is the raw material; others are tools for smoking it." },
+        { opts: ["Run", "Walk", "Think", "Jump", "Swim"], ans: 2, logic: "Think is a mental activity; others are physical." },
+        { opts: ["Taste", "Chew", "Swallow", "Gulp", "Lick"], ans: 0, logic: "Taste is a sense; others are physical mouth movements." },
+        { opts: ["Sun", "Moon", "Star", "Planets", "Universe"], ans: 4, logic: "Universe contains all the others." },
+        { opts: ["Guava", "Litchi", "Papaya", "Watermelon", "Jackfruit"], ans: 3, logic: "Watermelon is a ground-creeper; others grow on trees." },
+        { opts: ["Cabbage", "Papaya", "Gourd", "Cucumber", "Brinjal"], ans: 1, logic: "Papaya is a fruit; others are vegetables." },
+        { opts: ["Jordan", "Bhutan", "Turkey", "Norway", "Spain"], ans: 3, logic: "Norway is a Scandinavian/North European nation (others have different geopolitical groups)." },
+        { opts: ["Engineer", "Architect", "Mechanic", "Mason", "Blacksmith"], ans: 2, logic: "Mechanic works on machines; others are related to building/construction/crafting." },
+        { opts: ["Sleet", "Fog", "Hailstone", "Vapour", "Mist"], ans: 2, logic: "Hailstone is solid; others are gaseous or fine liquid droplets." },
+        { opts: ["Lake", "Sea", "River", "Pool", "Pond"], ans: 2, logic: "River is moving water; others are stagnant/contained." },
+        { opts: ["Cow", "Deer", "Donkey", "Rhinoceros", "Goat"], ans: 3, logic: "Rhinoceros has a single horn (or two); others are based on different hoof/horn structures." },
+        { opts: ["Rose", "Lotus", "Marigold", "Lily", "Tulip"], ans: 1, logic: "Lotus is aquatic; others are terrestrial." },
+        { opts: ["Metre", "Furlong", "Yard", "Mile", "Acre"], ans: 4, logic: "Acre is area; others are distance." },
+        { opts: ["Snore", "Slumber", "Yawn", "Doze", "Dream"], ans: 2, logic: "Yawn is done while awake/tired; others happen during sleep." },
+        { opts: ["Spade", "Spanner", "Shovel", "Rake", "Pick-axe"], ans: 1, logic: "Spanner is a mechanical tool; others are gardening/digging tools." },
+        { opts: ["Calf", "Cub", "Piglet", "Duckling", "Hireling"], ans: 4, logic: "Hireling is a person who works for money; others are baby animals." },
+        { opts: ["King", "Queen", "Bishop", "Minister", "Knight"], ans: 3, logic: "Minister is not a chess piece." },
+        { opts: ["Zinc", "Iron", "Aluminium", "Copper", "Mercury"], ans: 4, logic: "Mercury is liquid." },
+        { opts: ["Skull", "Appendix", "Pelvis", "Fibula", "Vertebra"], ans: 1, logic: "Appendix is an organ; others are bones." },
+        { opts: ["Shoulder", "Foot", "Elbow", "Arm", "Fingers"], ans: 1, logic: "Foot is part of the leg; others are part of the arm/upper body." },
+        { opts: ["Island", "Coast", "Harbour", "Oasis", "Peninsula"], ans: 3, logic: "Oasis is in a desert; others relate to the sea/ocean." },
+        { opts: ["Tonnes", "Quintals", "Grams", "Kilograms", "Kilometres"], ans: 4, logic: "Kilometres is distance; others are weight." },
+        { opts: ["Geometry", "Algebra", "Trigonometry", "Mathematics", "Arithmetic"], ans: 3, logic: "Mathematics is the field; others are branches." },
+        { opts: ["Virgo", "Pisces", "Sagittarius", "Cancer", "Orion"], ans: 4, logic: "Orion is a constellation; others are Zodiac signs." }
+    ];
+
+    let currentIdx = 0;
+
+    function init() {
+        document.getElementById('counter').innerText = `${currentIdx + 1} / ${questions.length}`;
+        const q = questions[currentIdx];
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.opts.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('logic-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(selectedIdx, btn) {
+        const correctIdx = questions[currentIdx].ans;
+        const btns = document.querySelectorAll('.opt-btn');
+        
+        btns.forEach(b => b.disabled = true);
+
+        if (selectedIdx === correctIdx) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            btns[correctIdx].classList.add('correct');
+        }
+
+        document.getElementById('logic-text').innerText = questions[currentIdx].logic;
+        document.getElementById('logic-box').style.display = 'block';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        if (currentIdx < questions.length - 1) {
+            currentIdx++;
+            init();
+        } else {
+            alert("Perfect! You've finished all 100+ items.");
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>

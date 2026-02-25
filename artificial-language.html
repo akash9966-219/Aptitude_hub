@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Artificial Language - Complete Set</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #8e44ad;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #fdfcfd;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            border-left: 8px solid var(--accent);
+        }
+
+        .language-table {
+            width: 100%;
+            background: #f9f6fb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        .language-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-prompt {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--primary);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 15px;
+            border: 2px solid #eee;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fdfaff; }
+        .opt-btn.selected { border-color: var(--accent); background: #f5eeff; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        .progress { font-weight: bold; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div id="data-area" class="language-table"></div>
+        <div id="prompt" class="question-prompt"></div>
+        <div id="options" class="options-grid"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress">Question 1</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="verify()">Decode</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next Pattern →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { clues: [["gorblflur", "fan belt"], ["pixngorbl", "ceiling fan"], ["arthtusl", "tile roof"]], q: "Which word could mean 'ceiling tile'?", opts: ["gorbltusl", "flurgorbl", "arthflur", "pixnarth"], ans: "pixnarth" },
+    { clues: [["hapllesh", "cloudburst"], ["srenchoch", "pinball"], ["resbosrench", "ninepin"]], q: "Which word could mean 'cloud nine'?", opts: ["leshsrench", "ochhapl", "haploch", "haplresbo"], ans: "haplresbo" },
+    { clues: [["agnoscrenia", "poisonous spider"], ["delanocrenia", "poisonous snake"], ["agnosdeery", "brown spider"]], q: "Which word could mean 'black widow spider'?", opts: ["deeryclostagnos", "agnosdelano", "agnosvitriblunin", "trymuttiagnos"], ans: "trymuttiagnos" },
+    { clues: [["moolokarn", "blue sky"], ["wilkospadi", "bicycle race"], ["moolowilko", "blue bicycle"]], q: "Which word could mean 'racecar'?", opts: ["wilkozwet", "spadiwilko", "moolobreil", "spadivolo"], ans: "spadivolo" },
+    { clues: [["migenlasan", "cupboard"], ["lasanpoen", "boardwalk"], ["cuopdansa", "pullman"]], q: "Which word could mean 'walkway'?", opts: ["poenmigen", "cuopeisel", "lasandansa", "poenforc"], ans: "poenforc" },
+    { clues: [["godabim", "kidney stones"], ["romzbim", "kidney beans"], ["romzbako", "wax beans"]], q: "Which word could mean 'wax statue'?", opts: ["godaromz", "lazbim", "wasibako", "romzpeo"], ans: "romzpeo" },
+    { clues: [["granamelke", "big tree"], ["pinimelke", "little tree"], ["melkehoon", "tree house"]], q: "Which word could mean 'big house'?", opts: ["granahoon", "pinishur", "pinihoon", "melkegrana"], ans: "granahoon" },
+    { clues: [["daftafoni", "advisement"], ["imodafta", "misadvise"], ["imolokti", "misconduct"]], q: "Which word could mean 'statement'?", opts: ["kratafoni", "kratadafta", "loktifoni", "daftaimo"], ans: "kratafoni" },
+    { clues: [["lelibroon", "yellow hat"], ["plekafroti", "flower garden"], ["frotimix", "garden salad"]], q: "Which word could mean 'yellow flower'?", opts: ["lelifroti", "lelipleka", "plekabroon", "frotibroon"], ans: "lelipleka" },
+    { clues: [["myncabel", "saddle horse"], ["conowir", "trail ride"], ["cabelalma", "horse blanket"]], q: "Which word could mean 'horse ride'?", opts: ["cabelwir", "conocabel", "almamyn", "conoalma"], ans: "cabelwir" },
+    { clues: [["dionot", "oak tree"], ["blyonot", "oak leaf"], ["blycrin", "maple leaf"]], q: "Which word could mean 'maple syrup'?", opts: ["blymuth", "hupponot", "patricrin", "crinweel"], ans: "crinweel" },
+    { clues: [["tamceno", "sky blue"], ["cenorax", "blue cheese"], ["aplmitl", "star bright"]], q: "Which word could mean 'bright sky'?", opts: ["cenotam", "mitltam", "raxmitl", "aplceno"], ans: "mitltam" },
+    { clues: [["gemolinea", "fair warning"], ["gerimitu", "report card"], ["gilageri", "weather report"]], q: "Which word could mean 'fair weather'?", opts: ["gemogila", "gerigeme", "gemomitu", "gerimita"], ans: "gemogila" },
+    { clues: [["slar", "jump"], ["slary", "jumping"], ["slarend", "jumped"]], q: "Which word could mean 'playing'?", opts: ["clargslarend", "clargy", "ellaclarg", "slarmont"], ans: "clargy" },
+    { clues: [["jalkamofti", "happy birthday"], ["moftihoze", "birthday party"], ["mentogunn", "goodness"]], q: "Which word could mean 'happiness'?", opts: ["jalkagunn", "mentohoze", "moftihoze", "hozemento"], ans: "jalkagunn" },
+    { clues: [["plekapaki", "fruitcake"], ["pakishillen", "cakewalk"], ["treftalan", "buttercup"]], q: "Which word could mean 'cupcake'?", opts: ["shillenalan", "treftpleka", "pakitreft", "alanpaki"], ans: "alanpaki" },
+    { clues: [["malgauper", "peach cobbler"], ["malgaport", "peach juice"], ["moggagrop", "apple jelly"]], q: "Which word could mean 'apple juice'?", opts: ["moggaport", "malgaauper", "gropport", "moggagrop"], ans: "moggaport" },
+    { clues: [["peslligen", "basketball court"], ["ligenstrisi", "courtroom"], ["oltaganti", "placement test"]], q: "Which word could mean 'guest room'?", opts: ["peslstrisi", "vosefstrisi", "gantipesl", "oltastrisi"], ans: "vosefstrisi" },
+    { clues: [["mallonpiml", "blue light"], ["mallontifl", "blueberry"], ["arpantifl", "raspberry"]], q: "Which word could mean 'lighthouse'?", opts: ["tiflmallon", "pimlarpan", "mallonarpan", "pimldoken"], ans: "pimldoken" },
+    { clues: [["briftamint", "militant"], ["uftonel", "occupied"], ["uftonalene", "occupation"]], q: "Which word could mean 'occupant'?", opts: ["elbrifta", "uftonamint", "elamint", "briftalene"], ans: "uftonamint" },
+    { clues: [["morpirquat", "birdhouse"], ["beelmorpir", "bluebird"], ["beelclak", "bluebell"]], q: "Which word could mean 'houseguest'?", opts: ["morpirhunde", "beelmoki", "quathunde", "clakquat"], ans: "quathunde" },
+    { clues: [["relftaga", "carefree"], ["otaga", "careful"], ["fertaga", "careless"]], q: "Which word could mean 'aftercare'?", opts: ["zentaga", "tagafer", "tagazen", "relffer"], ans: "tagazen" },
+    { clues: [["aptaose", "first base"], ["eptaose", "second base"], ["lartabuk", "ballpark"]], q: "Which word could mean 'baseball'?", opts: ["buklarta", "oseepta", "bukose", "oselarta"], ans: "oselarta" },
+    { clues: [["krekinblaf", "workforce"], ["dritakrekin", "groundwork"], ["krekinalti", "workplace"]], q: "Which word could mean 'someplace'?", opts: ["moropalti", "krekindrita", "altiblaf", "dritaalti"], ans: "moropalti" }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `Pattern ${idx + 1} of ${data.length}`;
+    const table = document.getElementById('data-area');
+    table.innerHTML = item.clues.map(c => `<div class="language-row"><span>${c[0]}</span><span>${c[1]}</span></div>`).join('');
+    document.getElementById('prompt').innerText = item.q;
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    item.opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = o;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function verify() {
+    if (!selected) return alert("Select the translated word!");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('correct');
+        if (b.innerText === selected && selected !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Artificial Language practice complete! All 22 patterns covered.");
+    }
+}
+render();
+</script>
+</body>
+</html>

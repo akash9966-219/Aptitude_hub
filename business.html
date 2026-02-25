@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Business & Economy 2026 - Master Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #1e293b; --bg: #f8fafc; --card: #ffffff; --accent: #0ea5e9; --correct: #22c55e; --wrong: #ef4444; --text: #334155; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
+        .container { max-width: 900px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; }
+        .q-text { font-size: 1.25rem; font-weight: 700; margin-bottom: 30px; color: #0f172a; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt-btn { padding: 18px; border: 2px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #f1f5f9; }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .explanation { margin-top: 25px; padding: 20px; background: #f0f9ff; border-radius: 10px; border-left: 5px solid var(--accent); display: none; }
+        .controls { display: flex; justify-content: space-between; margin-top: 40px; gap: 20px; }
+        .btn { padding: 15px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header">
+            <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+            <span id="q-count"></span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { q: "1. Which quick commerce platform partnered with Bizom for retail execution?", opts: ["Swiggy Instamart", "Zepto", "Blinkit", "BigBasket"], ans: 2, exp: "Blinkit partnered with Bizom in Feb 2026 to help brands improve supply chain visibility." },
+    { q: "2. Which company signed a pact with C-DOT for quantum-vulnerable algorithm detection?", opts: ["TCS", "Infosys", "Synergy Quantum", "Wipro"], ans: 2, exp: "Synergy Quantum partnered with C-DOT to build tools for quantum-safe cybersecurity." },
+    { q: "3. Which organisation partnered with India Post to distribute mutual funds?", opts: ["BSE", "NSE", "SEBI", "RBI"], ans: 1, exp: "NSE signed an MoU with the Department of Posts to expand investment access in rural areas." },
+    { q: "4. Which brand launched the Celestor 2.0 dual-band GPS smartwatch?", opts: ["Titan Smart", "Noise", "boAt", "Garmin"], ans: 0, exp: "Titan Smart launched Celestor 2.0 in January 2026." },
+    { q: "5. Which organisation signed an MoU with RITES for diesel locomotive leasing?", opts: ["Tata Steel", "NMDC", "RINL", "SAIL"], ans: 3, exp: "Steel Authority of India Limited (SAIL) partnered with RITES for rail logistics." },
+    { q: "6. Which Indian company was in the 2026 Global 100 Most Sustainable Corporations list?", opts: ["Tata Power", "Suzlon", "Reliance", "Adani Green"], ans: 1, exp: "Suzlon was ranked among the top 10 most sustainable corporations globally by Corporate Knights." },
+    { q: "7. Which platform became India’s first TReDS entity to pay a dividend?", opts: ["RXIL", "M1xchange", "Invoicemart", "SIDBI Portal"], ans: 0, exp: "RXIL declared a maiden dividend in Jan 2026." },
+    { q: "8. Which company launched a waste management comic with National Book Trust?", opts: ["Bisleri", "Tata Consumer", "Hindustan Unilever", "ITC"], ans: 3, exp: "ITC partnered with NBT for children's educational content on waste." },
+    { q: "9. Which company signed a 3 billion LNG supply agreement with ADNOC Gas?", opts: ["HPCL", "IOCL", "BPCL", "ONGC"], ans: 1, exp: "Indian Oil Corporation (IOCL) secured a 10-year LNG supply deal with ADNOC." },
+    { q: "10. Which organization won the SKOCH Silver Award 2025 for 'Net Zero Transition'?", opts: ["Power Grid", "SBI Capital Markets", "NTPC", "REC Limited"], ans: 1, exp: "SBI Capital Markets was honored for its ESG leadership." },
+    { q: "11. Which airline became the Associate Sponsor of Mumbai Indians?", opts: ["Air India", "Malaysia Airlines", "Singapore Airlines", "Emirates"], ans: 1, exp: "Malaysia Airlines expanded its Indian presence through this IPL partnership." },
+    { q: "12. Which company launched the 'Shakti' home battery storage system?", opts: ["Tata Power", "Ola", "Reliance", "Bosch"], ans: 1, exp: "Ola Electric launched Shakti BESS in Jan 2026." },
+    { q: "13. Which PSU awarded refinery contracts to Technip Energies for Bina and Mumbai?", opts: ["IOCL", "HPCL", "BPCL", "ONGC"], ans: 2, exp: "Bharat Petroleum (BPCL) awarded major contracts for refinery expansion." },
+    { q: "14. Which organization partnered with PNB MetLife for the DigiProtect Term Plan?", opts: ["HDFC Life", "ICICI Prudential", "Policybazaar", "Bajaj Allianz"], ans: 2, exp: "Policybazaar and PNB MetLife launched this digital-first plan." },
+    { q: "15. World’s most valuable company in Hurun Global 1000 Report 2025?", opts: ["Apple", "Microsoft", "Amazon", "Nvidia"], ans: 3, exp: "Nvidia topped the charts due to the AI chip boom." },
+    { q: "16. Which company launched its first global credit card in India on RuPay?", opts: ["Amazon", "Apple", "Google", "Microsoft"], ans: 0, exp: "Amazon launched the card to deepen financial integration in India." },
+    { q: "17. (Repeat) Which organization signed an MoU with India Post for mutual fund access?", opts: ["BSE", "NSE", "SEBI", "RBI"], ans: 1, exp: "NSE signed the agreement to utilize the vast postal network." },
+    { q: "18. Which global e-commerce giant signed an MoU with Gati Shakti Vishwavidyalaya?", opts: ["Flipkart", "Alibaba", "Walmart", "Amazon"], ans: 3, exp: "Amazon India partnered for academic innovation in logistics." },
+    { q: "19. Which company introduced the ‘Claim Kavach’ motor insurance programme?", opts: ["Coverfox", "Policybazaar", "Acko", "Bajaj Allianz"], ans: 1, exp: "Policybazaar launched Claim Kavach to simplify claims processing." },
+    { q: "20. Which company launched the tirzepatide drug Yurpeak in India?", opts: ["Lupin", "Cipla", "Sun Pharma", "Dr. Reddy’s"], ans: 1, exp: "Cipla launched Yurpeak for obesity and diabetes." },
+    { q: "21. Which brand renewed its partnership with the Argentina Football Association?", opts: ["Amul", "Nestle", "Britannia", "Mother Dairy"], ans: 0, exp: "Amul is the regional sponsor for AFA through the 2026 World Cup." },
+    { q: "22. Which semiconductor company signed an MoU with Tata Electronics?", opts: ["Intel", "AMD", "Qualcomm", "Samsung"], ans: 1, exp: "AMD and Tata Electronics are exploring chip packaging in India." },
+    { q: "23. Which company is launching the AI tax research platform ‘Tax Pragya’?", opts: ["PwC", "KPMG", "Deloitte", "EY"], ans: 2, exp: "Deloitte India launched Tax Pragya in late 2025." },
+    { q: "24. Which company acquired Warner Bros Discovery’s studios in a 72 billion deal?", opts: ["Amazon", "Disney", "Netflix", "Paramount"], ans: 2, exp: "Netflix made this massive acquisition in Dec 2025." },
+    { q: "25. Which organization signed an MoU with Sagarmala Finance for maritime boost?", opts: ["Cochin Shipyard", "L&T", "BEML", "GRSE"], ans: 3, exp: "Garden Reach Shipbuilders (GRSE) partnered to support maritime manufacturing." },
+    { q: "26. Which organization contributed 73 lakh for Eklavya Schools in Arunachal?", opts: ["Oil India", "Northern Coalfields", "NSTFDC", "Min. of Education"], ans: 2, exp: "NSTFDC provided funds for upgrading tribal residential schools." },
+    { q: "27. Which PSU was in the 2025 Global Top 100 Corporate Startup Stars?", opts: ["IOCL", "HPCL", "ONGC", "BPCL"], ans: 3, exp: "Bharat Petroleum (BPCL) was recognized for its startup ecosystem." },
+    { q: "28. Which telecom operator partnered with NHAI for highway safety alerts?", opts: ["Airtel", "Vi", "BSNL", "Jio"], ans: 1, exp: "Vodafone Idea (Vi) partnered with NHAI for IoT-based safety systems." },
+    { q: "29. Which company partnered with MapmyIndia for a geo-smart CRM?", opts: ["Salesforce", "Microsoft", "Freshworks", "Zoho"], ans: 3, exp: "Zoho and MapmyIndia launched India's first indigenous geo-CRM." },
+    { q: "30. Team India’s official colour partner under a 3-year BCCI deal?", opts: ["Berger Paints", "Sherwin-Williams", "Nippon Paints", "Asian Paints"], ans: 3, exp: "Asian Paints secured the deal starting in 2025." },
+    { q: "31. Which organisation signed an MoU with Aramco Asia India?", opts: ["GAIL", "EIL", "ONGC", "IOCL"], ans: 1, exp: "Engineers India Limited (EIL) partnered for global expansion." },
+    { q: "32. First aerospace/defence company to achieve CareEdge-ESG 1 rating?", opts: ["BEL", "HAL", "L&T", "BEML"], ans: 0, exp: "Bharat Electronics Ltd (BEL) reached the highest ESG category." },
+    { q: "33. City that hosted the 2nd National Economic Growth Summit 2025?", opts: ["Bengaluru", "Mumbai", "New Delhi", "Hyderabad"], ans: 1, exp: "Mumbai hosted the summit where BEML was honored." },
+    { q: "34. India’s most valuable brand in the 2025 Kantar BrandZ report?", opts: ["TCS", "HDFC Bank", "Zomato", "UltraTech"], ans: 1, exp: "HDFC Bank reclaimed the top spot from TCS." },
+    { q: "35. Partnered with BBSSL for a seed-to-market potato strategy?", opts: ["Nandini", "Mother Dairy", "GCMMF", "Banas Dairy"], ans: 3, exp: "Banas Dairy partnered with BBSSL to boost potato value chains." },
+    { q: "36. Partnered with EIL for onshore projects in Saudi Arabia?", opts: ["NMDC Energy", "Saudi Aramco", "ADNOC", "Reliance"], ans: 0, exp: "NMDC Energy (formerly NPCC) and EIL are collaborating on Gulf projects." },
+    { q: "37. Signed a 38 billion deal with OpenAI for cloud infra?", opts: ["Google", "Microsoft", "IBM", "Amazon"], ans: 3, exp: "Amazon (AWS) signed this landmark deal in 2025." },
+    { q: "38. First integrated payments wallet for ChatGPT?", opts: ["PayPal", "Stripe", "Shopify", "Google"], ans: 0, exp: "PayPal was integrated into ChatGPT for seamless transactions." },
+    { q: "39. Partnered with Nvidia for 100,000 robotaxis by 2027?", opts: ["Tesla", "Waymo", "Uber", "Lyft"], ans: 2, exp: "Uber partnered with Nvidia to lead autonomous ride-hailing." },
+    { q: "40. Awarded contract for Indian visa centres in Beijing/Shanghai?", opts: ["Cox & Kings", "Thomas Cook", "BLS International", "VFS Global"], ans: 2, exp: "BLS International won the 3-year MEA contract." },
+    { q: "41. Launched ‘Pay with Mutual Fund’ feature for UPI?", opts: ["HDFC AMC", "Bajaj Finserv", "ICICI Pru", "SBI MF"], ans: 1, exp: "Bajaj Finserv launched this feature to allow instant MF redemptions." },
+    { q: "42. Partnered with Govt to create 2.5 lakh jobs on NCS portal?", opts: ["Zomato", "Swiggy", "Ola", "Amazon"], ans: 3, exp: "Amazon India signed an MoU with the Labour Ministry." },
+    { q: "43. Name of the Muse Wearables smart ring for payments?", opts: ["FitBand", "Ring One", "SmartPay", "Pulse Loop"], ans: 1, exp: "Ring One is India's premier payment-enabled health ring." },
+    { q: "44. Awarded the Sonprayag to Kedarnath ropeway project?", opts: ["Reliance", "L&T", "Tata", "Adani"], ans: 1, exp: "Larsen & Toubro (L&T) is executing this critical pilgrimage project." },
+    { q: "45. Partnered with Airtel for the Airtel Cloud Platform?", opts: ["Microsoft", "IBM", "Google", "Oracle"], ans: 2, exp: "Google and Airtel are collaborating on cloud digital transformation." },
+    { q: "46. Airline that introduced the “Fare Se Fursat” fixed-fare scheme?", opts: ["Air India", "Alliance Air", "IndiGo", "SpiceJet"], ans: 1, exp: "Alliance Air launched this in Oct 2025 to stabilize regional fares." },
+    { q: "47. Partnered with Anthropic to integrate Claude into its ecosystem?", opts: ["Microsoft", "IBM", "Google", "Oracle"], ans: 3, exp: "Oracle integrated Anthropic's Claude into its cloud software." },
+    { q: "48. Global firm that launched India credit platform under Apurva Shah?", opts: ["KKR", "Blackstone", "Carlyle Group", "Bain Capital"], ans: 2, exp: "Carlyle Group expanded its credit footprint in India." },
+    { q: "49. Partnered with IICT and FICCI for creative-tech talent?", opts: ["Amazon Prime", "Netflix", "Disney+", "SonyLIV"], ans: 1, exp: "Netflix partnered to develop talent for the streaming era." },
+    { q: "50. First payment system partner for a global platform (UPI)?", opts: ["PayPal", "Stripe", "Google Pay", "Apple Pay"], ans: 2, exp: "Google Pay integrated UPI globally for cross-border payments." },
+    { q: "51. Quick-comm platform creating 10,000 jobs via NCS Portal?", opts: ["Blinkit", "Swiggy Instamart", "BigBasket", "Zepto"], ans: 1, exp: "Swiggy Instamart partnered with the Labour Ministry." },
+    { q: "52. Announced 100 billion investment in OpenAI infrastructure?", opts: ["Intel", "Microsoft", "Google", "Nvidia"], ans: 1, exp: "Microsoft's massive AI infra push for 2026." },
+    { q: "53. Signed MoU with Oil India for critical minerals exploration?", opts: ["ONGC", "Hindustan Copper", "Coal India", "NMDC"], ans: 3, exp: "NMDC and Oil India are collaborating on strategic minerals." },
+    { q: "54. SEBI framework for low-risk foreign investors (SWFs/Pension)?", opts: ["GIFT-Access", "SWAGAT-FI", "Invest-India+", "GlobalEdge-FI"], ans: 1, exp: "SWAGAT-FI streamlines access for trusted global investors." },
+    { q: "55. % stake SBI sold in Yes Bank to Japan’s SMBC?", opts: ["6.81%", "10%", "13.18%", "24.99%"], ans: 2, exp: "SBI offloaded a 13.18% stake to Sumitomo Mitsui Banking Corp." }
+];
+
+let current = 0;
+function load() {
+    const q = questions[current];
+    document.getElementById('q-count').innerText = `Question ${current + 1} / ${questions.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
+        b.onclick = () => {
+            const btns = document.querySelectorAll('.opt-btn'); btns.forEach(x => x.disabled = true);
+            if(i === q.ans) b.classList.add('correct');
+            else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
+            document.getElementById('exp-box').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('exp-box').style.display = 'block';
+        };
+        container.appendChild(b);
+    });
+    document.getElementById('exp-box').style.display = 'none';
+    document.getElementById('prev-btn').disabled = current === 0;
+    document.getElementById('next-btn').disabled = current === questions.length - 1;
+}
+function move(s) { current += s; load(); }
+load();
+</script>
+</body>
+</html>

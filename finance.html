@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Financial Markets & Fintech Quiz 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #0f172a; --bg: #f1f5f9; --card: #ffffff; --accent: #2563eb; --correct: #059669; --wrong: #dc2626; --text: #334155; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .quiz-card { background: var(--card); padding: 35px; border-radius: 16px; shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 8px solid var(--accent); }
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: 600; color: var(--accent); }
+        .q-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; font-weight: 700; color: var(--primary); }
+        .options { display: grid; gap: 12px; }
+        .opt { padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; background: none; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt:hover:not(:disabled) { border-color: var(--accent); background: #f8fafc; }
+        .opt.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+        .insight { margin-top: 25px; padding: 20px; background: #eff6ff; border-radius: 8px; border-left: 4px solid var(--accent); display: none; }
+        .nav { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .btn-nav { padding: 12px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-card">
+        <div class="q-header"><a href="currentaffairs.html" class="back-link">← Back to GK Portal</a><span id="q-count"></span></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="options" class="options"></div>
+        <div id="insight" class="insight"></div>
+        <div class="nav">
+            <button class="btn-nav" id="prev" onclick="move(-1)">Previous</button>
+            <button class="btn-nav" id="next" onclick="move(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "1. Which company received RBI in-principle approval to join Centralised Payment Systems (RTGS/NEFT)?", opts: ["Paytm", "Razorpay", "Pine Labs", "Transcorp"], ans: 3, exp: "Transcorp International received in-principle approval in Feb 2026, allowing it to hold an account with RBI and have its own IFSC." },
+    { q: "2. Revised collateral-free loan limit for MSEs effective April 1, 2026?", opts: ["20 Lakh", "10 Lakh", "15 Lakh", "25 Lakh"], ans: 0, exp: "RBI doubled the limit from 10 Lakh to 20 Lakh to ease credit access for Micro and Small Enterprises." },
+    { q: "3. Which company launched inFINity 3.0 for early-stage fintech startups?", opts: ["Razorpay", "PhonePe", "PayU", "Stripe"], ans: 2, exp: "PayU launched the third edition of its accelerator program to support the next wave of Indian fintechs." },
+    { q: "4. India's payment to the UN Regular Budget for 2026 to join the honour roll?", opts: ["32.50 Million", "35.18 Million", "40.00 Million", "28.75 Million"], ans: 1, exp: "India paid 35.18 million early in Feb 2026, joining 51 other nations on the UN honour roll." },
+    { q: "5. Institution that approved $830 million to modernise India's ITIs?", opts: ["IMF", "World Bank", "ADB", "UNDP"], ans: 1, exp: "The World Bank approved this for the PM-SETU program to overhaul skills training in India." },
+    { q: "6. Which fintech launched India's first RBI repo rate-linked savings account?", opts: ["Slice", "CRED", "Jupiter", "Fi Money"], ans: 2, exp: "Jupiter launched this account to offer transparent, market-linked interest rates via a digital-first interface." },
+    { q: "7. Which company became India's first unicorn of 2026 at a $1.2B valuation?", opts: ["Juspay", "Paytm", "Razorpay", "PhonePe"], ans: 0, exp: "Bengaluru-based Juspay secured Series D funding in Jan 2026 to reach unicorn status." },
+    { q: "8. Institution that approved 5,700 crore for Jal Sanrakshit Haryana Project?", opts: ["World Bank", "ADB", "IMF", "AIIB"], ans: 0, exp: "The World Bank sanctioned these funds for Haryana's canal restoration and water conservation drive." },
+    { q: "9. Which company's POS arm received RBI approval as an Offline Payment Aggregator?", opts: ["Razorpay", "Paytm", "PhonePe", "BharatPe"], ans: 3, exp: "BharatPe received the final license to operate as an offline PA-P (Payment Aggregator-Point of Sale)." },
+    { q: "10. Total value of India’s electronics exports recorded in FY2025?", opts: ["30 Billion", "47 Billion", "52 Billion", "40 Billion"], ans: 1, exp: "Minister Ashwini Vaishnaw confirmed a record 47 billion in exports, with smartphones contributing 30 billion." },
+    { q: "11. Institution that raised USD 350M from IFC and ADB for affordable housing?", opts: ["HDFC Bank", "Piramal Finance", "SBI Capital", "ICICI Bank"], ans: 1, exp: "Piramal Finance secured the funding under its Sustainable Finance Framework." },
+    { q: "12. Bengaluru fintech that received RBI approval as a PA-CB?", opts: ["Skydo", "Razorpay", "PayU", "Cashfree"], ans: 0, exp: "Skydo received final authorization to operate as a Cross-Border Payment Aggregator in Jan 2026." },
+    { q: "13. Institution acting as banker and debt manager for Yamuna rejuvenation projects?", opts: ["RBI", "SBI", "MoF", "NITI Aayog"], ans: 0, exp: "The Reserve Bank of India facilitates the market borrowings for the Delhi Government's infrastructure initiatives." },
+    { q: "14. Institution providing the app for verifying enterprises on Udyam Assist?", opts: ["SIDBI", "RBI", "NABARD", "SBI"], ans: 0, exp: "SIDBI manages the technical platform and verification systems for the Udyam Assist Platform." },
+    { q: "15. Company registered as a Type II NBFI for parent expansion into lending?", opts: ["Aryaman Finance", "Aryaman Capital", "Aryaman Merchant Bank", "Aryaman Investment"], ans: 1, exp: "Aryaman Capital Services Ltd received RBI registration to expand credit and lending operations." },
+    { q: "16. Institution that signed $2.2B in loan agreements with India in late 2025?", opts: ["World Bank", "IMF", "ADB", "NDB"], ans: 2, exp: "The Asian Development Bank (ADB) signed these for urban services, transport, and energy projects." },
+    { q: "17. Digital platform that introduced biometric PIN-free UPI payments?", opts: ["Google Pay", "PhonePe", "Amazon Pay", "Paytm"], ans: 1, exp: "PhonePe introduced fingerprint/face ID authentication for faster, PIN-less UPI transactions." },
+    { q: "18. Global giant setting up Asia’s largest Global Capability Centre in India?", opts: ["JP Morgan", "Goldman Sachs", "Citigroup", "Bank of America"], ans: 0, exp: "JP Morgan Chase announced a massive GCC expansion in Bengaluru and Hyderabad." },
+    { q: "19. Revised FDI limit in insurance companies under the 2025 Amendment Bill?", opts: ["100%", "74%", "51%", "49%"], ans: 0, exp: "The Bill proposed allowing up to 100% FDI to attract global capital into the insurance sector." },
+    { q: "20. Award period covered by the 16th Finance Commission’s report?", opts: ["2026-29", "2025-30", "2027-32", "2026-31"], ans: 3, exp: "The Commission's recommendations apply to the five-year period from April 2026 to March 2031." },
+    { q: "21. Focus of IEPFA’s awareness drive in Karnal, Haryana?", opts: ["Digital Payments", "Start-up Investments", "Rural Banking", "Empowering Rural Women"], ans: 3, exp: "The drive specifically targeted financial literacy and empowerment for women in rural sectors." },
+    { q: "22. Percentage of SBIFML stake SBI approved to divest through IPO?", opts: ["6.3%", "3.7%", "10%", "3.2%"], ans: 1, exp: "SBI approved the divestment of a 3.7% stake in its mutual fund arm, SBI Funds Management." },
+    { q: "23. Regulatory body proposing mutual fund fee structure reforms?", opts: ["RBI", "SEBI", "IRDAI", "PFRDA"], ans: 1, exp: "SEBI proposed a 'unified' fee structure to prevent hidden costs for investors." },
+    { q: "24. Country that launched the world’s first yen-pegged stablecoin, JPYC?", opts: ["Japan", "South Korea", "China", "Singapore"], ans: 0, exp: "JPYC (Japan Yield Coin) became a milestone for the integration of Yen into digital finance." },
+    { q: "25. Percentage of PF balance subscribers can now withdraw under new reforms?", opts: ["100%", "75%", "60%", "50%"], ans: 0, exp: "Reforms now allow 100% withdrawal under certain criteria like unemployment or housing." },
+    { q: "26. City where the 6th Global Fintech Fest (GFF) 2025 commenced?", opts: ["Bengaluru", "Delhi", "Hyderabad", "Mumbai"], ans: 3, exp: "Mumbai remains the permanent home for GFF, India's largest fintech gathering." },
+    { q: "27. City where 'Aapki Punji Aapka Adhikar' campaign was launched?", opts: ["Chennai", "Mumbai", "New Delhi", "Gandhinagar"], ans: 2, exp: "Launched in Delhi to sensitize investors about their rights regarding unclaimed assets." },
+    { q: "28. SIDBI’s net profit increase percentage in FY25 vs FY24?", opts: ["19.5%", "8.7%", "20.6%", "8.8%"], ans: 2, exp: "SIDBI reported a robust 20.6% growth in its annual net profit." },
+    { q: "29. Institution launched “Savings Pro” auto-invest facility?", opts: ["HDFC Bank", "ICICI Bank", "Jio Payments Bank", "Axis Bank"], ans: 2, exp: "Jio Payments Bank offers this to give users higher returns on idle savings." },
+    { q: "30. Institution signed $125M loan for Assam infrastructure upgrade?", opts: ["ADB", "World Bank", "IMF", "NDB"], ans: 1, exp: "World Bank funding is targeted at climate-resilient road and bridge infrastructure in Assam." },
+    { q: "31. Company that received RBI approval as an online payment aggregator?", opts: ["Paytm", "Google Pay", "BharatPe", "PhonePe"], ans: 2, exp: "BharatPe received the final certificate of authorization from RBI as a PA." },
+    { q: "32. Institution signed $126M for sustainable tourism in Uttarakhand?", opts: ["World Bank", "ADB", "IMF", "NDB"], ans: 1, exp: "ADB is funding the development of eco-tourism hubs and sustainable hospitality in the state." },
+    { q: "33. UPI limit for insurance/capital markets effective Sept 15, 2025?", opts: ["2 Lakh", "5 Lakh", "10 Lakh", "6 Lakh"], ans: 1, exp: "NPCI increased the limit to 5 Lakh for specific high-value transaction categories." },
+    { q: "34. Date NPCI will discontinue UPI peer-to-peer ‘collect requests’?", opts: ["Dec 31, 2025", "Jan 1, 2026", "Nov 1, 2025", "Oct 1, 2025"], ans: 1, exp: "Effective Jan 1, 2026, to prevent fraud where users are tricked into 'paying' when they expect to 'receive'." },
+    { q: "35. Total unclaimed bank deposits in India as of June 30, 2025?", opts: ["58,330 Cr", "67,003 Cr", "19,329 Cr", "8,673 Cr"], ans: 1, exp: "The total reached 67,003 crore, with SBI accounting for the largest share at over 19,000 crore." },
+    { q: "36. Organisation highlighting UPI in 'Growing Retail Digital Payments' note?", opts: ["World Bank", "ADB", "IMF", "FATF"], ans: 2, exp: "The IMF praised India's stack for achieving financial inclusion through interoperability." },
+    { q: "37. Largest development partner for Nepal in FY 2024/25?", opts: ["ADB", "World Bank", "IMF", "UNDP"], ans: 1, exp: "The World Bank emerged as the top donor, providing the highest volume of financial aid to Nepal." },
+    { q: "38. Company that received in-principle RBI approval for PA-CB license?", opts: ["Skydo", "Amazon Pay India", "PayPal", "EximPe"], ans: 1, exp: "Amazon Pay India is among the big players moving into cross-border merchant payments." },
+    { q: "39. CTBC Bank (applying for GIFT City unit) is the largest private bank of?", opts: ["South Korea", "Singapore", "Taiwan", "Japan"], ans: 2, exp: "Taiwan's CTBC Bank is expanding its footprint in India's GIFT City financial hub." },
+    { q: "40. Institution that contributed $44B to global GDP growth in FY25?", opts: ["HDFC Bank", "SBI", "ICICI Bank", "RBI"], ans: 1, exp: "SBI's economic footprint through lending and services had a significant global impact." },
+    { q: "41. Organisation leading the $200M GCF programme for clean energy in India?", opts: ["World Bank", "ADB", "IMF", "UNDP"], ans: 1, exp: "The Asian Development Bank (ADB) is managing the Green Climate Fund (GCF) facility." },
+    { q: "42. Fintech launched India's first UPI-powered bank branch in Bengaluru?", opts: ["Paytm", "Slice", "PhonePe", "Razorpay"], ans: 1, exp: "Slice launched its 'physical' digital experience branch focusing on UPI-first banking." },
+    { q: "43. Institutions set to adopt UPI-enabled QR payments by Aug 2025?", opts: ["Cooperative Banks", "Government Hospitals", "Post Offices", "Railway Stations"], ans: 2, exp: "India Post is modernizing its counters nationwide with UPI QR codes." },
+    { q: "44. Organisation praising UPI as a model for digital transformation?", opts: ["World Bank", "IMF", "United Nations", "WEF"], ans: 0, exp: "The World Bank often cites India's DPI (Digital Public Infrastructure) as a global blueprint." },
+    { q: "45. Institution released the report on state-led capex projections for FY26?", opts: ["NITI Aayog", "RBI", "MoF", "Bank of Baroda"], ans: 3, exp: "Bank of Baroda’s research wing provided the detailed state-wise capital expenditure outlook." },
+    { q: "46. Insurance company launched state-specific health insurance plans?", opts: ["ICICI Lombard", "HDFC ERGO", "Star Health", "Bajaj Allianz"], ans: 2, exp: "Star Health introduced plans with benefits tailored to the specific diseases/costs of different Indian states." },
+    { q: "47. Portal where NPCI API enables real-time PAN/bank validation?", opts: ["GST Portal", "Income Tax Portal", "DigiLocker", "UMANG App"], ans: 0, exp: "The GST portal integrated this for immediate taxpayer bank account verification." },
+    { q: "48. Organization approved $109.97M loan for skills in Gujarat?", opts: ["World Bank", "IMF", "ADB", "UNDP"], ans: 2, exp: "ADB is funding the 'Gujarat Skills Development Project' to enhance employability." },
+    { q: "49. Organization supporting UP AGREES and AI Pragya initiatives?", opts: ["World Bank", "ADB", "IMF", "United Nations"], ans: 0, exp: "The World Bank is the primary partner for Uttar Pradesh's agricultural and AI growth projects." },
+    { q: "50. Additional run-off factor imposed by RBI on digital banking deposits?", opts: ["2.5%", "1.5%", "5%", "3%"], ans: 2, exp: "RBI added a 5% run-off factor under LCR norms to account for 'fast-moving' digital money." }
+];
+
+let idx = 0;
+function move(dir) { idx += dir; render(); }
+function render() {
+    const q = data[idx];
+    document.getElementById('q-count').innerText = `Question ${idx + 1} of ${data.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options'); box.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button'); btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => {
+            const all = document.querySelectorAll('.opt'); all.forEach(b => b.disabled = true);
+            if(i === q.ans) btn.classList.add('correct');
+            else { btn.classList.add('wrong'); all[q.ans].classList.add('correct'); }
+            document.getElementById('insight').innerHTML = `<strong>Context:</strong> ${q.exp}`;
+            document.getElementById('insight').style.display = 'block';
+        };
+        box.appendChild(btn);
+    });
+    document.getElementById('insight').style.display = 'none';
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === data.length - 1;
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Direction Sense Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --accent: #ef4444;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text: #334155;
+            --dir-bg: #fef2f2;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .direction-box {
+            background: var(--dir-bg);
+            border-left: 5px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            white-space: pre-line;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #fff1f2; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .logic-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            border-left: 4px solid var(--correct);
+            display: none;
+        }
+
+        .nav-btns {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+        
+        .compass-hint {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="counter">Loading Questions...</span>
+</div>
+
+<div class="container">
+    <div class="compass-hint">North (Up) | South (Down) | East (Right) | West (Left)</div>
+    <div id="direction" class="direction-box">Standard Directional Logic</div>
+    
+    <div class="quiz-card">
+        <div id="question" class="question-text"></div>
+        <div id="options" class="options-grid"></div>
+        
+        <div id="logic" class="logic-box">
+            <strong>Mental Mapping:</strong><br>
+            <span id="logicText"></span>
+        </div>
+
+        <div class="nav-btns">
+            <button class="btn" id="prevBtn" onclick="prev()">Previous</button>
+            <button class="btn" id="nextBtn" onclick="next()" style="display:none">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { qs: [{ q: "One morning Udai and Vishal were talking face to face. If Vishal's shadow was exactly to the left of Udai, which direction was Udai facing?", opts: ["East", "West", "North", "South"], ans: 2, logic: "In the morning, the Sun is in the East, so shadows fall towards the West. If the shadow is to Udai's left, Udai must be facing North." }] },
+    { qs: [{ q: "Y is in the East of X which is in the North of Z. If P is in the South of Z, then in which direction of Y is P?", opts: ["North", "South", "South-East", "None of these"], ans: 3, logic: "P is directly South of Z, and Z is South of X, and Y is East of X. Therefore, P is South-West of Y. Since South-West isn't listed, 'None of these' is correct." }] },
+    { qs: [{ q: "If South-East becomes North, North-East becomes West and so on. What will West become?", opts: ["North-East", "North-West", "South-East", "South-West"], ans: 2, logic: "The directions are rotated 135 degrees anti-clockwise. West rotated 135 degrees anti-clockwise becomes South-East." }] },
+    { qs: [{ q: "A man walks 5 km south, turns right (West) for 3 km, turns left (South) for 5 km. In which direction is he from the start?", opts: ["West", "South", "North-East", "South-West"], ans: 3, logic: "He has moved both South and West from the origin." }] },
+    { qs: [{ q: "At 6 P.M. hour hand points North. In which direction will the minute hand point at 9.15 P.M.?", opts: ["South-East", "South", "North", "West"], ans: 3, logic: "At 6 PM, the hour hand is usually at 6 (South). If it's North, the clock is inverted. At 9:15, the minute hand is at 3. In the inverted clock, 3 points West." }] },
+    { qs: [{ q: "Rasik: 20m N, turn R 30m, turn R 35m, turn L 15m, turn L 15m. Distance and direction from start?", opts: ["15 m West", "30 m East", "30 m West", "45 m East"], ans: 3, logic: "Net displacement: North (20-35+15=0), East (30+15=45). Final: 45m East." }] },
+    { qs: [{ q: "Two cars 150 km apart. Car 1: 25km, R turn 15km, L turn 25km, back to main road. Car 2: 35km. Distance between them?", opts: ["65 km", "75 km", "80 km", "85 km"], ans: 0, logic: "Car 1 total horizontal distance: 25+25 = 50km. Car 2: 35km. Total distance covered: 85km. Remaining: 150 - 85 = 65km." }] },
+    { qs: [{ q: "Jayant: 15m West, Left (South) 20m, Left (East) 15m, Right (South) 12m. Total distance and direction?", opts: ["32 m, South", "47 m, East", "42 m, North", "27 m, South"], ans: 0, logic: "Horizontal: 15W - 15E = 0. Vertical: 20S + 12S = 32m South." }] },
+    { qs: [{ q: "One evening before sunset Rekha and Hema talk face to face. If Hema's shadow was exactly to the right of Hema, which direction was Rekha facing?", opts: ["North", "South", "East", "Data is inadequate"], ans: 1, logic: "Sunset = West. Shadow = East. If shadow is to Hema's right, Hema faces North. Rekha faces South." }] },
+    { qs: [{ q: "A boy rode North, left 1km, left 2km. He is 1km West of start. How far North did he go initially?", opts: ["1 km", "2 km", "3 km", "5 km"], ans: 1, logic: "The vertical leg must equal the second left turn (2km) to stay on the same horizontal line." }] },
+    { qs: [{ q: "K is 40m SW of L. M is 40m SE of L. M is in which direction of K?", opts: ["East", "West", "North-East", "South"], ans: 0, logic: "L is the center. K is bottom-left, M is bottom-right. M is directly East of K." }] },
+    { qs: [{ q: "Man: 2km N, 10km E, 3km N, 2km E. Total distance from start?", opts: ["10 km", "13 km", "15 km", "None of these"], ans: 1, logic: "Total North = 5km. Total East = 12km. Distance = square root of (5^2 + 12^2) = 13km." }] },
+    { qs: [{ q: "Room 8m x 6m. Cat runs all 4 walls and diagonal. Total distance?", opts: ["10", "14", "38", "48"], ans: 2, logic: "Perimeter (28) + Diagonal (10) = 38m." }] },
+    { qs: [{ q: "One morning Sujata walked towards the Sun (East). Turn R, R, R. Which direction is she facing?", opts: ["North", "South", "North-East", "South-West"], ans: 0, logic: "East -> Right (South) -> Right (West) -> Right (North). Final: North." }] },
+    { qs: [{ q: "Boys in 3 rows facing North. A is middle. P is right of A. Q is behind P. R is North of A. Direction of Q from R?", opts: ["South", "South-West", "North-East", "South-East"], ans: 3, logic: "R is (0,1), A is (0,0), P is (1,0), Q is (1,-1). Q is South-East of R." }] },
+    { qs: [{ q: "Vimal (morning) meets Stephen coming from opposite. Stephen's shadow is to Vimal's right. Vimal's direction?", opts: ["East", "West", "South", "Data inadequate"], ans: 2, logic: "Shadow is West. If West is Vimal's Right, Vimal faces South." }] },
+    { qs: [{ q: "Golu: 8km North, 6km Left. Shortest distance?", opts: ["10 km.", "16 km.", "14 km", "2 km."], ans: 0, logic: "Pythagoras: sqrt(8^2 + 6^2) = 10km." }] },
+    { qs: [{ q: "P: West 25m, Right (North) 10m, Right (East) 15m. Then turn Right 135 deg for 30m. Direction?", opts: ["West", "South", "South-West", "South-East"], ans: 2, logic: "From facing East, a 135 degree right turn points to South-West." }] },
+    { qs: [{ q: "X: South 5m, Left (East) 3m, Right (South) 5m. Direction facing now?", opts: ["North-East", "South", "North", "South-West"], ans: 1, logic: "Final turn was to the South." }] },
+    { qs: [{ q: "University: Hemant from East house to crossing. Left road ends in theater, straight is hospital. University direction?", opts: ["North", "South", "East", "West"], ans: 0, logic: "He comes from East (moving West). Straight is hospital (West). Left is theatre (South). Remaining (North) is University." }] },
+    { qs: [{ q: "After 6km, turn R 2km, turn L 10km, moving North. Start direction?", opts: ["North", "South", "East", "West"], ans: 0, logic: "The path is North -> Right (East) -> Left (North). Final is North, so Start was North." }] },
+    { qs: [{ q: "Ravi: 10km S, R 5km, R 10km, L 10km. Distance to home?", opts: ["10 km", "15 km", "20 km", "25 km"], ans: 1, logic: "Vertical legs cancel out (10S, 10N). Horizontal: 5W + 10W = 15km." }] },
+    { qs: [{ q: "Reena: A to B East 10ft, R 3ft, R 14ft. Distance from A?", opts: ["4 feet", "5 feet", "24 feet", "27 feet"], ans: 1, logic: "Horizontal: 10 - 14 = -4. Vertical: 3. Distance = sqrt(4^2 + 3^2) = 5ft." }] },
+    { qs: [{ q: "Morning: Nivedita and Niharika face-to-face. Niharika shadow right of Nivedita. Niharika facing?", opts: ["North", "South", "East", "Data is inadequate"], ans: 0, logic: "Shadow is West. West is Nivedita's right, so Nivedita is South. Niharika is opposite, so North." }] },
+    { qs: [{ q: "P % Q + R - S. P(East of Q), Q(North of R), R(West of S). Direction of S from Q?", opts: ["South-West", "South-East", "North-East", "North-West"], ans: 1, logic: "Q is north of R, R is west of S. S is South-East of Q." }] },
+    { qs: [{ q: "Morning Suresh face pole. Pole shadow right of Suresh. Facing?", opts: ["East", "South", "West", "Data is inadequate"], ans: 1, logic: "Shadow West. West is Right. Face South." }] },
+    { qs: [{ q: "Child: 90m East, R 20m, R 30m, 100m North. Distance from start?", opts: ["80 m", "100 m", "140 m", "260 m"], ans: 1, logic: "Net East: 90-30=60. Net North: 100-20=80. Distance: sqrt(60^2 + 80^2) = 100m." }] },
+    { qs: [{ q: "B East of A, North of C. C West of D. D direction from A?", opts: ["South-East", "North-East", "East", "Data is inadequate"], ans: 0, logic: "Mapping A(0,0), B(1,0), C(1,-1), D(2,-1). D is South-East of A." }] },
+    { qs: [{ q: "Umesh: P to Q (9ft), R 4ft, R 9ft, R 3ft. Distance from P?", opts: ["6 feet", "5 feet", "1 feet", "0 feet"], ans: 2, logic: "Displacement: 4-3 = 1ft." }] },
+    { qs: [{ q: "Shyam: 5km East, L 6km, R 9km, R 6km. Distance from start?", opts: ["26 km", "21 km", "14 km", "9 km"], ans: 2, logic: "North-South cancels. East: 5 + 9 = 14km." }] },
+    { qs: [{ q: "Amit back to sun. Turn L, R, L. Direction now?", opts: ["North or South", "East or West", "North or West", "South or West"], ans: 0, logic: "If morning (sun East), moves West -> L(S) -> R(W) -> L(S). If evening, moves East -> L(N) -> R(E) -> L(N). Either North or South." }] },
+    { qs: [{ q: "Rohit: 25m S, L 20m, L 25m, R 15m. Distance and direction?", opts: ["35 m East", "35 m North", "30 m West", "45 m East"], ans: 0, logic: "South-North cancels. East: 20 + 15 = 35m East." }] },
+    { qs: [{ q: "Q North of P. R East of Q. S left of P. S direction from R?", opts: ["West", "South-West", "South", "North-West"], ans: 1, logic: "S is West of P. R is NE of P. S is South-West of R." }] },
+    { qs: [{ q: "Radha: SE 7km, West 14km, NW 7km, East 4km. Distance from start?", opts: ["3 km", "4 km", "10 km", "11 km"], ans: 2, logic: "The SE and NW moves are equal and opposite. Net horizontal: 14W - 4E = 10km West." }] },
+    { qs: [{ q: "Sundar: 20m E, R 10m, R 9m, R 5m, L 12m, R 6m. Direction now?", opts: ["East", "West", "North", "South"], ans: 2, logic: "Tracking last turn: Face West -> Turn Right -> Facing North." }] },
+    { qs: [{ q: "Sachin: 20km N, L 40km, L 20km, L 20km. Distance from start?", opts: ["20 km.", "30 km.", "50 km.", "60 km."], ans: 0, logic: "N-S legs cancel. West 40, East 20. Remaining: 20km West." }] },
+    { qs: [{ q: "Lokesh: 15km N, W 10km, S 5km, E 10km. Direction from house?", opts: ["East", "West", "North", "South"], ans: 2, logic: "W-E cancels. North 15, South 5. Result: 10km North." }] },
+    { 
+        dir: "Kumar 40m right of Ankur. Dev 60m south of Kumar. Nilesh 25m west of Ankur. Pintu 90m North of Dev.",
+        qs: [
+            { q: "Which one is in the North-East of the person who is to the left of Kumar?", opts: ["Dev", "Nilesh", "Ankur", "Pintu"], ans: 3, logic: "Left of Kumar is Ankur. North-East of Ankur is Pintu (Pintu is N of Kumar, who is E of Ankur)." },
+            { q: "Total distance if boy meets Nilesh -> Ankur -> Kumar -> Dev -> Pintu?", opts: ["215 m", "155 m", "245 m", "185 m"], ans: 0, logic: "25 + 40 + 60 + 90 = 215m." }
+        ] 
+    },
+    { 
+        dir: "Six flats (P-U) in two rows. Q North facing, not next to S. S/U diagonally opposite. R next to U (South facing). T North facing.",
+        qs: [
+            { q: "If P and T interchange, who is next to U?", opts: ["P", "Q", "R", "T"], ans: 2, logic: "U is in South row with R and P. P's neighbor is R." },
+            { q: "Which combination gets south facing flats?", opts: ["QTS", "UPT", "URP", "Data inadequate"], ans: 2, logic: "South row: U, R, P." },
+            { q: "Other pair diagonally opposite (besides SU)?", opts: ["QP", "QR", "PT", "TS"], ans: 0, logic: "If S/U are ends, the other ends are Q and P." },
+            { q: "Whose flat is between Q and S?", opts: ["T", "U", "R", "P"], ans: 0, logic: "Q, T, and S form the North facing row." }
+        ] 
+    }
+];
+
+let sIdx = 0, qIdx = 0;
+
+function render() {
+    const s = data[sIdx], q = s.qs[qIdx];
+    document.getElementById('direction').innerText = s.dir || "General Directional Challenge";
+    document.getElementById('question').innerText = q.q;
+    document.getElementById('counter').innerText = `Problem ${qIdx + 1} of Set ${sIdx + 1}`;
+    
+    const optsCont = document.getElementById('options');
+    optsCont.innerHTML = '';
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => check(i, btn);
+        optsCont.appendChild(btn);
+    });
+
+    document.getElementById('logic').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('prevBtn').disabled = (sIdx === 0 && qIdx === 0);
+}
+
+function check(idx, btn) {
+    const q = data[sIdx].qs[qIdx];
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    if(idx === q.ans) btn.classList.add('correct');
+    else {
+        btn.classList.add('wrong');
+        btns[q.ans].classList.add('correct');
+    }
+    document.getElementById('logicText').innerText = q.logic;
+    document.getElementById('logic').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    if(qIdx < data[sIdx].qs.length - 1) qIdx++;
+    else if(sIdx < data.length - 1) { sIdx++; qIdx = 0; }
+    else alert("All Direction Sense questions completed!");
+    render();
+}
+
+function prev() {
+    if(qIdx > 0) qIdx--;
+    else if(sIdx > 0) { sIdx--; qIdx = data[sIdx].qs.length - 1; }
+    render();
+}
+
+render();
+</script>
+</body>
+</html>

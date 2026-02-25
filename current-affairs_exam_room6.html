@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 6</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 6</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+      const questions = [
+    { q: "Which banker has been appointed as the new Chairman of GIFT City by the Gujarat government?", options: ["Hasmukh Adhia", "Sanjay Kaul", "Narendra Modi", "Uday Kotak"], ans: 3, logic: "Veteran banker Uday Kotak was appointed as the Chairman of GIFT City in February 2026, succeeding Hasmukh Adhia." },
+    { q: "Which company received the FIPI Award 2025 as ‘Oil & Gas Production Company of the Year’ in Goa?", options: ["Oil India Limited", "ONGC", "Indian Oil Corporation", "Bharat Petroleum Corporation Limited"], ans: 0, logic: "Oil India Limited (OIL) won the award during India Energy Week 2026 for its performance in the 1 MTOE+ category." },
+    { q: "With which country is India conducting the joint military exercise ‘AJEYA WARRIOR-25’?", options: ["United States", "France", "United Kingdom", "Australia"], ans: 2, logic: "The 2025 edition of Ajeya Warrior was held between the Indian and British Armies in Bikaner, Rajasthan." },
+    { q: "By which year does the Army aim to build a future-ready force under its three-phase roadmap?", options: ["2032", "2037", "2040", "2047"], ans: 3, logic: "The Indian Army's transformation roadmap aims for a fully integrated, next-generation force by 2047." },
+    { q: "Where will Exercise Vayushakti-26 be conducted to showcase the IAF’s combat readiness?", options: ["Pokhran", "Gwalior", "Jodhpur", "Ambala"], ans: 0, logic: "The mega exercise is scheduled for February 27, 2026, at the Pokhran Air-to-Ground Range in Rajasthan." },
+    { q: "By what percentage did India’s net direct tax collections increase during FY26 up to December 2025?", options: ["4%", "6%", "10%", "8%"], ans: 3, logic: "Net direct tax collections rose 8% year-on-year to reach 17.04 lakh crore as of December 17, 2025." },
+    { q: "Which institute partnered with Coromandel International to establish a Corporate Research Centre?", options: ["IIT Delhi", "IIM Bangalore", "IIT Madras", "NIT Trichy"], ans: 2, logic: "IIT Madras Research Park signed an MoU with Coromandel International for agri-tech and sustainability research." },
+    { q: "From which country is India set to receive 8 cheetahs under Project Cheetah?", options: ["Botswana", "Namibia", "South Africa", "Kenya"], ans: 0, logic: "Following bilateral talks in late 2025, Botswana agreed to donate 8 cheetahs to India's reintroduction program." },
+    { q: "Which institution raised USD 350 million from IFC and ADB to support affordable housing and MSMEs?", options: ["HDFC Bank", "Piramal Finance", "SBI Capital Markets", "ICICI Bank"], ans: 1, logic: "Piramal Finance secured this multilateral funding in January 2026 under its Sustainable Finance Framework." },
+    { q: "On which date is World Environmental Health Day celebrated each year?", options: ["September 26", "October 16", "March 22", "July 5"], ans: 0, logic: "World Environmental Health Day is observed annually on September 26." },
+    { q: "Who became the first U.S. president to receive South Korea’s Grand Order of Mugunghwa?", options: ["Joe Biden", "Donald Trump", "Barack Obama", "George W. Bush"], ans: 1, logic: "Donald Trump was awarded the honour in October 2025 for his role in Korean Peninsula diplomacy." },
+    { q: "How many new Indian names were approved by the IAU for Martian geological features?", options: ["5", "7", "9", "12"], ans: 1, logic: "In November 2025, the IAU approved 7 names (like Bekal and Thumba) proposed by Indian researchers." },
+    { q: "The Dulhasti Stage-II Hydel Project is being developed on which river?", options: ["Ravi", "Chenab", "Jhelum", "Beas"], ans: 1, logic: "The 260 MW Stage-II project is located on the Chenab river in the Kishtwar district of J&K." },
+    { q: "Where was the International Salinity Conference 3.0, WE-CARE 2025, inaugurated?", options: ["Kerala", "Goa", "Maharashtra", "Gujarat"], ans: 1, logic: "The conference was held at the ICAR-Central Coastal Agricultural Research Institute in Old Goa." },
+    { q: "Which country announced that Donald Trump will receive the Israel Prize for Peace in 2026?", options: ["Ukraine", "Israel", "United Kingdom", "France"], ans: 1, logic: "Israel created a new 'Peace' category for its highest civilian award specifically to honour Trump in 2026." },
+    { q: "Which banned industrial dye has been repeatedly detected in Indian sweets and spices?", options: ["Auramine O", "Tartrazine", "Sunset yellow", "Quinoline yellow"], ans: 0, logic: "Auramine O, a carcinogenic industrial yellow dye, has been frequently flagged by food safety regulators." },
+    { q: "Which Australian women’s cricketer announced her retirement after the 2026 home series against India?", options: ["Meg Lanning", "Alyssa Healy", "Ellyse Perry", "Beth Mooney"], ans: 1, logic: "Legendary captain and wicketkeeper Alyssa Healy announced her retirement effective after the Feb 2026 India series." },
+    { q: "In which state did Union Minister Pralhad Joshi inaugurate a pellet plant and K2 Bio-Ethanol plant?", options: ["Punjab", "Rajasthan", "Uttar Pradesh", "Haryana"], ans: 3, logic: "The plants were inaugurated in Rewari, Haryana, to convert agricultural waste into green fuel." },
+    { q: "In which state did PM Narendra Modi unveil a 1.22 lakh crore development package from Banswara?", options: ["Gujarat", "Madhya Pradesh", "Rajasthan", "Maharashtra"], ans: 2, logic: "The package for Rajasthan included the Mahi Banswara Atomic Power Project and various rail initiatives." },
+    { q: "In which city was the 20th East Asia Summit held where the Kuala Lumpur Declaration was adopted?", options: ["Jakarta", "Bangkok", "Manila", "Kuala Lumpur"], ans: 3, logic: "The summit was held in Kuala Lumpur in October 2025, where EAM Dr. S. Jaishankar represented India." }
+];
+    
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

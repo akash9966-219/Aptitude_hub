@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Cause and Effect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --accent: #16a085;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --text: #34495e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .statement-container {
+            margin-bottom: 30px;
+        }
+
+        .statement-label {
+            font-weight: bold;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .statement-text {
+            background: #f9f9f9;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .options-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--accent);
+            background: #f0f9f8;
+        }
+
+        .opt-btn.correct {
+            background: var(--correct) !important;
+            color: white;
+            border-color: var(--correct);
+        }
+
+        .opt-btn.wrong {
+            background: var(--wrong) !important;
+            color: white;
+            border-color: var(--wrong);
+        }
+
+        .sidebar {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 15px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #explanation-box {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.95rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="progress">Question 1 / 36</span>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <div class="statement-container">
+            <span class="statement-label">Statement I</span>
+            <div id="st1" class="statement-text"></div>
+            
+            <span class="statement-label">Statement II</span>
+            <div id="st2" class="statement-text"></div>
+        </div>
+
+        <div class="options-list" id="options">
+            <button class="opt-btn" onclick="check(0)"><b>(A)</b> Statement I is the cause and II is its effect.</button>
+            <button class="opt-btn" onclick="check(1)"><b>(B)</b> Statement II is the cause and I is its effect.</button>
+            <button class="opt-btn" onclick="check(2)"><b>(C)</b> Both are independent causes.</button>
+            <button class="opt-btn" onclick="check(3)"><b>(D)</b> Both are effects of independent causes.</button>
+            <button class="opt-btn" onclick="check(4)"><b>(E)</b> Both are effects of some common cause.</button>
+        </div>
+        
+        <button class="btn-next" id="nextBtn" onclick="loadNext()">Next Question</button>
+    </div>
+
+    <div class="sidebar">
+        <h3 style="color: var(--accent); margin-top: 0;">Analysis Guide</h3>
+        <p>To determine the relationship, ask:</p>
+        <ul style="padding-left: 20px; font-size: 0.9rem;">
+            <li>Does one event <b>logically lead</b> to the other?</li>
+            <li>Are they <b>triggered</b> by the same outside event?</li>
+            <li>Are they <b>unrelated</b> occurrences?</li>
+        </ul>
+        
+        <div id="explanation-box">
+            <strong style="color: var(--accent);">Logic:</strong><br>
+            <span id="logic-text"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { s1: "Standard of living among the middle class society is constantly going up since part of few years.", s2: "Indian Economy is observing remarkable growth.", ans: 1, hint: "Growth in the economy (Cause) leads to an increase in the purchasing power and living standards of people (Effect)." },
+        { s1: "The meteorological Department has issued a statement mentioning deficient rainfall during monsoon.", s2: "The Government has lowered the revised estimated GDP growth.", ans: 0, hint: "Deficient rainfall affects agriculture, which in turn leads to a reduction in the estimated GDP growth." },
+        { s1: "The staff of Airport Authorities called off the strike they were observing in protest against privatization.", s2: "The staff of Airport Authorities went on strike anticipating a threat to their jobs.", ans: 1, hint: "First, they go on strike (Cause), then they call it off (Effect) after negotiations or decisions." },
+        { s1: "A huge truck overturned on the middle of the road last night.", s2: "The police had cordoned of entire area in the locality this morning.", ans: 0, hint: "The accident (Cause) resulted in the police cordoning off the area for safety or clearing (Effect)." },
+        { s1: "Importance of Yoga and exercise is being realized by all sections of the society.", s2: "There is an increasing awareness about health in the society.", ans: 1, hint: "The general increase in health awareness (Cause) leads people to specifically realize the importance of Yoga/exercise (Effect)." },
+        { s1: "The prices of food grains and other essential commodities in the open market have risen sharply.", s2: "The political party in opposition has given a call for general strike.", ans: 0, hint: "The price rise (Cause) triggers a protest/strike by the opposition (Effect)." },
+        { s1: "The Government has decided to hold a single entrance test for admission to all medical colleges in India.", s2: "The State Government has debarred students from other States to apply for medical seats in the State.", ans: 3, hint: "Both are separate policy decisions taken by different authorities for different purposes." },
+        { s1: "Large number of Primary Schools in the rural areas is run by only one teacher.", s2: "There has been a huge dropout from the primary schools in rural areas.", ans: 0, hint: "The lack of sufficient teachers (Cause) leads to poor education quality and subsequent dropouts (Effect)." },
+        { s1: "The employees of the biggest bank in the country have given an indefinite strike call.", s2: "The employees of the Central Government have withdrawn their week long demonstrations.", ans: 3, hint: "One is a strike call, the other is a withdrawal of protest. They are independent of each other." },
+        { s1: "The farmers have decided against selling their Kharif crops to the Government agencies.", s2: "The Government has reduced the procurement price of Kharif crops.", ans: 1, hint: "The reduction in price (Cause) leads the farmers to refuse selling to the government (Effect)." },
+        { s1: "Many people visited the religious place during the week-end.", s2: "Few people visited the religious place during the week days.", ans: 4, hint: "Both are effects of a common cause: the availability of free time during weekends vs work days." },
+        { s1: "All the schools in the area had to be kept closed for most part of the week.", s2: "Many parents have withdrawn their children from the local schools.", ans: 4, hint: "Both are likely effects of a common cause, such as a major safety issue or natural calamity in the area." },
+        { s1: "The literacy rate in the district has been increasing for the last four years.", s2: "The district administration has conducted extensive training programme for workers.", ans: 1, hint: "The training programs (Cause) led to the successful increase in literacy rates (Effect)." },
+        { s1: "The car manufacturing companies have recently increased the prices of mid-sized cars.", s2: "The Government recently increased the duty on mid-sized cars.", ans: 1, hint: "The increase in government duty (Cause) forced companies to raise prices to maintain margins (Effect)." },
+        { s1: "The university officers have decided to conduct examinations in March/April to announce results on time.", s2: "In past the result was declared late due to lack of examiners.", ans: 1, hint: "The past failure (Cause) led the university to change the schedule/strategy (Effect)." },
+        { s1: "The State Government has announced special tax package for the new industries.", s2: "Last year the State Government had hiked the taxes for all industrial activities.", ans: 3, hint: "These are independent tax policy changes; one doesn't directly cause the other." },
+        { s1: "The government has allowed private airline companies to operate overseas.", s2: "The national air carrier has increased its flights to overseas destinations.", ans: 4, hint: "Both are effects of a common cause: an increase in international passenger traffic/globalization." },
+        { s1: "The Government has imported large quantities of sugar.", s2: "The prices of sugar in the domestic market have fallen sharply.", ans: 0, hint: "Increased supply through imports (Cause) leads to a drop in market prices (Effect)." },
+        { s1: "Many people in the area are reported to be suffering from Malaria.", s2: "Private Medical Practitioners in the area have decided to close their clinics for few days.", ans: 3, hint: "Closing clinics during an outbreak are contradictory; they are likely independent events." },
+        { s1: "Rural and semi-urban areas have been suffering due to load-shedding.", s2: "If the Government is not able to overcome the power crisis, load-shedding will be extended to urban areas.", ans: 0, hint: "The existing crisis (Cause) leads to the warning of further extensions (Effect)." },
+        { s1: "The Government has increased rates of petrol and diesel by 10%.", s2: "Oil producing countries have decided to increase 10% of production on crude oil.", ans: 3, hint: "Higher production usually lowers prices; these two statements show opposite trends and are independent." },
+        { s1: "The vegetable prices in the local market have increases manifold.", s2: "Incessant rains have created flood like situation in most rural parts.", ans: 1, hint: "Floods (Cause) disrupt supply chains, causing prices to rise (Effect)." },
+        { s1: "Police had resorted to lathi-charge to disperse the unruly mob.", s2: "The civic administration has recently hiked the property tax by about 30 percent.", ans: 1, hint: "The tax hike (Cause) caused the mob protest, which led to police action (Effect)." },
+        { s1: "The government decided to give tax benefits for small savings. However, withdrawals are to be taxed.", s2: "People have been investing more in small savings than in equity market.", ans: 0, hint: "The new tax policy (Cause) shifted people's investment behavior (Effect)." },
+        { s1: "There was a huge rush of people to the temple last Sunday.", s2: "The temple authority had decided to close down the temple for repairs from 17th.", ans: 4, hint: "The rush was due to it being a Sunday/15th, and the closure was for repairs. No direct link." },
+        { s1: "Large number of people in low lying areas has been evacuated.", s2: "The Government has rushed in relief supplies to the affected areas.", ans: 4, hint: "Both are effects of a common cause, likely a flood or natural disaster." },
+        { s1: "The RBI has recently put restrictions on few small banks.", s2: "Small banks are not in a position to withstand the competitions of bigger banks.", ans: 1, hint: "The weakness of the banks (Cause) led the regulator to step in with restrictions (Effect)." },
+        { s1: "The prices of petrol and diesel in the domestic market have remained unchanged.", s2: "The crude oil prices in the International market have gone up substantially.", ans: 3, hint: "Domestic stability despite international rise indicates independent policy interventions." },
+        { s1: "The performance of Indian sports persons in Olympics could not reach expectation.", s2: "The performance of Indian sports person in the last Asian games was far better.", ans: 3, hint: "Two different events with two different results; these are independent." },
+        { s1: "Large numbers of people have fallen sick after consuming sweets.", s2: "Major part of the locality is flooded and has become inaccessible.", ans: 3, hint: "Food poisoning and flooding are unrelated, independent causes/events." },
+        { s1: "The life today is too fast and full of variety which leads to stressful situation.", s2: "Number of suicide cases among teenagers is on increase.", ans: 0, hint: "The fast-paced, stressful lifestyle (Cause) is a factor in rising suicide rates (Effect)." },
+        { s1: "The university authority has instructed colleges to ban cell phones.", s2: "Majority of teachers signed a petition complaining about disturbances.", ans: 1, hint: "The teachers' complaint (Cause) prompted the authority to issue the ban (Effect)." },
+        { s1: "Majority of people decided to protest against the mall construction.", s2: "Many shopping malls have been opened all over the city in the recent time.", ans: 3, hint: "The opening of other malls and the protest against a specific local mall are independent." },
+        { s1: "The Government has reduced petroleum prices after a previous increase.", s2: "The rate of inflation dropped marginally during the last week.", ans: 0, hint: "Reduction in fuel prices (Cause) contributed to the drop in inflation (Effect)." },
+        { s1: "Police authority has recently increased vigil during the evening hours.", s2: "There has been considerable reduction in incidents of petty crimes.", ans: 0, hint: "Increased police presence (Cause) led to a decrease in crime (Effect)." },
+        { s1: "The committee drastically reduced professional course fees.", s2: "Parents had launched a severe agitation protesting against high fees.", ans: 1, hint: "The parents' agitation (Cause) forced the committee to reduce the fees (Effect)." }
+    ];
+
+    let currentIdx = 0;
+
+    function render() {
+        const q = data[currentIdx];
+        document.getElementById('progress').innerText = `Question ${currentIdx + 1} / ${data.length}`;
+        document.getElementById('st1').innerText = q.s1;
+        document.getElementById('st2').innerText = q.s2;
+        
+        // Reset styles
+        const btns = document.querySelectorAll('.opt-btn');
+        btns.forEach(b => {
+            b.className = 'opt-btn';
+            b.disabled = false;
+        });
+        
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('explanation-box').style.display = 'none';
+    }
+
+    function check(idx) {
+        const correct = data[currentIdx].ans;
+        const btns = document.querySelectorAll('.opt-btn');
+        
+        btns.forEach(b => b.disabled = true);
+        
+        if(idx === correct) {
+            btns[idx].classList.add('correct');
+        } else {
+            btns[idx].classList.add('wrong');
+            btns[correct].classList.add('correct');
+        }
+        
+        document.getElementById('logic-text').innerText = data[currentIdx].hint;
+        document.getElementById('explanation-box').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function loadNext() {
+        if(currentIdx < data.length - 1) {
+            currentIdx++;
+            render();
+        } else {
+            alert("Module complete! You've mastered Cause and Effect.");
+        }
+    }
+
+    render();
+</script>
+
+</body>
+</html>

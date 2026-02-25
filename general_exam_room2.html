@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>General Knowledge Test - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">General Knowledge Test 2</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 2</button>
+        <a href="test8.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+      const questions = [
+    { q: "Deficit financing implies which of the following?", options: ["printing new currency notes", "replacing new currency with worn out currency", "public expenditure in excess of public revenue", "public revenue in excess of public expenditure"], ans: 2, logic: "Deficit financing occurs when a government's total expenditure exceeds its total revenue, often balanced by borrowing or printing money." },
+    { q: "The Board of Industrial and Financial Reconstruction (BIFR) came into existence in?", options: ["1984", "1986", "1987", "1989"], ans: 2, logic: "BIFR was established in January 1987 under the Sick Industrial Companies (Special Provisions) Act, 1985, to address industrial 'sickness'." },
+    { q: "Lal Bahadur Shastri is also known by which sobriquet?", options: ["Guruji", "Man of Peace", "Punjab Kesari", "Mahamana"], ans: 1, logic: "Lal Bahadur Shastri earned the title 'Man of Peace' for his humble nature and his role in the Tashkent Declaration after the 1965 war." },
+    { q: "What is defined as a Liquid Asset?", options: ["a type of asset that is in cash in the current account", "a type of asset that is in the form of a deposit in the current account", "either of these", "None of the above"], ans: 2, logic: "Liquid assets are those that can be quickly converted into cash without significant loss of value, including cash and bank deposits." },
+    { q: "Moment of inertia is classified as a?", options: ["vector", "scalar", "phasor", "tensor"], ans: 3, logic: "In physics, the moment of inertia is technically a second-order tensor because it relates two vectors (angular momentum and angular velocity)." },
+    { q: "What beverage was invented by Charles Alderton in 1885 in Waco, Texas?", options: ["Cream soda", "Coca-Cola", "Dr. Pepper", "Sprite"], ans: 2, logic: "Dr. Pepper is the oldest major soft drink in the United States, created by pharmacist Charles Alderton in 1885." },
+    { q: "Which invention caused several historical deaths during its early testing phases?", options: ["Dynamite", "Ladders", "Race cars", "Parachute"], ans: 3, logic: "Many early aviation and parachute pioneers, such as Franz Reichelt, tragically died while testing their designs." },
+    { q: "Experts say the healthiest way to view a computer monitor is by?", options: ["Placing it 18 to 30 inches away from your eyes", "Viewing from a darkened room", "Adjusting the screen for maximum contrast", "Using special glasses that filter out UV rays"], ans: 0, logic: "Maintaining a distance of 18 to 30 inches helps reduce eye strain and prevents Digital Eye Strain (Computer Vision Syndrome)." },
+    { q: "Ramapithecus and Cro-Magnon man are scientifically considered?", options: ["ancestors of modern man", "ancestors of monkey", "ancestors of lion", "None of the above"], ans: 0, logic: "These represent different stages in human evolution; Ramapithecus is an early hominid, and Cro-Magnon is the first early modern human." },
+    { q: "What are the important industries located in Assam?", options: ["tea processing, oil refineries and coal", "silk and plywood", "both (a) and (b)", "None of the above"], ans: 2, logic: "Assam is world-famous for its tea and silk (Muga), and also home to Digboi, Asia's oldest operating oil refinery." },
+    { q: "The scientist who first discovered that the earth revolves round the sun was?", options: ["Newton", "Dalton", "Copernicus", "Einstein"], ans: 2, logic: "Nicolaus Copernicus formulated the heliocentric model of the universe, which placed the Sun, rather than the Earth, at the center." },
+    { q: "When did India enter into the space age by launching the satellite 'Aryabhatta'?", options: ["1966", "1932", "1975", "1990"], ans: 2, logic: "India's first satellite, Aryabhatta, was launched on April 19, 1975, using a Soviet Kosmos-3M rocket." },
+    { q: "The longest day (shortest night) in the southern hemisphere occurs on?", options: ["June 21", "December 22", "July 21", "November 22"], ans: 1, logic: "December 22 is the summer solstice in the Southern Hemisphere, resulting in the longest day of the year there." },
+    { q: "Which process explains recent changes in sea level height in coastal Canada and Scandinavia?", options: ["isostasy", "continental drift", "plate tectonics", "None of the above"], ans: 0, logic: "Isostasy refers to the rise of land masses that were depressed by the huge weight of ice sheets during the last ice age." },
+    { q: "Who won the Grand Slam title four times successively in professional tennis?", options: ["Martina Navratilova", "Steffi Graf", "Jennifer Capriati", "Monica Seles"], ans: 1, logic: "Steffi Graf achieved the 'Golden Slam' in 1988, winning all four Grand Slam titles and an Olympic gold in a single year." },
+    { q: "Jude Felix is a famous Indian player associated with which field?", options: ["Volleyball", "Tennis", "Football", "Hockey"], ans: 3, logic: "Jude Felix Sabastine is a former captain of the Indian national hockey team and an Arjuna Awardee." },
+    { q: "The title of 'Sparrow' was given to which famous personality?", options: ["Napoleon", "Major General Rajinder Singh", "T. T. Krishnamachari", "Sardar Patel"], ans: 1, logic: "Major General Rajinder Singh Sparrow was a celebrated Indian Army officer and a two-time recipient of the Maha Vir Chakra." },
+    { q: "Which of the following prestigious awards was conferred on Mrs. Kiran Bedi?", options: ["Golden Globe", "Rani Lakshmi", "Magsaysay", "Saraswati"], ans: 2, logic: "Kiran Bedi received the Ramon Magsaysay Award in 1994 for Government Service and her revolutionary prison reforms." },
+    { q: "The famous novel 'Crime and Punishment' was written by?", options: ["Fyodor Dostoevsky", "Vladimir Nabokov", "Lewis Carroll", "Alexander Solzhenitsyn"], ans: 0, logic: "First published in 1866, 'Crime and Punishment' is a masterpiece by the Russian author Fyodor Dostoevsky." },
+    { q: "Gypsum is added to cement clinker during the manufacturing process to?", options: ["increase the tensile strength of cement", "decrease the rate of setting of cement", "facilitate the formation of colloidal gel", "bind the particles of calcium silicate"], ans: 1, logic: "Gypsum acts as a retarding agent, preventing the cement from hardening too quickly (flash setting) once water is added." }
+];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

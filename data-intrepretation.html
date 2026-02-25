@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DI Reasoning Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --primary: #1e293b;
+            --accent: #3b82f6;
+            --text: #334155;
+            --card-hover: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .topic-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .topic-card h2 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .topic-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .portal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="reasoning.html" style="color: black; text-decoration: none; font-size: 0.9rem;">← Back to Home</a>
+        <h1>Data Interpretation</h1>
+        <p>Select a topic to start practicing</p>
+    </div>
+
+    <div class="portal-grid">
+        <a href="table-charts.html" class="topic-card">
+            <div class="icon">📋</div>
+            <h2>Table Charts</h2>
+            <p>Analyze rows and columns of raw data</p>
+        </a>
+
+        <a href="bar-charts.html" class="topic-card">
+            <div class="icon">📊</div>
+            <h2>Bar Charts</h2>
+            <p>Compare quantities across categories</p>
+        </a>
+
+        <a href="pie-charts.html" class="topic-card">
+            <div class="icon">🍕</div>
+            <h2>Pie Charts</h2>
+            <p>Understand proportional distribution</p>
+        </a>
+
+        <a href="line-charts.html" class="topic-card">
+            <div class="icon">📈</div>
+            <h2>Line Charts</h2>
+            <p>Track trends and fluctuations over time</p>
+        </a>
+    </div>
+
+</body>
+</html>

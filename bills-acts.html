@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs - Bills & Acts 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #374151;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --accent: #6366f1;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #111827;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--accent); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border-top: 6px solid var(--primary);
+        }
+
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .q-text { font-size: 1.2rem; font-weight: 600; line-height: 1.4; margin-bottom: 25px; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .opt-btn { padding: 15px; border: 1px solid #d1d5db; border-radius: 8px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: background 0.2s; }
+        .opt-btn:hover:not(:disabled) { background: #f9fafb; border-color: var(--accent); }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+
+        .explanation { margin-top: 20px; padding: 15px; background: #eef2ff; border-radius: 8px; border-left: 4px solid var(--accent); display: none; font-size: 0.95rem; }
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px;}
+        .btn { padding: 12px 20px; border-radius: 6px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="currentaffairs.html" class="back-link">← Back to Dashboard</a>
+
+    <div class="quiz-card">
+        <div class="q-header">
+            <span style="color:var(--accent)">Section: Constitution & Legislation</span>
+            <span id="q-count">Question 1 / 50</span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent)">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const legalQuestions = [
+    { q: "Which Article of the Indian Constitution grants plenary powers to the Election Commission over electoral rolls and the conduct of elections?", opts: ["Article 320", "Article 326", "Article 356", "Article 324"], ans: 3, exp: "Article 324 provides for the superintendence, direction, and control of elections to be vested in an Election Commission." },
+    { q: "Under which Act is Bharat Taxi registered as India’s first cooperative-based ride-hailing platform?", opts: ["Companies Act, 2013", "Multi-State Cooperative Societies Act, 2002", "Motor Vehicles Act, 1988", "Consumer Protection Act, 2019"], ans: 1, exp: "It utilizes the cooperative framework to provide better equity for drivers." },
+    { q: "Under which constitutional provision did the Supreme Court direct the continued application of the UGC (Promotion of Equity in Higher Educational Institutions) Regulations, 2012?", opts: ["Article 32", "Article 136", "Article 226", "Article 142"], ans: 3, exp: "Article 142 allows the SC to pass such decree or order as is necessary for doing complete justice." },
+    { q: "Which provision of the Prevention of Corruption Act, 1988, requires prior approval before initiating an inquiry into a public servant’s official acts?", opts: ["Section 6A", "Section 13", "Section 19", "Section 17A"], ans: 3, exp: "Section 17A was introduced to protect public servants from malicious prosecution for bona fide decisions." },
+    { q: "Under which Article of the Indian Constitution did the Supreme Court affirm that the right to hold or renew a passport is part of personal liberty?", opts: ["Article 14", "Article 19", "Article 20", "Article 21"], ans: 3, exp: "The SC linked the right to travel abroad with Article 21 (Right to Life and Personal Liberty)." },
+    { q: "Which provision of the Indian Constitution is violated when civilian awards like Bharat Ratna are used as prefixes or suffixes?", opts: ["Article 14", "Article 18(1)", "Article 19", "Article 21"], ans: 1, exp: "Article 18(1) abolishes titles, and awards are not to be used as titles." },
+    { q: "The SPREE-2025 initiative by ESIC is launched under which Act?", opts: ["ESI Amendment Act 2010", "Social Security Code 2020", "Factories Act 1947", "ESI Act 1948"], ans: 3, exp: "The Employees' State Insurance Act, 1948 provides the legal framework for ESIC initiatives." },
+    { q: "Which constitutional provisions were highlighted regarding meritorious PwD candidates and unreserved seats?", opts: ["Articles 19 & 21", "Articles 15 & 17", "Articles 39 & 41", "Articles 14 & 16"], ans: 3, exp: "Articles 14 (Equality) and 16 (Opportunity in Public Employment) are core to reservation jurisprudence." },
+    { q: "How many consecutive days of detention lead to automatic removal of PM, CMs, and Ministers under the 2025 Bill?", opts: ["30 days", "15 days", "60 days", "90 days"], ans: 2, exp: "The new bill proposes a 60-day limit to ensure governance continuity." },
+    { q: "In which year was the Mines and Minerals (Development and Regulation) Act originally enacted?", opts: ["1957", "1962", "1975", "1980"], ans: 0, exp: "The MMDR Act was enacted in 1957 to regulate the mining sector in India." },
+    { q: "Under which section of the Banking Regulation Act, 1949, did the RBI approve the merger of NICBL with Saraswat Co-operative Bank?", opts: ["Section 35A", "Section 44A(4)", "Section 45", "Section 12B"], ans: 1, exp: "Section 44A deals with the procedure for amalgamation of banking companies." },
+    { q: "Under which Act do the Environment Protection (Management of Contaminated Sites) Rules, 2025 fall?", opts: ["Water Act, 1974", "Air Act, 1981", "Environment Protection Act, 1986", "Hazardous Waste Rules"], ans: 2, exp: "The EPA 1986 is the umbrella legislation for environmental protection rules." },
+    { q: "Under which article is the National Commission for Scheduled Castes (NCSC) mandated to submit an annual report?", opts: ["Article 338", "Article 356", "Article 370", "Article 324"], ans: 0, exp: "Article 338 establishes the NCSC and defines its reporting duties." },
+    { q: "Under which Article of the Indian Constitution was the GST Council established?", opts: ["Article 279A", "Article 370", "Article 246A", "Article 368"], ans: 0, exp: "Article 279A was inserted by the 101st Amendment Act." },
+    { q: "In which year was the Forest Rights Act (FRA) enacted?", opts: ["2006", "2010", "2014", "2020"], ans: 0, exp: "The Scheduled Tribes and Other Traditional Forest Dwellers Act was enacted in 2006." },
+    { q: "Under which year's Indian Patents Act can compulsory licensing be invoked?", opts: ["1965", "1980", "1970", "1995"], ans: 2, exp: "The Patents Act, 1970, is the primary law governing patents in India." },
+    { q: "Under which Article has the Centre issued regulations for Ladakh to address the demands of its people?", opts: ["Article 240", "Article 370", "Article 371", "Article 239"], ans: 0, exp: "Article 240 gives the President power to make regulations for certain Union Territories." },
+    { q: "Under which year was the Prevention of Money Laundering Act (PMLA) enacted?", opts: ["1999", "2002", "2005", "2010"], ans: 1, exp: "PMLA was enacted in 2002 to prevent money laundering and provide for confiscation of property." },
+    { q: "In which year was India's first comprehensive bankruptcy law (IBC) enacted?", opts: ["2016", "2018", "2020", "2014"], ans: 0, exp: "The Insolvency and Bankruptcy Code (IBC) was enacted in 2016." },
+    { q: "Under which Article of the WHO Constitution was the world’s first global Pandemic Agreement adopted?", opts: ["Article 21", "Article 25", "Article 19", "Article 15"], ans: 2, exp: "Article 19 gives the WHO Health Assembly authority to adopt conventions or agreements." },
+    { q: "In which year was the original Consumer Protection Act enacted in India?", opts: ["1991", "2019", "2002", "1986"], ans: 3, exp: "The first Consumer Protection Act was passed in 1986." },
+    { q: "Under which Act was service tax on broadcasting services introduced?", opts: ["Finance Act, 2017", "Broadcasting Act, 2001", "Digital Services Tax Act", "Finance Act, 1994"], ans: 3, exp: "Service tax in India was originally introduced via the Finance Act of 1994." },
+    { q: "In which year was the mandatory registration of Waqfs first introduced?", opts: ["1954", "1995", "1923", "2025"], ans: 1, exp: "The Waqf Act 1995 replaced the 1954 Act and introduced stricter registration." },
+    { q: "In which year was the Civil Defence Act enacted in India?", opts: ["1955", "1968", "1971", "1980"], ans: 1, exp: "The Civil Defence Act was enacted in 1968." },
+    { q: "Which Article, known for its role in amendments, is discussed in 'Beyond the Courtroom'?", opts: ["Article 356", "Article 368", "Article 360", "Article 32"], ans: 1, exp: "Article 368 outlines the power of Parliament to amend the Constitution." },
+    { q: "In which year was the Registration of Births and Deaths (RBD) Act enacted?", opts: ["1969", "1956", "2023", "1955"], ans: 0, exp: "The RBD Act was enacted in 1969 to unify the system of registration." },
+    { q: "Which constitutional article did the SC cite regarding the Governor’s inaction on re-passed Bills?", opts: ["Article 200", "Article 356", "Article 163", "Article 123"], ans: 0, exp: "Article 200 deals with the Governor's assent to Bills passed by State Legislatures." },
+    { q: "In which year was the Maintenance and Welfare of Parents and Senior Citizens (MWPSC) Act enacted?", opts: ["2007", "2005", "2010", "2012"], ans: 0, exp: "The Act was passed in 2007 to provide more effective provisions for the maintenance of parents." },
+    { q: "In which year was the original Waqf Act, later amended in 2024, enacted?", opts: ["1995", "2001", "1984", "2013"], ans: 0, exp: "The Waqf Act was passed in 1995." },
+    { q: "In which year was the Armed Forces (Special Powers) Act (AFSPA) enacted?", opts: ["1962", "1971", "1985", "1958"], ans: 3, exp: "AFSPA was enacted in 1958 to maintain public order in disturbed areas." },
+    { q: "In which year was the original Disaster Management Act passed?", opts: ["2005", "2010", "2012", "2018"], ans: 0, exp: "It was passed in 2005 following the 2004 Tsunami." },
+    { q: "What year was the Immigration and Nationality Act passed?", opts: ["1949", "1952", "1965", "1980"], ans: 1, exp: "This is a significant piece of US legislation enacted in 1952." },
+    { q: "Which Act is being amended to delink petroleum from mining operations?", opts: ["1958 Act", "1968 Act", "1978 Act", "1948 Act"], ans: 3, exp: "The Oilfields (Regulation and Development) Act, 1948 is being modernized." },
+    { q: "In which year was India's Patents Act, Section 3(d) introduced?", opts: ["1970", "1980", "1990", "2000"], ans: 0, exp: "The main Act is 1970; Section 3(d) specifically restricts 'evergreening'." },
+    { q: "In which year was the Oilfields (Regulation and Development) Act originally enacted?", opts: ["1960", "1970", "1955", "1948"], ans: 3, exp: "It was one of the early post-independence industrial laws." },
+    { q: "In which year was the Dramatic Performances Act enacted by the British?", opts: ["1857", "1861", "1876", "1881"], ans: 2, exp: "The 1876 Act was used to suppress revolutionary theater." },
+    { q: "In which year was the Income Tax Act originally enacted?", opts: ["1950", "1955", "1960", "1961"], ans: 3, exp: "The current Income Tax Act was enacted in 1961." },
+    { q: "In which year was the Representation of the People Act (RP Act) enacted?", opts: ["1950", "1951", "1952", "1961"], ans: 1, exp: "There are two; the main one for conduct of elections is the 1951 Act." },
+    { q: "In which year was the Lokpal Act enacted?", opts: ["2010", "2012", "2014", "2015"], ans: 2, exp: "The Lokpal and Lokayuktas Act was passed in 2013/2014." },
+    { q: "Which Article of the Indian Constitution mandates a Governor for each State?", opts: ["Article 153", "Article 155", "Article 159", "Article 174"], ans: 0, exp: "Article 153 states: There shall be a Governor for each State." },
+    { q: "Which section of the CGST Act, 2017, empowers the government to implement 'Track and Trace Mechanism'?", opts: ["Section 147A", "Section 148A", "Section 149A", "Section 150A"], ans: 1, exp: "Section 148 allows for specific procedures for certain classes of registered persons." },
+    { q: "In which year was the Right to Education (RTE) Act enacted?", opts: ["2010", "2012", "2009", "2015"], ans: 2, exp: "The RTE Act was passed in 2009 and came into effect in 2010." },
+    { q: "Under which Article does the SC have the discretionary power to hear SLPs?", opts: ["Article 136", "Article 142", "Article 226", "Article 124"], ans: 0, exp: "Article 136 deals with Special Leave to appeal by the Supreme Court." },
+    { q: "In which year was the Indian Railway Board Act passed?", opts: ["1905", "1989", "2014", "2015"], ans: 0, exp: "The Railway Board was first constituted under the 1905 Act." },
+    { q: "In which year was the Disaster Management Act enacted in India?", opts: ["2004", "2001", "2005", "2008"], ans: 2, exp: "Passed in 2005, it established the NDMA." },
+    { q: "In which year was the Aircraft Act first enacted?", opts: ["1934", "1947", "1950", "1962"], ans: 0, exp: "The Aircraft Act was originally a British-era law from 1934." },
+    { q: "In which year was the POSH Act enacted?", opts: ["2010", "2011", "2012", "2013"], ans: 3, exp: "The Sexual Harassment of Women at Workplace Act was passed in 2013." },
+    { q: "Under which Article did the SC issue guidelines for property demolitions (Bulldozer justice)?", opts: ["Article 32", "Article 136", "Article 226", "Article 142"], ans: 3, exp: "Article 142 was used to ensure 'complete justice' and protection of due process." },
+    { q: "Which section of the Citizenship Act was upheld regarding the Assam Accord?", opts: ["Section 3", "Section 5", "Section 7A", "Section 6A"], ans: 3, exp: "Section 6A was specifically added to give effect to the Assam Accord." },
+    { q: "In what year was the Prevention of Money Laundering Act (PMLA) passed?", opts: ["2002", "2010", "1995", "2005"], ans: 0, exp: "PMLA was enacted in 2002 to fight the generation of black money." }
+];
+
+let currentQ = 0;
+
+function load() {
+    const q = legalQuestions[currentQ];
+    document.getElementById('q-count').innerText = `Question ${currentQ + 1} / ${legalQuestions.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => check(i, btn);
+        container.appendChild(btn);
+    });
+    
+    document.getElementById('exp-box').style.display = 'none';
+    document.getElementById('prev-btn').disabled = currentQ === 0;
+    document.getElementById('next-btn').disabled = currentQ === legalQuestions.length - 1;
+}
+
+function check(idx, btn) {
+    const correct = legalQuestions[currentQ].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if(idx === correct) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+    }
+    
+    document.getElementById('exp-box').innerHTML = `<strong>Legal Note:</strong> ${legalQuestions[currentQ].exp}`;
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function move(step) {
+    currentQ += step;
+    load();
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clock Puzzles - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #06b6d4; /* Cyan for Clock Puzzles */
+            --bg: #0f172a;
+            --correct: #0891b2;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #083344, #0f172a);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 35px;
+            border-radius: 30px;
+            margin-top: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header { display: flex; justify-content: space-between; color: var(--accent); font-weight: 800; margin-bottom: 25px; letter-spacing: 1px; }
+        
+        .puzzle-image {
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .puzzle-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .opt-btn:hover:not(:disabled) { 
+            background: rgba(6, 182, 212, 0.2); 
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .opt-btn.correct { background: var(--correct) !important; border-color: white; }
+        .opt-btn.wrong { background: var(--wrong) !important; border-color: white; }
+
+        .explanation {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            display: none;
+            line-height: 1.6;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .back-link { margin-top: 25px; color: #94a3b8; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+<a href="puzzles.html" class="back-link">← Return to Puzzles</a>
+    <h1 style="font-weight: 800;">Clock & Time Logic</h1>
+
+    <div class="container">
+        <div class="header">
+            <span id="q-number">Puzzle 1/12</span>
+            <span>Chronological Reasoning</span>
+        </div>
+
+        <div class="puzzle-image">
+            <img id="main-img" src="" alt="Clock Puzzle">
+        </div>
+
+        <div id="options-container" class="options"></div>
+
+        <div id="explanation-box" class="explanation"></div>
+
+        <div class="nav-controls">
+            <button class="nav-btn" id="prev-btn" onclick="move(-1)">Previous</button>
+            <button class="nav-btn" id="next-btn" onclick="move(1)">Next</button>
+        </div>
+    </div>
+
+    
+
+    <script>
+        const data = [
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-2.png", opts: ["2:30", "3:00", "4:15", "5:20"], ans: 1, exp: "Logic: The sequence of clocks shows an increment of 45 minutes in each step. The missing time is 3:00." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-1-q-16.png", opts: ["6:00", "7:30", "9:00", "12:00"], ans: 2, exp: "Logic: The hour hand moves 90 degrees in each step. 9:00 fits the geometric progression." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-3-q-19.png", opts: ["12", "14", "16", "18"], ans: 0, exp: "Logic: Central value logic related to the time shown. 12 is the calculated constant." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-5-q-2.png", opts: ["4:20", "5:45", "6:15", "7:30"], ans: 0, exp: "Logic: Reflection/Mirror logic. If the real time is 7:40, the mirror image shows 4:20." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-5-q-16.png", opts: ["8", "9", "10", "11"], ans: 1, exp: "Logic: The sum of the numbers in the quadrants follows a spiral addition. 9 is the missing factor." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-6-q-19.png", opts: ["18", "20", "22", "24"], ans: 2, exp: "Logic: Multiplication of opposite clock values. 22 fits the logic." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-7-q-2.png", opts: ["1:15", "2:15", "3:15", "4:15"], ans: 2, exp: "Logic: Incremental steps of 1 hour and 15 minutes. 3:15 is the next in sequence." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-7-q-16.png", opts: ["35", "42", "49", "56"], ans: 2, exp: "Logic: Mathematical relationship between hands positions. Result is 49." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-9-q-19.png", opts: ["11", "12", "13", "14"], ans: 2, exp: "Logic: Consecutive prime numbers or values. 13 is the missing entry." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-11-q-2.png", opts: ["10:10", "11:11", "12:12", "1:01"], ans: 0, exp: "Logic: Visual symmetry in the clock hands. 10:10 completes the pattern." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-11-q-16.png", opts: ["4", "5", "6", "7"], ans: 2, exp: "Logic: Pattern based on the difference between hour and minute values. Result is 6." },
+            { img: "https://www.indiabix.com/_files/images/puzzles/10-12-q-19.png", opts: ["32", "34", "36", "38"], ans: 2, exp: "Logic: Sum of squares of values at specific intervals. 36 is the answer." }
+        ];
+
+        let idx = 0;
+
+        function render() {
+            const q = data[idx];
+            document.getElementById('q-number').innerText = `Puzzle ${idx + 1}/${data.length}`;
+            document.getElementById('main-img').src = q.img;
+            document.getElementById('explanation-box').style.display = 'none';
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    const all = document.querySelectorAll('.opt-btn');
+                    all.forEach(b => b.disabled = true);
+                    if(i === q.ans) btn.classList.add('correct');
+                    else {
+                        btn.classList.add('wrong');
+                        all[q.ans].classList.add('correct');
+                    }
+                    const box = document.getElementById('explanation-box');
+                    box.innerHTML = `<strong>Time Logic:</strong> ${q.exp}`;
+                    box.style.display = 'block';
+                };
+                container.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = idx === 0;
+            document.getElementById('next-btn').disabled = idx === data.length - 1;
+        }
+
+        function move(dir) {
+            idx += dir;
+            render();
+        }
+
+        render();
+    </script>
+</body>
+</html>

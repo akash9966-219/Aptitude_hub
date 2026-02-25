@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Change of Voice - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #1abc9c;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .instruction {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .active-sentence {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-left: 15px;
+            border-left: 5px solid var(--accent);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .opt-btn:hover { background: #f0fdfa; border-color: var(--accent); }
+        .opt-btn.selected { border-color: var(--accent); background: #e6f9f5; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="verbal-ability.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Home</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <span class="instruction">Choose the correct Passive/Active equivalent:</span>
+        <div id="q-text" class="active-sentence"></div>
+        <div id="options" class="options-list"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress">Question 1 of 19</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="validate()">Check Answer</button>
+                <button class="btn btn-next" id="nextBtn" onclick="next()">Next Question →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "After driving professor Kumar to the museum she dropped him at his hotel.", opts: ["After being driven to the museum, Professor Kumar was dropped at his hotel.", "Professor Kumar was being driven dropped at his hotel.", "After she had driven Professor Kumar to the museum she had dropped him at his hotel.", "After she was driven Professor Kumar to the museum she had dropped him at his hotel."], ans: 0 },
+    { q: "I remember my sister taking me to the museum.", opts: ["I remember I was taken to the museum by my sister.", "I remember being taken to the museum by my sister.", "I remember myself being taken to the museum by my sister.", "I remember taken to the museum by my sister."], ans: 1 },
+    { q: "Who is creating this mess?", opts: ["Who has been created this mess?", "By whom has this mess been created?", "By whom this mess is being created?", "By whom is this mess being created?"], ans: 3 },
+    { q: "They greet me cheerfully every morning.", opts: ["Every morning I was greeted cheerfully.", "I am greeted cheerfully by them every morning.", "I am being greeted cheerfully by them every morning.", "Cheerful greeting is done by them every morning to me."], ans: 1 },
+    { q: "Darjeeling grows tea.", opts: ["Tea is being grown in Darjeeling.", "Let the tea be grown in Darjeeling.", "Tea is grown in Darjeeling.", "Tea grows in Darjeeling."], ans: 2 },
+    { q: "They have built a perfect dam across the river.", opts: ["Across the river a perfect dam was built.", "A perfect dam has been built by them across the river.", "A perfect dam should have been built by them.", "Across the river was a perfect dam."], ans: 1 },
+    { q: "Do you imitate others?", opts: ["Are others being imitated by you?", "Are others imitated by you?", "Have others being imitated by you?", "Were others being imitated by you?"], ans: 1 },
+    { q: "You need to clean your shoes properly.", opts: ["Your shoes are needed to clean properly.", "You are needed to clean your shoes properly.", "Your shoes need to be cleaned properly.", "Your shoes are needed by you to clean properly."], ans: 2 },
+    { q: "He is said to be very rich.", opts: ["He said he is very rich.", "People say he is very rich.", "He said it is very rich.", "People say it is very rich."], ans: 1 },
+    { q: "The invigilator was reading out the instructions.", opts: ["The instructions were read by the invigilator.", "The instructions were being read out by the invigilator.", "The instructions had been read out by the invigilator.", "The instructions had been read by the invigilator."], ans: 1 },
+    { q: "You can play with these kittens quite safely.", opts: ["These kittens can played with quite safely.", "These kittens can play with you quite safely.", "These kittens can be played with you quite safely.", "These kittens can be played with quite safely."], ans: 3 },
+    { q: "A child could not have done this mischief.", opts: ["This mischief could not be done by a child.", "This mischief could not been done by a child.", "This mischief could not have been done by a child.", "This mischief a child could not have been done."], ans: 2 },
+    { q: "James Watt discovered the energy of steam.", opts: ["The energy of steam discovered James Watt.", "The energy of steam was discovered by James Watt.", "James Watt was discovered by the energy of steam.", "James Watt had discovered energy by the steam."], ans: 1 },
+    { q: "She makes cakes every Sunday.", opts: ["Every Sunday cakes made by her.", "Cakes are made by her every Sunday.", "Cakes make her every Sunday.", "Cakes were made by her every Sunday."], ans: 1 },
+    { q: "She spoke to the official on duty.", opts: ["The official on duty was spoken to by her", "The official was spoken to by her on duty.", "She was spoken to by the official on duty.", "She was the official to be spoken to on duty"], ans: 0 },
+    { q: "The doctor advised the patient not to eat rice.", opts: ["The patient was advised by the doctor not to eat rice.", "The patient was advised by the doctor that he should not eat rice.", "The patient was being advised by the doctor that he should not rice by the doctor.", "The patient has been advised not to eat rice by the doctor."], ans: 0 },
+    { q: "I cannot accept your offer.", opts: ["Your offer cannot be accepted by me.", "I cannot be accepted by your offer.", "The offer cannot be accepted by me.", "Your offer cannot be accepted."], ans: 0 },
+    { q: "You should open the wine about three hours before you use it.", opts: ["Wine should be opened about three hours before use.", "Wine should be opened by you three hours before use.", "Wine should be opened about three hours before you use it.", "Wine should be opened about three hours before it is used."], ans: 3 },
+    { q: "They will inform the police.", opts: ["The police will be informed by them.", "The police will inform them.", "The police are informed by them.", "Informed will be the police by them."], ans: 0 }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `Question ${idx + 1} of ${data.length}`;
+    document.getElementById('q-text').innerText = item.q;
+    
+    const optBox = document.getElementById('options');
+    optBox.innerHTML = '';
+    item.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        optBox.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function validate() {
+    if (selected === null) return alert("Please select an answer!");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((b, i) => {
+        if (i === correct) b.classList.add('correct');
+        if (i === selected && i !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Voice Practice Completed!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

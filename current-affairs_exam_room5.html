@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 5</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 5</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+      const questions = [
+    { q: "Which organisation successfully completed the user evaluation trials of the Next Generation Akash missile system?", options: ["DRDO", "ISRO", "HAL", "Bharat Electronics Limited"], ans: 0, logic: "The Defence Research and Development Organisation (DRDO) completed the trials of Akash-NG in late 2025." },
+    { q: "Which river in Australia has been identified as the world’s oldest continuously flowing river (300–400 million years)?", options: ["Finke River", "Murray River", "Darling River", "Gascoyne River"], ans: 0, logic: "The Finke River in central Australia is believed to have followed its current course for over 300 million years." },
+    { q: "Which institution acts as the debt manager to facilitate market borrowings for Delhi’s Yamuna rejuvenation projects?", options: ["Reserve Bank of India", "State Bank of India", "Ministry of Finance", "NITI Aayog"], ans: 0, logic: "The RBI manages the market borrowings and financial agency for these major infrastructure initiatives." },
+    { q: "Which Bengaluru-based fintech company received RBI approval to operate as a Payment Aggregator–Cross Border (PA-CB)?", options: ["Skydo", "Razorpay", "PayU", "Cashfree"], ans: 1, logic: "Razorpay received the PA-CB license in January 2026, allowing it to facilitate international payments." },
+    { q: "On which date is World Computer Literacy Day observed globally?", options: ["December 1", "December 5", "November 30", "December 2"], ans: 3, logic: "World Computer Literacy Day is celebrated annually on December 2." },
+    { q: "Which country is set to benefit from the IFC’s 166 million programme to support SMEs and inclusive growth?", options: ["India", "Bangladesh", "Sri Lanka", "Nepal"], ans: 2, logic: "The International Finance Corporation (IFC) announced this investment for Sri Lanka in January 2026." },
+    { q: "Which country has announced plans to build a power plant on the Moon by 2036?", options: ["Russia", "China", "United States", "Japan"], ans: 0, logic: "Russia (Roscosmos) announced plans for a lunar power plant to support a joint station with China by 2036." },
+    { q: "Which country has officially adopted the euro, becoming the 21st member of the eurozone?", options: ["Bulgaria", "Romania", "Croatia", "Greece"], ans: 0, logic: "Bulgaria officially joined the Eurozone as its 21st member on January 1, 2026." },
+    { q: "What is the name of the storm that caused fatalities and severe flooding in Portugal and Wales in early 2026?", options: ["Helena", "Leonardo", "Claudia", "Fiona"], ans: 1, logic: "Storm Leonardo brought heavy rainfall and severe flooding to Portugal and parts of the UK in February 2026." },
+    { q: "Who was sworn in as the new Prime Minister of Bangladesh after the 13th Parliamentary Elections?", options: ["Tarique Rahman", "Muhammad Yunus", "Khaleda Zia", "Mohammed Shahabuddin"], ans: 0, logic: "Tarique Rahman took office in early 2026 following a landslide election victory." },
+    { q: "With which country did India recently sign key power agreements to build 400 kV transmission lines?", options: ["Bangladesh", "Bhutan", "Nepal", "Sri Lanka"], ans: 2, logic: "India and Nepal signed agreements for the Inaruwa-Purnea and Lamki-Bareilly 400 kV lines." },
+    { q: "Which country became the first South Asian nation to join the UN Water Convention in 2025?", options: ["Nepal", "Sri Lanka", "Bangladesh", "Bhutan"], ans: 2, logic: "Bangladesh acceded to the UN Water Convention in June 2025 to improve transboundary water management." },
+    { q: "In which city was the Emerging Science & Technology Innovation Conclave (ESTIC-2025) held?", options: ["New Delhi", "Bengaluru", "Hyderabad", "Mumbai"], ans: 0, logic: "PM Modi inaugurated ESTIC-2025 at Bharat Mandapam in New Delhi in November 2025." },
+    { q: "How many seats did the NDA win in the 2025 Bihar Assembly Elections?", options: ["202", "189", "243", "122"], ans: 0, logic: "The National Democratic Alliance (NDA) won a massive mandate with 202 seats in the 243-member house." },
+    { q: "Who won the gold medal in the men’s heptathlon at the Asian Indoor Athletics Championships 2026?", options: ["Tejaswin Shankar", "Tajinderpal Singh Toor", "Ancy Sojan", "Pooja"], ans: 0, logic: "Tejaswin Shankar won gold in Tianjin, China, with a national record of 5,993 points." },
+    { q: "Which country won the ICC Under-19 Men’s Cricket World Cup 2026 by defeating England?", options: ["Australia", "South Africa", "New Zealand", "India"], ans: 3, logic: "India defeated England by 100 runs in February 2026 to lift their record 6th U19 World Cup title." },
+    { q: "From which state was India’s nationwide pulses revolution launched in 2025?", options: ["Uttar Pradesh", "Rajasthan", "Madhya Pradesh", "Maharashtra"], ans: 2, logic: "The mission for self-reliance in pulses was centrally focused on the agricultural hub of Madhya Pradesh." },
+    { q: "Which state police launched Phase 2 of the 72-hour ‘Operation Prahar’ against gangsters?", options: ["Haryana", "Rajasthan", "Punjab", "Uttar Pradesh"], ans: 0, logic: "Haryana Police conducted 'Operation Prahar' to crack down on organized crime and wanted criminals." },
+    { q: "Which Indian state hosted the FIDE World Cup 2025?", options: ["Maharashtra", "Goa", "Karnataka", "Kerala"], ans: 1, logic: "The FIDE World Cup 2025 was held in Goa from late October to November." },
+    { q: "Which Hong Kong-based startup is launching the Feilian Constellation (3D wind data satellites)?", options: ["SkyMatrix", "AeroLink", "WindSphere", "Stellerus"], ans: 3, logic: "Stellerus Technology is deploying the world's first 3D wind data satellite network." }
+];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

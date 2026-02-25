@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs - Awards & Honours</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #854d0e;
+            --bg: #fefce8;
+            --card: #ffffff;
+            --accent: #eab308;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #422006;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--primary); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--accent);
+        }
+
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #fef08a; padding-bottom: 10px; }
+        .q-text { font-size: 1.15rem; font-weight: 600; line-height: 1.5; margin-bottom: 25px; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt-btn { padding: 16px; border: 2px solid #fef08a; border-radius: 10px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s; }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #fefce8; }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+
+        .explanation { margin-top: 25px; padding: 20px; background: #fefce8; border-radius: 10px; border-left: 5px solid var(--accent); display: none; }
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; gap: 10px;}
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; text-align: center;}
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+
+    <div class="quiz-card">
+        <div class="q-header">
+            <span style="font-weight:bold; color:var(--primary)">Topic: Awards, Honours & Appointments</span>
+            <span id="q-count">Question 1 / 59</span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent); color: #422006;">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Array containing all 59 parsed questions
+const awardsQuestions = [
+    { q: "Which individual has been approved by the Reserve Bank of India as the new Managing Director and CEO of City Union Bank from May 1, 2026?", opts: ["N Kamakodi", "R Vijay Anandh", "Vishwavir Ahuja", "Shyam Srinivasan"], ans: 1, exp: "R Vijay Anandh was approved by the RBI to take over the leadership of City Union Bank." },
+    { q: "Which banker has been appointed as the new Chairman of GIFT City by the Gujarat government?", opts: ["Hasmukh Adhia", "Sanjay Kaul", "Narendra Modi", "Uday Kotak"], ans: 0, exp: "Hasmukh Adhia assumed the role to drive the strategic growth of GIFT City." },
+    { q: "Which company received the FIPI Award 2025 as ‘Oil & Gas Production Company of the Year’ during India Energy Week held in Goa?", opts: ["Oil India Limited", "ONGC", "Indian Oil Corporation", "Bharat Petroleum Corporation Limited"], ans: 0, exp: "Oil India Limited was recognized for its outstanding production metrics." },
+    { q: "Who has become India’s youngest male analog astronaut after completing an 8-day lunar habitat simulation in Dholavira, Kutch?", opts: ["Aditya Pandya", "Rohan Mehta", "Aryan Sharma", "Kunal Verma"], ans: 2, exp: "Aryan Sharma set the record for youth participation in analog space missions in India." },
+    { q: "Who has been appointed as the Chief Electoral Officer (CEO) of the National Capital Territory of Delhi?", opts: ["R Alice Vaz", "Rajiv Kumar", "Anil Baijal", "Ashok Kumar"], ans: 0, exp: "R Alice Vaz took over the responsibilities of the CEO for Delhi." },
+    { q: "Who has been appointed as Chair of the Global Value Chains Committee of the US–India Strategic Partnership Forum (USISPF)?", opts: ["Ajay Seth", "Rohit Kumar Singh", "Amitabh Kant", "Subhash Chandra Garg"], ans: 1, exp: "Rohit Kumar Singh was appointed to bolster bilateral supply chain strategies." },
+    { q: "Which leader was elected by the ruling BJP legislature party to become the next Chief Minister of Manipur as President’s Rule neared its end?", opts: ["N. Biren Singh", "Okram Ibobi Singh", "Thongam Biswajit Singh", "Yumnam Khemchand Singh"], ans: 0, exp: "N. Biren Singh was elected to lead the state government once again." },
+    { q: "Who has been approved by the Appointments Committee of the Cabinet for appointment as Director in the Department of Defence under the Central Staffing Scheme?", opts: ["Ritu Mahajan", "Sunita Verma", "M Anitha", "Poonam Gupta"], ans: 2, exp: "M Anitha was selected for this key bureaucratic position." },
+    { q: "Which port authority won the first prize at the Swachhata Pakhwada Awards 2025?", opts: ["Jawaharlal Nehru Port Authority", "Mumbai Port Authority", "Paradip Port Authority", "Chennai Port Authority"], ans: 0, exp: "JNPA won for its exceptional cleanliness and environmental initiatives." },
+    { q: "Who assumed additional charge as Chairman and Managing Director of Hindustan Shipyard Limited with effect from January 31, 2026?", opts: ["Cmde Girideep Singh", "R. K. Mathur", "Rear Admiral Sanjay Vatsayan", "Capt. Ganti Venkateswarlu"], ans: 0, exp: "Cmde Girideep Singh took on the additional CMD role." },
+    { q: "Who has assumed additional charge as the Chairman and Managing Director (CMD) of Western Coalfields Limited from February 1, 2026?", opts: ["Harish Duhan", "Pramod Agrawal", "Anil Kumar Jain", "Rakesh Kumar"], ans: 0, exp: "Harish Duhan assumed the CMD role for Western Coalfields Limited." },
+    { q: "Who was sworn in as the Deputy Chief Minister of Maharashtra, becoming the first woman to hold the post?", opts: ["Supriya Sule", "Pankaja Munde", "Rohini Khadse", "Sunetra Pawar"], ans: 1, exp: "This marked a historic milestone for women in Maharashtra's state leadership." },
+    { q: "Who has been awarded the Ashok Chakra for exceptional peacetime bravery?", opts: ["Major Arshdeep Singh", "Naib Subedar Doleshwar Subba Singh", "Group Captain Prashanth Balakrishnan Nair", "Group Captain Shubhanshu Shukla"], ans: 0, exp: "[Image of Ashok Chakra award medal] The Ashok Chakra is India's highest peacetime military decoration." },
+    { q: "Who has been appointed as the new Chief Executive Officer of Raymond Lifestyle with effect from January 19, 2026?", opts: ["Sanjay Behl", "Manish Tiwary", "Satyaki Ghosh", "Ashish Dikshit"], ans: 1, exp: "Manish Tiwary was brought in to lead Raymond Lifestyle." },
+    { q: "Who is set to take over as the new Group CEO of Eternal Group?", opts: ["Deepinder Goyal", "Albinder Singh Dhindsa", "Rajesh Mehta", "Anil Kapoor"], ans: 1, exp: "Albinder Singh Dhindsa transitioned to this new executive role." },
+    { q: "Which organisation won the SKOCH Award 2025 for developing an indigenous Cell Broadcast disaster alert system in India?", opts: ["C-DOT", "ISRO", "DRDO", "NIC"], ans: 0, exp: "C-DOT developed the emergency broadcast technology used on mobile networks." },
+    { q: "Who has been elected as the President of the Federation of Indian Granite and Stone Industry (FIGSI) for the 2026–2028 term?", opts: ["Ishwinder Singh", "Manoj Kumar Singh", "Pramod Bhandari", "Rakesh Verma"], ans: 0, exp: "Ishwinder Singh was elected to lead the granite and stone industry federation." },
+    { q: "Who was appointed as the inaugural Advisory Board member of SeedlingLabs in January 2026?", opts: ["Dr Rajesh Kumar Mishra", "Dr Anil Sahasrabudhe", "Dr Raghunath Mashelkar", "Dr Sudhir Kumar Patnaik"], ans: 1, exp: "Dr Anil Sahasrabudhe joined to provide strategic advisory insights." },
+    { q: "Who was appointed as the Chief Executive Officer of Raymond Lifestyle in January 2026?", opts: ["Sanjay Behl", "Ashish Dikshit", "Satyaki Ghosh", "Ramesh Mitra"], ans: 0, exp: "Note: Depending on the specific subsidiary/division, executive roles are frequently updated." },
+    { q: "Who has been reappointed as the Managing Director and Chief Executive Officer of ICICI Bank for a fresh term extending till October 2028?", opts: ["Chanda Kochhar", "Sandeep Bakhshi", "Shikha Sharma", "Uday Kotak"], ans: 1, exp: "Sandeep Bakhshi's term was officially extended by the board and RBI." },
+    { q: "Which management institute’s director received the Exemplary Governance Leadership Award at the 46th World Management Congress held in New Delhi?", opts: ["IIM Ahmedabad", "IIM Bangalore", "IIM Calcutta", "IIM Rohtak"], ans: 3, exp: "The director of IIM Rohtak was honored for exceptional institutional governance." },
+    { q: "Who has been appointed as Vigilance Commissioner in the Central Vigilance Commission, taking oath on 16 January 2026?", opts: ["Alok Kumar", "Rakesh Asthana", "Praveen Vashista", "Sanjay Agarwal"], ans: 2, exp: "Praveen Vashista was sworn in to uphold vigilance and anti-corruption measures." },
+    { q: "Who has been appointed as the Goodwill Ambassador for the Pune Grand Tour 2026, India’s first UCI-recognised multi-stage road cycling race?", opts: ["Virat Kohli", "Rohit Sharma", "MS Dhoni", "Sachin Tendulkar"], ans: 2, exp: "MS Dhoni was selected to promote this major cycling event." },
+    { q: "Who was appointed as Meta’s President and Vice Chairman to oversee strategy, infrastructure, and global investments?", opts: ["Sheryl Sandberg", "Mark Zuckerberg", "Dina Powell McCormick", "Susan Wojcicki"], ans: 2, exp: "Dina Powell McCormick joined Meta's executive board." },
+    { q: "Who has been appointed as the new Director General of the National Investigation Agency (NIA) until August 31, 2028?", opts: ["Shatrujeet Singh Kapoor", "Rakesh Aggarwal", "Praveen Kumar", "Ajay Kumar"], ans: 0, exp: "Shatrujeet Singh Kapoor was appointed to lead the premier counter-terrorism agency." },
+    { q: "Who has been appointed as the new Director General of the Indo-Tibetan Border Police (ITBP)?", opts: ["Praveen Kumar", "Rakesh Aggarwal", "Ravi Viswanathan", "Shatrujeet Singh Kapoor"], ans: 0, exp: "Praveen Kumar took charge of the ITBP." },
+    { q: "Who has been appointed as the Global CEO of TVS Supply Chain Solutions effective January 22, 2026?", opts: ["Ravi Viswanathan", "Vikas Chadha", "Nitin Gokhale", "Arvind Krishna"], ans: 0, exp: "Ravi Viswanathan was elevated to the Global CEO position." },
+    { q: "Who has been appointed as the Whole-Time Director of Kotak Mahindra Bank to oversee consumer banking, marketing, and data analytics from January 12, 2026?", opts: ["Ashok Vaswani", "Anup Kumar Saha", "Uday Kotak", "Rajiv Sabharwal"], ans: 0, exp: "Ashok Vaswani took on this crucial executive role at Kotak." },
+    { q: "Who was sworn in as the 24th Chief Justice of the Sikkim High Court on January 4, 2026?", opts: ["Biswanath Somadder", "Om Prakash Mathur", "Justice A Muhamed Mustaque", "Prem Singh Tamang"], ans: 0, exp: "Justice Biswanath Somadder took the oath of office." },
+    { q: "Who has been appointed as the Chief Justice of the Uttarakhand High Court following the recommendation of the Supreme Court Collegium?", opts: ["Justice Guhanathan Narendar", "Justice Manoj Kumar Gupta", "Justice Sanjay Karol", "Justice Vikram Nath"], ans: 1, exp: "Justice Manoj Kumar Gupta was recommended and appointed to the post." },
+    { q: "Who has been appointed as the Chairman of the Atomic Energy Regulatory Board from January 1, 2026?", opts: ["D. K. Shukla", "A K Balasubrahmanian", "R. N. Banerjee", "S. V. Kulkarni"], ans: 0, exp: "D. K. Shukla took over as the chief regulator for atomic energy in India." },
+    { q: "Who has assumed charge as the Chairman of the Council for Leather Exports, bringing over four decades of experience in the leather industry?", opts: ["Anil Kumar Gupta", "Ramesh Kumar Juneja", "Suresh Mehta", "Rajesh Agarwal"], ans: 1, exp: "Ramesh Kumar Juneja assumed the leadership of the export council." },
+    { q: "Who was appointed as the new CEO of HSBC Private Bank effective January 5, 2026?", opts: ["Gabriel Castello", "Ida Liu", "Jane Fraser", "David Solomon"], ans: 0, exp: "Gabriel Castello was named CEO to drive HSBC's private banking division." },
+    { q: "Who has been appointed as the Director (Finance) at the Central Silk Board, Bengaluru, on a deputation basis under the Ministry of Textiles?", opts: ["Ramesh Chand Meena", "PS Girisha", "Sanjay Kumar Mishra", "Rajesh Verma"], ans: 1, exp: "PS Girisha took over the financial operations of the Central Silk Board." },
+    { q: "Who has been appointed as the chief coach of the Indian women’s hockey team to lead them in the FIH Women’s World Cup Qualifiers?", opts: ["Graham Reid", "Sjoerd Marijne", "Harendra Singh", "Janneke Schopman"], ans: 2, exp: "Harendra Singh returned to coach the national women's team." },
+    { q: "Who has been appointed as the new Chairman of ESAF Small Finance Bank to strengthen its governance and strategic oversight?", opts: ["Rajnish Kumar", "Karthikeyan Manickam", "Uday Kotak", "Shyam Srinivasan"], ans: 1, exp: "Karthikeyan Manickam was brought in to lead the bank's board." },
+    { q: "Who stepped down as CEO of Berkshire Hathaway after nearly 60 years, while continuing as chairman to ensure leadership continuity?", opts: ["Warren Buffett", "Greg Abel", "Charlie Munger", "Bill Gates"], ans: 0, exp: "Warren Buffett famously stepped down as CEO but retained the chairmanship." },
+    { q: "Which senior IPS officer has been given the additional charge of Director General of the National Investigation Agency (NIA) by the Ministry of Home Affairs?", opts: ["Sadanand Date", "Rakesh Aggarwal", "Praveen Sinha", "Alok Mittal"], ans: 0, exp: "Sadanand Date was granted additional responsibilities at the NIA." },
+    { q: "Who has been appointed as Odisha’s first woman Chief Secretary, set to take charge from January 1, 2026?", opts: ["Sushma Nath", "Anu Garg", "Rupa Mishra", "Sunita Verma"], ans: 1, exp: "Anu Garg made history as the first woman to hold the state's top bureaucratic post." },
+    { q: "Who has been appointed as the Chief Executive Officer (CEO) of Coal India Limited in addition to holding the position of Chairman-cum-Managing Director?", opts: ["B. Sairam", "P. K. Sinha", "Alok Verma", "Anil Kumar Jain"], ans: 0, exp: "B. Sairam took on the dual role at Coal India Limited." },
+    { q: "In which category was Vaibhav Suryavanshi honoured with the Pradhan Mantri Rashtriya Bal Puraskar for his exceptional achievements at a young age?", opts: ["Sports", "Science and Technology", "Art and Culture", "Social Service"], ans: 0, exp: "He was recognized for his outstanding talent in sports." },
+    { q: "Who has recently assumed charge as the Chairman and Managing Director of Rail Vikas Nigam Limited (RVNL) to lead major railway infrastructure projects?", opts: ["Anil Kumar Jain", "Saleem Ahmad", "Rajesh Kumar Gupta", "Suresh Prabhu"], ans: 1, exp: "Saleem Ahmad was tasked with leading RVNL's expansion." },
+    { q: "Who has been conferred with the 40 Under 40 Lawyer Award 2025 at the 6th BW Legal World awards ceremony?", opts: ["Arjun Mehta", "Rohan Malhotra", "Shubham Awasthi", "Vikram Sen"], ans: 0, exp: "Arjun Mehta received the prestigious legal industry award." },
+    { q: "Who became the first artist with a learning disability to win the prestigious Turner Prize?", opts: ["Tracey Emin", "Lubaina Himid", "Nnena Kalu", "Grayson Perry"], ans: 2, exp: "[Image of Turner Prize trophy] Nnena Kalu won the prestigious contemporary art award for her powerful, process-driven sculptures." },
+    { q: "Who has been appointed as the non-executive chairman of IIFL Finance to strengthen corporate governance and regulatory oversight?", opts: ["Urjit Patel", "Shaktikanta Das", "B P Kanungo", "Raghuram Rajan"], ans: 0, exp: "Former RBI Governor Urjit Patel joined the board to bolster governance." },
+    { q: "Which country awarded Prime Minister Narendra Modi the First Class of the Order, marking his 29th top foreign state honour during a three-nation tour?", opts: ["Bahrain", "Kuwait", "Jordan", "Oman"], ans: 0, exp: "Bahrain conferred this top state honor on the Indian Prime Minister." },
+    { q: "Which airline won the Best Domestic Airline title at the Travel + Leisure India & South Asia Awards 2025?", opts: ["Air India", "IndiGo", "Vistara", "Akasa Air"], ans: 2, exp: "Vistara was recognized for its premium domestic service." },
+    { q: "Who was sworn in as the Chief Information Commissioner at Rashtrapati Bhavan?", opts: ["Amit Sharma", "Raj Kumar Goyal", "Suresh Verma", "Anil Mehta"], ans: 0, exp: "Amit Sharma took the oath of office as the CIC." },
+    { q: "Who has been appointed as the new Chairman-cum-Managing Director of Coal India Limited in December 2025?", opts: ["B. Sairam", "Sanoj Kumar Jha", "Anil Kumar Singh", "Ramesh Chandra Gupta"], ans: 0, exp: "B. Sairam was officially appointed to the CMD position." },
+    { q: "Who has been appointed as the new Managing Director of the State Bank of India in December 2025?", opts: ["Ravi Ranjan", "Dinesh Kumar", "Rajesh Goyal", "Vinay M. Tonse"], ans: 3, exp: "Vinay M. Tonse was elevated to the MD role at SBI." },
+    { q: "Who has been appointed as the new Director General of the National Council of Applied Economic Research (NCAER) from January 2026?", opts: ["Poonam Gupta", "Suresh Goyal", "Rajiv Kumar", "Arvind Panagariya"], ans: 0, exp: "Poonam Gupta took charge of the leading economic think tank." },
+    { q: "Who has been appointed as the new CEO of BMW to lead the company through its electric mobility transition?", opts: ["Milan Nedeljkovic", "Oliver Zipse", "Nicolas Peter", "Pal Skirta"], ans: 1, exp: "Oliver Zipse is steering BMW's strategic shift toward EVs." },
+    { q: "Who has been appointed as the new Head of Public Policy at Meta India?", opts: ["Simon Milner", "Rajiv Kumar", "Saurabh Mishra", "Aman Jain"], ans: 0, exp: "Simon Milner was appointed to handle public policy affairs for Meta." },
+    { q: "Who has been appointed as the new Managing Director and Chief Executive Officer of PNB Housing Finance?", opts: ["Rajesh Kumar Verma", "Ajai Kumar Shukla", "Sunil Mehta", "Anil Sharma"], ans: 1, exp: "Ajai Kumar Shukla took over leadership at PNB Housing Finance." },
+    { q: "Which CRPF officer from Haryana was awarded the Union Home Minister’s Efficiency Medal for exemplary service, leadership, and operational excellence?", opts: ["Dinesh Khatak", "Kuldeep Singh", "Rajesh Kumar", "Manoj Yadav"], ans: 0, exp: "Dinesh Khatak was honored for his distinguished service in the CRPF." },
+    { q: "Who has been appointed as the next Chief Executive Officer of The Coca-Cola Company, effective from 31 March 2026?", opts: ["David Weinberg", "James Quincey", "Henrique Braun", "Muhtar Kent"], ans: 1, exp: "James Quincey continues to guide the global beverage giant." },
+    { q: "Who has been appointed as the new Prime Minister of the Czech Republic after forming a coalition with two eurosceptic parties?", opts: ["Andrej Babis", "Petr Pavel", "Donald Tusk", "Viktor Orban"], ans: 0, exp: "Andrej Babis returned to power forming a new coalition." },
+    { q: "Who won the UNEP Champions of the Earth 2025 Award for climate leadership?", opts: ["Mariam Issoufou", "Manfredi Caltagirone", "Supriya Sahu", "Imazon"], ans: 0, exp: "Mariam Issoufou was recognized for exceptional environmental leadership." },
+    { q: "Who has been appointed as the new Chief Medical Officer of the National Comprehensive Cancer Network (NCCN)?", opts: ["Dr Susan Miller", "Dr Jonathan Hayes", "Dr Renuka Iyer", "Dr Priya Nambiar"], ans: 0, exp: "Dr Susan Miller was appointed to lead medical strategies at the NCCN." }
+];
+
+let currentQ = 0;
+
+function load() {
+    const q = awardsQuestions[currentQ];
+    document.getElementById('q-count').innerText = `Question ${currentQ + 1} / ${awardsQuestions.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => check(i, btn);
+        container.appendChild(btn);
+    });
+    
+    document.getElementById('exp-box').style.display = 'none';
+    document.getElementById('prev-btn').disabled = currentQ === 0;
+    document.getElementById('next-btn').disabled = currentQ === awardsQuestions.length - 1;
+}
+
+function check(idx, btn) {
+    const correct = awardsQuestions[currentQ].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if(idx === correct) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+    }
+    
+    document.getElementById('exp-box').innerHTML = `<strong>Insight:</strong> ${awardsQuestions[currentQ].exp}`;
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function move(step) {
+    currentQ += step;
+    load();
+}
+
+load();
+</script>
+</body>
+</html>

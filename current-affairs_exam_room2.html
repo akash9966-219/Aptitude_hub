@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Great work! You are mastering the February 2026 current affairs.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 2</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 2</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Who has been appointed as Chair of the Global Value Chains Committee of the US–India Strategic Partnership Forum (USISPF)?", options: ["Ajay Seth", "Rohit Kumar Singh", "Amitabh Kant", "Subhash Chandra Garg"], ans: 1, logic: "Former Consumer Affairs Secretary Rohit Kumar Singh was appointed to this role on February 9, 2026." },
+            { q: "Who has been awarded the Ashok Chakra for exceptional peacetime bravery in 2026?", options: ["Major Arshdeep Singh", "Naib Subedar Doleshwar Subba Singh", "Group Captain Prashanth Balakrishnan Nair", "Group Captain Shubhanshu Shukla"], ans: 3, logic: "Group Captain Shubhanshu Shukla received the Ashok Chakra for his historic space and military contributions." },
+            { q: "Who has been appointed as the Chief Electoral Officer (CEO) of the National Capital Territory of Delhi?", options: ["R Alice Vaz", "Rajiv Kumar", "Anil Baijal", "Ashok Kumar"], ans: 0, logic: "R Alice Vaz serves as the CEO for Delhi during the 2025-2026 election cycles." },
+            { q: "Who stepped down as CEO of Berkshire Hathaway after nearly 60 years in early 2026?", options: ["Warren Buffett", "Greg Abel", "Charlie Munger", "Bill Gates"], ans: 0, logic: "Warren Buffett officially stepped down as CEO on Dec 31, 2025, but remains Chairman." },
+            { q: "Which public sector company awarded major refinery contracts to Technip Energies for projects at Bina and Mumbai refineries?", options: ["Indian Oil Corporation Ltd", "Hindustan Petroleum Corporation Ltd", "Bharat Petroleum Corporation Ltd", "Oil and Natural Gas Corporation"], ans: 2, logic: "BPCL awarded these major contracts for expansion at Bina and Mumbai." },
+            { q: "Which organisation developed the hand-operated Sea Water Desalination System (SWaDeS) for soldiers in remote areas?", options: ["ISRO", "BHEL", "HAL", "DRDO"], ans: 3, logic: "The Defence Laboratory, Jodhpur (DRDO) developed SWaDeS to purify saline water for troops." },
+            { q: "What was India’s core sector growth rate in January 2026 according to the Index of Core Industries (ICI)?", options: ["4.7%", "7.8%", "4.0%", "2.8%"], ans: 2, logic: "The combined Index of Eight Core Industries recorded a growth of 4.0% in Jan 2026." },
+            { q: "Which wildlife sanctuary has been renamed as Kerala’s first butterfly sanctuary?", options: ["Silent Valley", "Periyar", "Aralam", "Wayanad"], ans: 2, logic: "Aralam Wildlife Sanctuary in Kannur was renamed Aralam Butterfly Sanctuary in January 2026." },
+            { q: "On which date is the International Day of Women and Girls in Science observed every year?", options: ["January 24", "February 11", "March 8", "April 22"], ans: 1, logic: "This day is celebrated annually on February 11 to promote gender equality in science." },
+            { q: "On which date is Earth’s Rotation Day observed?", options: ["January 1", "February 28", "January 8", "March 21"], ans: 2, logic: "Observed on January 8 to honor Foucault's experiment proving Earth rotates." },
+            { q: "Which country successfully flight-tested the indigenously developed Taimoor air-launched cruise missile with a range of 600 km?", options: ["Iran", "Turkey", "Pakistan", "Saudi Arabia"], ans: 2, logic: "The Pakistan Air Force successfully tested the Taimoor ALCM on Jan 3, 2026." },
+            { q: "Which country introduced an official butterfly logo for the COP17 Conference on Biological Diversity?", options: ["Georgia", "Azerbaijan", "Armenia", "Kazakhstan"], ans: 2, logic: "Armenia unveiled the 'Blue Butterfly' logo for the upcoming COP17 in Yerevan." },
+            { q: "By which year does Indian Railways plan to double the originating train capacity in 48 major cities?", options: ["2025", "2030", "2035", "2040"], ans: 1, logic: "Railway Minister Ashwini Vaishnaw announced the goal to double capacity by 2030." },
+            { q: "In which city did the 12th Smile International Film Festival for Children & Youth (SIFFCY) begin?", options: ["Mumbai", "New Delhi", "Kolkata", "Chennai"], ans: 1, logic: "The 12th edition of SIFFCY took place in New Delhi in Jan-Feb 2026." },
+            { q: "Who won the 2026 FIDE Freestyle Chess World Championship by defeating Fabiano Caruana in the final?", options: ["Fabiano Caruana", "Levon Aronian", "Magnus Carlsen", "Nodirbek Abdusattorov"], ans: 2, logic: "Magnus Carlsen won the title in Weissenhaus by defeating Caruana 2.5-1.5." },
+            { q: "Which Indian state is set to launch the country’s first chronic kidney disease (CKD) patient registry?", options: ["Kerala", "Odisha", "Maharashtra", "Karnataka"], ans: 1, logic: "Odisha is set to launch India's first CKD Patient Registry on March 31, 2026." },
+            { q: "Which state government introduced the Mukhya Mantri Sehat Yojana to provide free treatment up to 10 lakh per family?", options: ["Punjab", "Haryana", "Rajasthan", "Uttar Pradesh"], ans: 0, logic: "Punjab CM Bhagwant Mann launched this universal health scheme in January 2026." },
+            { q: "In which Indian state was the new dragonfly species “Lyriothemis keralensis” discovered?", options: ["Kerala", "Tamil Nadu", "Karnataka", "Andhra Pradesh"], ans: 0, logic: "This new species, the Slender Bombardier, was discovered in coastal Kerala." },
+            { q: "Which Indian state is set to get a third district with headquarters at Quepem?", options: ["Maharashtra", "Karnataka", "Goa", "Kerala"], ans: 2, logic: "Goa announced the creation of 'Kushavati' district with Quepem as its headquarters." },
+            { q: "In which city was the world’s first administration of the ITVISMA gene therapy for spinal muscular atrophy carried out?", options: ["Abu Dhabi", "Dubai", "New York", "Geneva"], ans: 0, logic: "Abu Dhabi became the first city globally to administer ITVISMA at SKMC in late 2025/2026." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

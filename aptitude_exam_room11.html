@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptitude Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Aptitude Test 11</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 11</button>
+        <a href="test1.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Commodity X increases by 40p/yr, Y by 15p/yr. 2001: X=4.20, Y=6.30. When will X cost 40p more than Y?", options: ["2010", "2011", "2012", "2013"], ans: 1, logic: "Let n years pass. (4.20 + 0.40n) - (6.30 + 0.15n) = 0.40. Solving gives 0.25n = 2.5, so n=10. 2001 + 10 = 2011." },
+            { q: "If a - b = 3 and a² + b² = 29, find the value of ab.", options: ["10", "12", "15", "18"], ans: 0, logic: "(a-b)² = a²+b² - 2ab => 3² = 29 - 2ab => 9 = 29 - 2ab => 2ab = 20 => ab = 10." },
+            { q: "Room A & B. 10 from A to B makes them equal. 20 from B to A makes A double B. Students in A?", options: ["20", "80", "100", "200"], ans: 2, logic: "A-10=B+10 => A-B=20. A+20=2(B-20) => A-2B=-60. Solving gives A=100, B=80." },
+            { q: "Product of two numbers is 120 and sum of squares is 289. Sum of numbers?", options: ["20", "23", "169", "None"], ans: 1, logic: "(x+y)² = x²+y² + 2xy = 289 + 2(120) = 529. √(529) = 23." },
+            { q: "Salaries A:B:C = 2:3:5. Increments: 15%, 10%, 20%. New ratio?", options: ["3:3:10", "10:11:20", "23:33:60", "Data inadequate"], ans: 2, logic: "New Ratio = 2*1.15 : 3*1.10 : 5*1.20 = 2.3 : 3.3 : 6.0 = 23:33:60." },
+            { q: "Partnership A:B = 4:5. After 3m, A withdraws 1/4, B withdraws 1/5. Profit 760. A's share?", options: ["330", "360", "380", "430"], ans: 0, logic: "A: (4*3 + 3*7)=33. B: (5*3 + 4*7)=43. Ratio 33:43. A share = (33/76)*760 = 330." },
+            { q: "R's share in joint venture? I. Q invested 80,000. II. R joined after 3m. III. P joined after 4m with 1,20,000, got 6,000 profit.", options: ["All necessary", "I and III", "II and III", "Cannot be determined", "None"], ans: 3, logic: "Even with all info, we don't know R's investment amount, so his share cannot be calculated." },
+            { q: "A in 6d, B in 8d. Together with C in 3d. Total pay 3200. Share of C?", options: ["375", "400", "600", "800"], ans: 1, logic: "A's 3d work = 3/6=1/2. B's 3d work = 3/8. C's work = 1 - (1/2 + 3/8) = 1/8. C's pay = 3200 * 1/8 = 400." },
+            { q: "Train (72 kmph) crosses 250m platform in 26s. Length of train?", options: ["230 m", "240 m", "260 m", "270 m"], ans: 3, logic: "Speed = 72 * 5/18 = 20 m/s. Total Dist = 20 * 26 = 520m. Train = 520 - 250 = 270m." },
+            { q: "If log10 2 = 0.3010, then log2 10 is equal to:", options: ["699/301", "1000/301", "0.3010", "0.6990"], ans: 1, logic: "log2 10 = 1 / log10 2 = 1 / 0.3010 = 10000 / 3010 = 1000/301." },
+            { q: "Error 2% in side of square. % error in area?", options: ["2%", "2.02%", "4%", "4.04%"], ans: 3, logic: "Formula: (1 + e)² - 1 = (1.02)² - 1 = 1.0404 - 1 = 0.0404 = 4.04%." },
+            { q: "5cm rain on 1.5 hectares (15,000 sq.m). Volume of water?", options: ["75 cu. m", "750 cu. m", "7500 cu. m", "75000 cu. m"], ans: 1, logic: "Vol = Area * Depth = 15000 * 0.05 = 750 cu. m." },
+            { q: "Volume of a cube? I. Face area = 64. II. Side = 8.", options: ["A", "B", "C", "D", "E"], ans: 2, logic: "Statement I gives side=8, so Vol=8³. Statement II gives side=8. Either is sufficient." },
+            { q: "Reflex angle between hands of clock at 10:25?", options: ["180°", "192.5°", "195°", "197.5°"], ans: 3, logic: "Angle = |30h - 5.5m| = |30(10) - 5.5(25)| = |300 - 137.5| = 162.5°. Reflex = 360 - 162.5 = 197.5°." },
+            { q: "Between 4 and 5 o'clock, when will hands be opposite?", options: ["45 min past", "40 min past", "54 6/11 min past", "50 4/11 min past"], ans: 2, logic: "Opposite means 30 min apart. At 4:00, gap is 20 min. Need 10 more min gap. Time = 40 * (60/55) = 480/11 = 54 6/11 min." },
+            { q: "A 12% stock yielding 10% is quoted at:", options: ["83.33", "110", "112", "120"], ans: 3, logic: "Yield = (Dividend / Market Value) * 100 => 10 = (12 / MV) * 100 => MV = 120." },
+            { q: "Arrangements of 'DETAIL' so vowels occupy odd positions (1, 3, 5)?", options: ["32", "48", "36", "60"], ans: 2, logic: "Vowels (E,A,I) in 3 odd spots = 3!. Consonants (D,T,L) in 3 even spots = 3!. Total = 6 * 6 = 36." },
+            { q: "Two dice tossed. Prob that total score is prime?", options: ["1/6", "5/12", "1/2", "7/9"], ans: 1, logic: "Prime sums: 2, 3, 5, 7, 11. Outcomes: (1,1), (1,2), (2,1), (1,4), (4,1)... Total 15 outcomes. 15/36 = 5/12." },
+            { q: "Observer 1.6m tall, 20√3m from tower. Elevation 30°. Height of tower?", options: ["21.6 m", "23.2 m", "24.72 m", "None"], ans: 0, logic: "Tower = 1.6 + 20√3 * tan(30°) = 1.6 + 20√3 * (1/√3) = 1.6 + 20 = 21.6 m." },
+            { q: "Odd man out: 1, 4, 9, 16, 23, 25, 36", options: ["9", "23", "25", "36"], ans: 1, logic: "All are perfect squares except 23." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

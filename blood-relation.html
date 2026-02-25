@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Blood Relations</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f8faff;
+            --card: #ffffff;
+            --accent: #e67e22;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fffaf5; }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .sidebar {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            height: fit-content;
+            border-top: 5px solid var(--accent);
+            position: sticky;
+            top: 20px;
+        }
+
+        .symbol-key {
+            background: #fdf2e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="progress">Question 1 / 53</span>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <div class="question-text" id="qText"></div>
+        <div class="options-grid" id="options"></div>
+        <button class="btn-next" id="nextBtn" onclick="loadNext()">Next Question →</button>
+    </div>
+
+    <div class="sidebar">
+        <h3 style="color: var(--accent); margin-top:0;">Mapping Guide</h3>
+        <p style="font-size: 0.9rem;">Use these symbols to sketch the relation:</p>
+        <div class="symbol-key">
+            <strong>[ ]</strong> : Male<br>
+            <strong>( )</strong> : Female<br>
+            <strong>=</strong> : Married Couple<br>
+            <strong>|</strong> : Next Generation<br>
+            <strong>--</strong> : Siblings
+        </div>
+        <div id="hintBox" style="margin-top:20px; font-size: 0.85rem; color: #666; font-style: italic;"></div>
+    </div>
+</div>
+
+<script>
+const data = [
+    // TYPE 1: Pointing/Dialogue
+    { q: "Pointing to a photograph of a boy Suresh said, 'He is the son of the only son of my mother.' How is Suresh related to that boy?", opts: ["Brother", "Uncle", "Cousin", "Father"], ans: 3, hint: "The only son of Suresh's mother is Suresh himself." },
+    { q: "Introducing a boy, a girl said, 'He is the son of the daughter of the father of my uncle.' How is the boy related to the girl?", opts: ["Brother", "Nephew", "Uncle", "Son-in-law"], ans: 0, hint: "Father of uncle is grandfather. Daughter of grandfather is aunt or mother." },
+    { q: "Pointing to a photograph Lata says, 'He is the son of the only son of my grandfather.' How is the man in photograph related to Lata?", opts: ["Brother", "Uncle", "Cousin", "Data inadequate"], ans: 0, hint: "Grandfather's only son is Lata's father." },
+    { q: "Pointing to a photograph, Bajpai said, 'He is the son of the only daughter of the father of my brother.' How is Bajpai related to the man?", opts: ["Nephew", "Brother", "Father", "Maternal Uncle"], ans: 3, hint: "Father of brother is Bajpai's father. His only daughter is Bajpai's sister." },
+    { q: "Deepak said to Nitin, 'That boy playing football is the younger of the two brothers of the daughter of my father's wife.' How is the boy related to Deepak?", opts: ["Son", "Brother", "Cousin", "Brother-in-law"], ans: 1, hint: "Father's wife is Mother. Her daughter is Sister." },
+    { q: "Pointing a photograph X said to Y, 'She is the only daughter of the father of my mother.' How is X related to the person?", opts: ["Daughter", "Son", "Nephew", "Cannot be decided"], ans: 1, hint: "Father of mother is Grandfather. His only daughter is X's mother." },
+    { q: "Pointing to a woman, Abhijit said, 'Her granddaughter is the only daughter of my brother.' How is the woman related to Abhijit?", opts: ["Sister", "Grandmother", "Mother-in-law", "Mother"], ans: 3, hint: "Brother's daughter is Abhijit's niece. The woman is the grandmother of that niece." },
+    { q: "Amit said - 'This girl is the wife of the grandson of my mother'. How is Amit related to the girl?", opts: ["Brother", "Grandfather", "Husband", "Father-in-law"], ans: 3, hint: "Mother's grandson is Amit's son. Son's wife is Daughter-in-law." },
+    { q: "Pointing towards a man, a woman said, 'His mother is the only daughter of my mother.' How is the woman related to the man?", opts: ["Mother", "Grandmother", "Sister", "Daughter"], ans: 0, hint: "Only daughter of woman's mother is the woman herself." },
+    { q: "Introducing Sonia, Aamir says, 'She is the wife of only nephew of only brother of my mother.' How is Sonia related to Aamir?", opts: ["Wife", "Sister", "Sister-in-law", "Data inadequate"], ans: 0, hint: "Mother's brother is Uncle. His only nephew is Aamir." },
+    { q: "Pointing to Varman, Madhav said, 'I am the only son of one of the sons of his father.' How is Varman related to Madhav?", opts: ["Nephew", "Uncle", "Father or Uncle", "Father"], ans: 2, hint: "Madhav is the grandson of Varman's father." },
+    { q: "Introducing a woman, Shashank said, 'She is the mother of the only daughter of my son.' How is that woman related to Shashank?", opts: ["Daughter", "Sister-in-law", "Wife", "Daughter-in-law"], ans: 3, hint: "Mother of son's daughter is the son's wife." },
+    { q: "Pointing to a photograph Anjali said, 'He is the son of the only son of my grandfather.' How is the man related to Anjali?", opts: ["Brother", "Uncle", "Son", "Data inadequate"], ans: 0, hint: "Grandfather's only son is Father." },
+    { q: "Pointing to a person, Deepak said, 'His only brother is the father of my daughter's father'. How is the person related to Deepak?", opts: ["Father", "Grandfather", "Uncle", "Brother-in-law"], ans: 2, hint: "Daughter's father is Deepak himself. Deepak's father is the brother of the person." },
+    { q: "Introducing a man, a woman said, 'He is the only son of the mother of my mother.' How is the woman related to the man?", opts: ["Mother", "Sister", "Niece", "Maternal aunt"], ans: 2, hint: "Mother's mother's son is Maternal Uncle. Woman is his niece." },
+    { q: "Pointing to Gopi, Nalni says, 'I am the daughter of the only son of his grandfather.' How is Nalni related to Gopi?", opts: ["Niece", "Daughter", "Sister", "Cannot be determined"], ans: 2, hint: "The only son of Gopi's grandfather is Gopi's father." },
+    { q: "Pointing to a lady a person said, 'The son of her only brother is the brother of my wife.' How is the lady related to the person?", opts: ["Maternal aunt", "Grandmother", "Sister of father-in-law", "None"], ans: 2, hint: "Wife's brother is brother-in-law. His father is father-in-law. Lady is father-in-law's sister." },
+    { q: "Pointing to a girl Sandeep said, 'She is the daughter of the only sister of my father.' How is Sandeep related to the girl?", opts: ["Uncle", "Cousin", "Father", "Grandfather"], ans: 1, hint: "Father's sister is Aunt. Her daughter is Cousin." },
+    { q: "Pointing to a boy in the photograph Reena said, 'He is the only son of the only child of my grandfather.' How is Reena related to that boy?", opts: ["Mother", "Sister", "Aunt", "Cannot be determined"], ans: 1, hint: "Grandfather's only child is Reena's parent. Their only son is Reena's brother." },
+    { q: "Pointing towards a girl, Abhisek says, 'This girl is the daughter of only a child of my father.' What is relation of Abhisek's wife to that girl?", opts: ["Daughter", "Mother", "Aunt", "Sister"], ans: 1, hint: "Only child of father is Abhisek. The girl is his daughter." },
+    { q: "Anupam said to a lady, 'The only daughter of the brother of my wife is the sister-in-law of the brother of your sister.' How is the husband of the lady related to Anupam?", opts: ["Maternal uncle", "Uncle", "Father", "Son-in-law"], ans: 3, hint: "Complex relation: Lady is likely Anupam's daughter." },
+
+    // TYPE 2: Coded Relations
+    { q: "A + B = Mother; A - B = Brother; A % B = Father; A x B = Sister. Which shows P is maternal uncle of Q?", opts: ["Q-N+MxP", "P+SxN-Q", "P-M+NxQ", "Q-SxP"], ans: 2, hint: "P is brother of M, M is mother of N, N is sister of Q." },
+    { q: "A+B=Brother; A-B=Sister; AxB=Father. Which means C is the son of M?", opts: ["M-NxC+F", "F-C+NxM", "N+M-FxC", "MxN-C+F"], ans: 3, hint: "M is father of N, N is sister of C, C is brother of F." },
+    { q: "A+B=Brother; AxB=Son; A%B=Daughter (of A). Which means M is maternal uncle of N?", opts: ["M+OxN", "M%OxN+P", "M+O%N", "None"], ans: 2, hint: "M is brother of O, N is daughter of O." },
+    { q: "A+B=Father; A-B=Brother; A%B=Wife; AxB=Mother. Which shows M is maternal grandmother of T?", opts: ["MxN%S+T", "MxN-S%T", "MxS-N%T", "MxNxS%T"], ans: 0, hint: "M is mother of N, N is wife of S, S is father of T." },
+    { q: "A+B=Sister; AxB=Wife; A%B=Father; A-B=Brother. Which means T is daughter of P?", opts: ["PxQ%R+S-T", "PxQ%R-T+S", "PxQ%R+T-S", "PxQ%R+S+T"], ans: 1, hint: "P is wife of Q, Q is father of R, R is brother of T, T is sister of S." },
+    { q: "P$Q=Brother; P#Q=Mother; P*Q=Daughter. In A#B$C*D, who is the father?", opts: ["D", "B", "C", "Data inadequate"], ans: 0, hint: "A is mother of B, B is brother of C, C is daughter of D. So A and D are parents." },
+    { q: "A+B=Brother; A%B=Father; AxB=Sister. Which means M is uncle of P?", opts: ["M%NxP", "NxP%M", "M+S%R%P", "M+K%TxP"], ans: 3, hint: "M is brother of K, K is father of T, T is sister of P." },
+    { q: "A+B=Brother; AxB=Husband; A-B=Mother; A%B=Father. Which shows Q is grandmother of T?", opts: ["Q-P+R%T", "PxQ%R-T", "PxQ%R+T", "P+Q%R-T"], ans: 0, hint: "Q is mother of P, P is brother of R, R is father of T." },
+    { q: "A3P=Mother; A4P=Brother; A9P=Husband; A5P=Daughter. Which means K is mother-in-law of M?", opts: ["M9N3K4J", "M9N5K3J", "K5J9M3N", "K3J9N4M"], ans: 1, hint: "M is husband of N, N is daughter of K." },
+    { q: "P$Q=Father; P#Q=Mother; P*Q=Sister. N#L$P*Q shows what relation of Q to N?", opts: ["Grandson", "Granddaughter", "Nephew", "Data inadequate"], ans: 3, hint: "Gender of Q is not mentioned." },
+    { q: "A$B=Brother; A@B=Wife; A#B=Daughter; A*B=Father. Which shows U is father-in-law of P?", opts: ["P@Q$T#U*W", "P@W$Q*T#U", "P@Q$W*T#U", "P@Q$T#W*U"], ans: 0, hint: "P is wife of Q, Q is brother of T, T is daughter of U." },
+    { q: "B5D=Father; B9D=Sister; B4D=Brother; B3D=Wife. Which means F is mother of K?", opts: ["F3M5K", "F5M3K", "F9M4N3K", "F3M5N3K"], ans: 0, hint: "F is wife of M, M is father of K." },
+    { q: "A$B=Father; A#B=Sister; A*B=Daughter; A@B=Brother. Which indicates M is wife of Q?", opts: ["Q$R#T@M", "Q$R@T#M", "Q$R*T#M", "Q$R@T*M"], ans: 3, hint: "Q is father of R, R is brother of T, T is daughter of M." },
+    { q: "A$B=Brother; B*C=Son; C@D=Wife; A#D=Son. How is C related to A?", opts: ["Grandmother", "Aunt", "Aunt", "Mother"], ans: 3, hint: "A and B are sons of C and D." },
+    { q: "A*B=Sister; A$B=Mother; A+B=Brother; A=B=Father. Which means M is maternal uncle of N?", opts: ["M=P+Q*N", "N+P=Q*M", "N*P$Q*M", "None"], ans: 3, hint: "None of the expressions satisfy maternal uncle." },
+    { q: "MxN=Daughter; M+N=Father; M%N=Mother; M-N=Brother. P%Q+R-TxK indicates P to K?", opts: ["Daughter-in-law", "Sister-in-law", "Aunt", "None"], ans: 0, hint: "P is grandmother of T, K is T's parent." },
+    { q: "P+Q=Brother; PxQ=Father; P-Q=Sister. Which shows I is niece of K?", opts: ["K+Y+Z-I", "K+YxI-Z", "Z-IxY+K", "KxY+I-Z"], ans: 1, hint: "K is brother of Y, Y is father of I." },
+    { q: "A$B=Father; A#B=Mother; A*B=Sister; A@B=Husband. Which indicates N is grandmother of P?", opts: ["P*Q#M$N", "P@Q$M#N", "P#Q$N*M", "None"], ans: 0, hint: "P is sister of Q, Q is daughter of M, M is son of N." },
+    { q: "P+Q=Brother; PxQ=Wife; P%Q=Daughter. Which means D is uncle of A?", opts: ["A%BxC+D", "AxB+C%D", "A+C%BxD", "None"], ans: 0, hint: "A is daughter of B, B is wife of C, C is brother of D." },
+    { q: "X+Y=Daughter; X-Y=Brother; X%Y=Father; XxY=Sister. Which means I is niece of J?", opts: ["J-N%CxI", "IxC-N%J", "J+MxC%I", "IxC+N-J"], ans: 3, hint: "I is sister of C, C is daughter of N, N is sister of J." },
+    { q: "A+B=Mother; A-B=Sister; A*B=Father; ABetaB=Brother. Which means Q is grandfather of P?", opts: ["P+N*M*Q", "Q*N*M+P", "QBetaMBetaN*P", "None"], ans: 1, hint: "Q is father of N, N is father of M, M is mother of P." },
+    { q: "A+B=Mother; A-B=Sister; A*B=Father; ABetaB=Brother. Which means N is maternal uncle of M?", opts: ["NbetaP-L+E-M", "N-Y+ABetaM", "M-Y*P-N", "NBetaC+F*M"], ans: 0, hint: "N is brother of P, P is sister of L, L is mother of E." },
+    { q: "M%N=Son; M@N=Sister; M$N=Father. Which shows C is granddaughter of E?", opts: ["C%B$F$E", "B$F$E%C", "C@B%F%E", "E%B$F$C"], ans: 2, hint: "C is sister of B, B is son of F, F is son of E." },
+    { q: "M%N=Son; M@N=Sister; M$N=Father. Which shows S is father of Q?", opts: ["S@P$Q", "Q@P%S", "Q$S@P", "None"], ans: 1, hint: "Q is sister of P, P is son of S." },
+
+    // TYPE 3: General Logic / Data Sufficiency
+    { q: "A is brother of B; B is sister of C; C is father of D. How is D related to A?", opts: ["Brother", "Sister", "Nephew", "Cannot be determined"], ans: 3, hint: "Gender of D is not mentioned." },
+    { q: "Veena is sister-in-law of Ashok and daughter-in-law of Kalyani. Dheeraj is father of Sudeep (only brother of Ashok). How is Kalyani related to Ashok?", opts: ["Mother-in-law", "Aunt", "Wife", "None"], ans: 3, hint: "Kalyani is the mother of Ashok." },
+    { q: "If D is brother of B, how is B related to C? Needed: (1) Son of D is grandson of C. (2) B is sister of D.", opts: ["Only 1", "Only 2", "Either 1 or 2", "1 and 2 both"], ans: 3, hint: "Need (1) to connect to C and (2) to know B's gender." },
+    { q: "A and B are children of D. Who is the father of A? Needed: (1) C is brother of A and son of E. (2) F is mother of B.", opts: ["Only 1", "Only 2", "Either 1 or 2", "1 and 2 both"], ans: 1, hint: "If F is mother of children A and B, then D must be the father." },
+    { q: "A's son B is married to C whose sister D is married to E (brother of B). How is D related to A?", opts: ["Sister", "Daughter-in-law", "Sister-in-law", "Cousin"], ans: 1, hint: "D is the wife of A's son E." },
+    { q: "P is mother of K; K is sister of D; D is father of J. How is P related to J?", opts: ["Mother", "Grandmother", "Aunt", "Data inadequate"], ans: 1, hint: "P is the mother of J's father D." },
+    { q: "A is son of C; C and Q are sisters; Z is mother of Q; P is son of Z. Which is true?", opts: ["P/A are cousins", "P is maternal uncle of A", "Q is mat. grandfather", "C and P are sisters"], ans: 1, hint: "P is the brother of A's mother C." },
+    { q: "M is father of N (son of V). To know M to P relation, needed: (1) P is brother of V. (2) Daughter of N is granddaughter of V.", opts: ["Only 1", "Only 2", "Either 1 or 2", "1 and 2 both"], ans: 0, hint: "V is N's mother. P is V's brother, so P is M's brother-in-law." }
+];
+
+let currentIdx = 0;
+
+function render() {
+    const q = data[currentIdx];
+    document.getElementById('progress').innerText = `Question ${currentIdx + 1} / ${data.length}`;
+    document.getElementById('qText').innerText = q.q;
+    document.getElementById('hintBox').innerText = "Hover or click an option to see logic later.";
+    
+    const optArea = document.getElementById('options');
+    optArea.innerHTML = '';
+    
+    q.opts.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = text;
+        btn.onclick = () => check(i, q.ans, btn);
+        optArea.appendChild(btn);
+    });
+    
+    document.getElementById('nextBtn').style.display = 'none';
+}
+
+function check(idx, correct, btn) {
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if(idx === correct) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+    }
+    document.getElementById('hintBox').innerHTML = `<strong>Explanation:</strong> ${data[currentIdx].hint}`;
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function loadNext() {
+    if(currentIdx < data.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        alert("You have completed all Blood Relation questions!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

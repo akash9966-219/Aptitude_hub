@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Essential Part - Logical Reasoning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #fdfaf6;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            border-top: 6px solid var(--accent);
+        }
+
+        .instruction {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .target-word {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-transform: lowercase;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            padding: 18px;
+            border: 1px solid #eee;
+            background: #fff;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #fffaf5; }
+        .opt-btn.selected { border-color: var(--accent); background: #fff5eb; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress { color: #7f8c8d; font-weight: bold; }
+
+        @media (max-width: 500px) {
+            .options-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <span class="instruction">Select the part that is essential to:</span>
+        <div id="target" class="target-word"></div>
+        <div id="options" class="options-list"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress">Question 1</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="verify()">Check</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    // Set 1
+    { q: "harvest", opts: ["autumn", "stockpile", "tractor", "crop"], ans: "crop" },
+    { q: "desert", opts: ["cactus", "arid", "oasis", "flat"], ans: "arid" },
+    { q: "book", opts: ["fiction", "pages", "pictures", "learning"], ans: "pages" },
+    { q: "language", opts: ["tongue", "slang", "writing", "words"], ans: "words" },
+    { q: "school", opts: ["student", "report card", "test", "learning"], ans: "learning" },
+    { q: "pain", opts: ["cut", "burn", "nuisance", "hurt"], ans: "hurt" },
+    { q: "gala", opts: ["celebration", "tuxedo", "appetizer", "orator"], ans: "celebration" },
+    { q: "monopoly", opts: ["corrupt", "exclusive", "rich", "gigantic"], ans: "exclusive" },
+    { q: "guitar", opts: ["band", "teacher", "songs", "strings"], ans: "strings" },
+    { q: "election", opts: ["president", "voter", "November", "nation"], ans: "voter" },
+    { q: "shoe", opts: ["sole", "leather", "laces", "walking"], ans: "sole" },
+    { q: "swimming", opts: ["pool", "bathing suit", "water", "life jacket"], ans: "water" },
+    { q: "lightning", opts: ["electricity", "thunder", "brightness", "rain"], ans: "electricity" },
+    // Set 2
+    { q: "ovation", opts: ["outburst", "bravo", "applause", "encore"], ans: "applause" },
+    { q: "bonus", opts: ["reward", "raise", "cash", "employer"], ans: "reward" },
+    { q: "antique", opts: ["rarity", "artifact", "aged", "prehistoric"], ans: "aged" },
+    { q: "culture", opts: ["civility", "education", "agriculture", "customs"], ans: "customs" },
+    { q: "knowledge", opts: ["school", "teacher", "textbook", "learning"], ans: "learning" },
+    { q: "domicile", opts: ["tenant", "dwelling", "kitchen", "house"], ans: "dwelling" },
+    { q: "vertebrate", opts: ["backbone", "reptile", "mammal", "animal"], ans: "backbone" },
+    { q: "itinerary", opts: ["map", "route", "travel", "guidebook"], ans: "route" },
+    { q: "orchestra", opts: ["violin", "stage", "musician", "soloist"], ans: "musician" },
+    { q: "facsimile", opts: ["picture", "image", "mimeograph", "copier"], ans: "image" },
+    { q: "provisions", opts: ["groceries", "supplies", "gear", "caterers"], ans: "supplies" },
+    { q: "sustenance", opts: ["nourishment", "water", "grains", "menu"], ans: "nourishment" },
+    { q: "infirmary", opts: ["surgery", "disease", "patient", "receptionist"], ans: "patient" },
+    { q: "purchase", opts: ["trade", "money", "bank", "acquisition"], ans: "acquisition" },
+    { q: "dimension", opts: ["compass", "ruler", "inch", "measure"], ans: "measure" },
+    // Set 3
+    { q: "wedding", opts: ["love", "church", "ring", "marriage"], ans: "marriage" },
+    { q: "faculty", opts: ["buildings", "textbooks", "teachers", "meetings"], ans: "teachers" },
+    { q: "recipe", opts: ["desserts", "directions", "cookbook", "utensils"], ans: "directions" },
+    { q: "autograph", opts: ["athlete", "actor", "signature", "pen"], ans: "signature" },
+    { q: "cage", opts: ["enclosure", "prisoner", "animal", "zoo"], ans: "enclosure" },
+    { q: "champion", opts: ["running", "swimming", "winning", "speaking"], ans: "winning" },
+    { q: "saddle", opts: ["horse", "seat", "stirrups", "horn"], ans: "seat" },
+    { q: "dome", opts: ["rounded", "geodesic", "governmental", "coppery"], ans: "rounded" },
+    { q: "glacier", opts: ["mountain", "winter", "prehistory", "ice"], ans: "ice" },
+    { q: "directory", opts: ["telephone", "listing", "computer", "names"], ans: "listing" },
+    { q: "contract", opts: ["agreement", "document", "written", "attorney"], ans: "agreement" },
+    { q: "hurricane", opts: ["beach", "cyclone", "damage", "wind"], ans: "wind" },
+    { q: "town", opts: ["residents", "skyscrapers", "parks", "libraries"], ans: "residents" },
+    { q: "vibration", opts: ["motion", "electricity", "science", "sound"], ans: "motion" }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `Question ${idx + 1} of ${data.length}`;
+    document.getElementById('target').innerText = item.q;
+    
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    item.opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = o;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        box.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function verify() {
+    if (!selected) return alert("Select an essential part!");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('correct');
+        if (b.innerText === selected && selected !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Essential Part practice complete!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

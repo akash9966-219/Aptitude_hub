@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs - Banking 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --bg: #eff6ff;
+            --card: #ffffff;
+            --accent: #3b82f6;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --text: #172554;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .back-link { text-decoration: none; color: var(--accent); font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--accent);
+        }
+
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #bfdbfe; padding-bottom: 10px; }
+        .q-text { font-size: 1.15rem; font-weight: 600; line-height: 1.5; margin-bottom: 25px; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt-btn { padding: 16px; border: 2px solid #bfdbfe; border-radius: 10px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s; }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #eff6ff; }
+        .opt-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
+
+        .explanation { margin-top: 25px; padding: 20px; background: #eff6ff; border-radius: 10px; border-left: 5px solid var(--accent); display: none; }
+        .controls { display: flex; justify-content: space-between; margin-top: 30px; gap: 10px;}
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; flex: 1; text-align: center;}
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="currentaffairs.html" class="back-link">← Back to GK Portal</a>
+
+    <div class="quiz-card">
+        <div class="q-header">
+            <span style="font-weight:bold; color:var(--primary)">Topic: Banking & Finance</span>
+            <span id="q-count">Question 1 / 55</span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div id="opt-container" class="options-grid"></div>
+        <div id="exp-box" class="explanation"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="move(-1)" id="prev-btn">Previous</button>
+            <button class="btn" onclick="move(1)" id="next-btn" style="background:var(--accent);">Next Question</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const bankingQuestions = [
+    { q: "Which bank became the first in India to issue a fully digital Foreign Portfolio Investor (FPI) licence using an end-to-end online process with e-signatures?", opts: ["State Bank of India", "HDFC Bank", "ICICI Bank", "Kotak Mahindra Bank"], ans: 3, exp: "Kotak Mahindra Bank became the first custodian in India to enable FPI registration entirely via electronic signatures, aligning with SEBI's digital transformation agenda." },
+    { q: "Which Indian private sector bank received RBI approval for Blackstone’s acquisition of up to a 9.99% stake?", opts: ["ICICI Bank", "Axis Bank", "Federal Bank", "IndusInd Bank"], ans: 3, exp: "The RBI granted approval to the global investment firm Blackstone to acquire a significant minority stake in IndusInd Bank." },
+    { q: "Which bank partnered with Tripura Gramin Bank to launch India’s first RRB co-branded RuPay Credit Card?", opts: ["State Bank of India", "Bank of Baroda", "Canara Bank", "Punjab National Bank"], ans: 3, exp: "Punjab National Bank (PNB) partnered with Tripura Gramin Bank to enhance rural credit penetration." },
+    { q: "Which asset management company partnered with the Central Bank of India to distribute mutual fund products?", opts: ["SBI Mutual Fund", "HDFC Asset Management", "HSBC", "ICICI Prudential"], ans: 3, exp: "ICICI Prudential AMC tied up with Central Bank of India to leverage its extensive branch network for mutual fund distribution." },
+    { q: "Which bank launched the premium LUXURA Metal Credit Card on the VISA Infinite platform?", opts: ["State Bank of India", "Punjab National Bank", "Bank of Baroda", "ICICI Bank"], ans: 0, exp: "SBI Card introduced the LUXURA Metal Credit Card to cater to premium lifestyle and travel needs." },
+    { q: "Which bank launched CHAKRA, a Centre of Excellence to promote financing for sunrise sectors under Viksit Bharat 2047?", opts: ["Reserve Bank of India", "State Bank of India", "Punjab National Bank", "Bank of Baroda"], ans: 1, exp: "SBI launched CHAKRA to focus on deep-tech, green energy, and other sunrise sectors." },
+    { q: "Which bank has adopted HyperVerge’s AI-powered Video KYC solution to enhance digital onboarding and regulatory compliance?", opts: ["AU Small Finance Bank", "Ujjivan Small Finance Bank", "Equitas Small Finance Bank", "Suryoday Small Finance Bank"], ans: 0, exp: "AU Small Finance Bank integrated this AI solution for seamless customer onboarding." },
+    { q: "Which bank partnered with India Infrastructure Finance Company Ltd (IIFCL) to boost infrastructure financing in India?", opts: ["State Bank of India", "Punjab National Bank", "Bank of Baroda", "Canara Bank"], ans: 0, exp: "SBI partnered with IIFCL to co-finance major infrastructure projects." },
+    { q: "Which bank has enabled Khajane‑2 e-receipt payments for Karnataka Government through its Internet banking platform?", opts: ["State Bank of India", "ICICI Bank", "HDFC Bank", "Karnataka Bank"], ans: 3, exp: "Karnataka Bank integrated with the state's Khajane-2 portal for seamless tax and non-tax payments." },
+    { q: "Which bank won the IBA Banking Technology Award 2026 for Best Fintech & DPI Adoption?", opts: ["Karnataka Bank", "State Bank of India", "HDFC Bank", "ICICI Bank"], ans: 0, exp: "Karnataka Bank was recognized for its excellent integration of Digital Public Infrastructure." },
+    { q: "Which Indian state’s regional rural bank launched the country’s first fully solar-powered ATM van?", opts: ["Assam", "Tripura", "Meghalaya", "Manipur"], ans: 2, exp: "Meghalaya Rural Bank launched a solar-powered ATM van to reach unbanked hilly terrains." },
+    { q: "Which bank launched the new brand identity named ‘Fortuna Wave’ to position itself as a digital-first, pan-India institution?", opts: ["ICICI Bank", "Federal Bank", "Axis Bank", "Kotak Mahindra Bank"], ans: 1, exp: "Federal Bank unveiled 'The Fortuna Wave' as part of its brand modernization strategy." },
+    { q: "Which bank launched the ‘Safety Centre’ on its mobile banking app to enhance customer control over digital banking security?", opts: ["Axis Bank", "HDFC Bank", "ICICI Bank", "State Bank of India"], ans: 2, exp: "ICICI Bank introduced the Safety Centre to help users easily manage limits and block cards." },
+    { q: "Which Indian private sector bank unveiled its refreshed brand identity called ‘The Fortuna Wave’ in January 2026, emphasizing modernization and digital banking?", opts: ["HDFC Bank", "ICICI Bank", "Axis Bank", "Federal Bank"], ans: 3, exp: "Federal Bank refreshed its brand with 'The Fortuna Wave' to appeal to a younger, digital-native demographic." },
+    { q: "Which bank launched the ‘Zero-Forex Diamond Reserve Credit Card’ offering zero foreign exchange markup along with travel and lifestyle benefits?", opts: ["HDFC Bank", "ICICI Bank", "Axis Bank", "IDFC FIRST Bank"], ans: 3, exp: "IDFC FIRST Bank launched this card targeting frequent international travelers." },
+    { q: "Which bank received approval from the Reserve Bank of India to acquire up to a 9.5% stake in IndusInd Bank?", opts: ["ICICI Bank", "HDFC Bank", "State Bank of India", "Axis Bank"], ans: 1, exp: "HDFC Bank received RBI clearance to acquire up to a 9.5% stake in IndusInd Bank." },
+    { q: "Which institution, along with the Government of India, launched the #OneRRBOneLogo initiative to provide a unified brand identity to all Regional Rural Banks?", opts: ["Reserve Bank of India", "Ministry of Finance", "State Bank of India", "NABARD"], ans: 3, exp: "NABARD launched the initiative to give a standard, recognizable face to all RRBs in India." },
+    { q: "Which bank launched the Global Savings Account in USD and Euro for NRIs through GIFT City, offering features like full repatriability and zero remittance fees?", opts: ["IDFC FIRST Bank", "State Bank of India", "HDFC Bank", "Axis Bank"], ans: 3, exp: "Axis Bank launched this specialized account out of the IFSC in GIFT City." },
+    { q: "Which bank has acquired a 50% stake in the Indian Digital Payment Intelligence Corporation (IDPIC) to combat digital payment frauds?", opts: ["SBI", "HDFC Bank", "ICICI Bank", "Axis Bank"], ans: 0, exp: "SBI and Bank of Baroda partnered to establish IDPIC to secure the digital payment ecosystem." },
+    { q: "Which banking institution was honoured as the Global Bank of the Year 2025 by The Banker, recognizing excellence in digital innovation, financial performance, and global leadership?", opts: ["HSBC", "DBS", "Standard Chartered", "Citibank"], ans: 1, exp: "DBS Bank was globally recognized for its digital-first approach and strong financial metrics." },
+    { q: "Which payments bank became the first to receive RBI’s in-principle approval to convert into a Small Finance Bank (SFB)?", opts: ["Paytm Payments Bank", "India Post Payments Bank", "Airtel Payments Bank", "Fino Payments Bank"], ans: 3, exp: "Fino Payments Bank became the first to successfully transition from a payments bank to an SFB." },
+    { q: "Which bank, along with SBI, signed an MoU to collaborate on a Centre of Excellence in Strategic Partnership for project financing?", opts: ["Punjab National Bank", "Canara Bank", "Bank of India", "Union Bank of India"], ans: 1, exp: "Canara Bank partnered with SBI for large-scale consortium project financing." },
+    { q: "Which bank appointed Harmanpreet Kaur as its first-ever female brand ambassador?", opts: ["Bank of Baroda", "State Bank of India", "Punjab National Bank", "Canara Bank"], ans: 0, exp: "Bank of Baroda brought on the Indian women's cricket captain as their brand ambassador." },
+    { q: "Under which Article does the Constitution (131st Amendment) Bill, 2025 propose to place Chandigarh for governance through Presidential regulations?", opts: ["Article 239", "Article 240", "Article 243", "Article 244"], ans: 1, exp: "The amendment proposes bringing Chandigarh under Article 240 for specific regulatory oversight." },
+    { q: "Which Indian bank became the first to cross both USD 100 billion in market capitalisation and ₹100 trillion in total business?", opts: ["HDFC Bank", "ICICI Bank", "Axis Bank", "State Bank of India"], ans: 0, exp: "HDFC Bank achieved this massive dual milestone following its merger with HDFC Ltd." },
+    { q: "The newly launched ‘SBI-STAR’ Awards by the State Bank of India are primarily aimed at recognizing which aspect of its workforce?", opts: ["Employee Talents", "Financial Performance", "Customer Service Efficiency", "Technological Innovation"], ans: 0, exp: "The SBI-STAR awards recognize and encourage non-banking talents and extracurricular achievements of its staff." },
+    { q: "Which bank executed its first gold trade as a Special Category Client (SCC) on the India International Bullion Exchange (IIBX)?", opts: ["Punjab National Bank", "HDFC Bank", "Bank of Baroda", "SBI"], ans: 3, exp: "SBI became a major participant in IIBX to streamline bullion trading." },
+    { q: "From which date will the new nomination rules under the Banking Laws (Amendment) Act, 2025 come into effect?", opts: ["November 1", "August 1", "December 1", "October 15"], ans: 0, exp: "The new rules allowing up to 4 nominees will be effective from November 1." },
+    { q: "What key feature does the new UPI innovation ‘Pay with Mutual Fund’ primarily enable for users?", opts: ["Scheduled Bill Payments", "Recurring Deposits", "Instant Transactions", "Credit-Based Payments"], ans: 2, exp: "It allows users to pledge their mutual fund holdings to conduct instant UPI transactions." },
+    { q: "Which Indian bank was awarded the title of 'World’s Best Consumer Bank 2025' by Global Finance?", opts: ["SBI", "HDFC Bank", "ICICI Bank", "Axis Bank"], ans: 0, exp: "SBI won the award for its massive retail reach and integration of the YONO platform." },
+    { q: "Which bank is implementing Automatic Number Plate Recognition (ANPR)-based Multi-Lane Free Flow (MLFF) tolling on NH-48?", opts: ["State Bank of India", "HDFC Bank", "Jio Payments Bank", "ICICI Bank"], ans: 3, exp: "ICICI Bank is pioneering barrier-less tolling technology on key national highways." },
+    { q: "Which bank launched the “My Business QR” initiative to provide small merchants with a digital storefront and QR-based commerce identity?", opts: ["ICICI Bank", "Axis Bank", "State Bank of India", "HDFC Bank"], ans: 1, exp: "Axis Bank launched this to empower SMEs with a unique digital commerce identity." },
+    { q: "Which bank launched the ‘Innovation Banking’ initiative with a USD 1 billion allocation to support Indian startups?", opts: ["HDFC Bank", "ICICI Bank", "Axis Bank", "HSBC India"], ans: 3, exp: "HSBC India allocated USD 1 billion to lend to high-growth tech startups." },
+    { q: "What regulatory action did the Reserve Bank of India (RBI) take against Datta Finance and Trading Pvt Ltd due to violations in digital lending operations?", opts: ["NBFC Licence", "Banking Licence", "SEBI Registration", "GST Registration"], ans: 0, exp: "The RBI canceled its NBFC license due to coercive recovery practices and high interest rates." },
+    { q: "What global rank did Kotak811 achieve in banking app downloads during the first half of 2025?", opts: ["1st", "2nd", "3rd", "4th"], ans: 1, exp: "Kotak811 became the 2nd most downloaded digital banking app globally in H1 2025." },
+    { q: "Which bank signed an MoU with TCIL to enhance IT infrastructure and accelerate digital banking services?", opts: ["State Bank of India", "Punjab National Bank", "Bank of Baroda", "Canara Bank"], ans: 1, exp: "PNB partnered with Telecommunications Consultants India Ltd for its digital transformation." },
+    { q: "Which bank signed a ₹21,000 crore MoU with the Rajasthan government under the Rising Rajasthan initiative?", opts: ["State Bank of India", "Bank of Baroda", "Canara Bank", "Punjab National Bank"], ans: 0, exp: "SBI committed immense capital to fund infrastructure and industrial projects in Rajasthan." },
+    { q: "Which bank signed an MoU with DPIIT to support startups under the Startup India initiative?", opts: ["ICICI Bank", "HDFC Bank", "Axis Bank", "State Bank of India"], ans: 1, exp: "HDFC Bank collaborated with the Department for Promotion of Industry and Internal Trade." },
+    { q: "Which Indian IT company has partnered with Mastercard to integrate Mastercard Move into its Finacle platform for faster cross-border payments?", opts: ["Infosys", "Wipro", "HCLTech", "Tech Mahindra"], ans: 0, exp: "Infosys integrated the solution into Finacle to streamline international money transfers." },
+    { q: "In which city did Punjab National Bank inaugurate its first startup focused branch?", opts: ["Mumbai", "Bengaluru", "Hyderabad", "New Delhi"], ans: 1, exp: "PNB opened its specialized branch in Bengaluru, the startup capital of India." },
+    { q: "Which bank became the first public sector bank in India to migrate its corporate website to the secure ‘.bank.in’ domain?", opts: ["Bank of Baroda", "Punjab National Bank", "Canara Bank", "Indian Bank"], ans: 0, exp: "Bank of Baroda migrated to the exclusive top-level domain for enhanced cybersecurity." },
+    { q: "Which bank has inaugurated a Centre of Excellence for MSMEs in Gurugram?", opts: ["Punjab National Bank", "State Bank of India", "Bank of Baroda", "HDFC Bank"], ans: 0, exp: "PNB set up this CoE to provide specialized advisory and credit facilities to MSMEs." },
+    { q: "Which bank launched a collateral-free personal loan scheme of up to ₹4 lakh for Agniveers on India’s 79th Independence Day?", opts: ["Bank of Baroda", "HDFC Bank", "ICICI Bank", "State Bank of India"], ans: 3, exp: "SBI launched this tailored financial product specifically for returning Agniveers." },
+    { q: "Which bank recently reduced its minimum average balance requirement for new urban savings accounts to ₹15,000 after facing public backlash?", opts: ["Axis Bank", "HDFC Bank", "ICICI Bank", "State Bank of India"], ans: 1, exp: "HDFC Bank revised the requirement following customer feedback." },
+    { q: "Which bank has introduced global UPI services through its bob इ Pay app?", opts: ["State Bank of India", "Bank of Baroda", "Punjab National Bank", "Canara Bank"], ans: 1, exp: "Bank of Baroda integrated cross-border UPI functionality in its primary mobile app." },
+    { q: "Which bank launched the zero-fee digital remittance platform RemitFIRST2India for NRIs?", opts: ["IDFC FIRST Bank", "HDFC Bank", "ICICI Bank", "Axis Bank"], ans: 0, exp: "IDFC FIRST Bank introduced this platform to make inward remittances cheaper." },
+    { q: "Which bank has launched the ‘Lock FD’ feature to protect customers from digital banking fraud?", opts: ["HDFC Bank", "Axis Bank", "ICICI Bank", "Kotak Mahindra Bank"], ans: 3, exp: "Kotak Mahindra Bank launched a feature preventing premature withdrawal of FDs via digital channels without secondary verification." },
+    { q: "Which bank has sharply increased its Minimum Average Balance requirements across all branch categories effective August 2025?", opts: ["ICICI Bank", "HDFC Bank", "Axis Bank", "Kotak Mahindra Bank"], ans: 2, exp: "Axis Bank updated its tariff structure, requiring higher average balances." },
+    { q: "Which bank has become the first Small Finance Bank in India to receive the RBI’s in-principle approval for conversion into a Universal Bank?", opts: ["Ujjivan Small Finance Bank", "Equitas Small Finance Bank", "AU Small Finance Bank", "Suryoday Small Finance Bank"], ans: 2, exp: "AU Small Finance Bank successfully met all the regulatory criteria to transition into a Universal Bank." },
+    { q: "Which bank received RBI approval for Warburg Pincus to acquire up to a 9.99% stake?", opts: ["HDFC Bank", "Axis Bank", "IDFC First Bank", "ICICI Bank"], ans: 2, exp: "IDFC First Bank received regulatory clearance for this major private equity investment." },
+    { q: "Which bank was named the World’s Best Consumer Bank for 2025 by Global Finance magazine?", opts: ["HDFC Bank", "State Bank of India", "ICICI Bank", "Bank of Baroda"], ans: 1, exp: "State Bank of India took home this prestigious global award." },
+    { q: "Which bank raised ₹25,000 crore through India’s largest-ever Qualified Institutional Placement (QIP) in July 2025?", opts: ["SBI", "HDFC Bank", "ICICI Bank", "Axis Bank"], ans: 0, exp: "SBI successfully executed the historic capital raise." },
+    { q: "Who was appointed as the interim MD and CEO of Karnataka Bank starting from 16 July 2025?", opts: ["Srikrishnan Hari Hara Sarma", "Sekhar Rao", "Raghavendra S Bhat", "Anand Subramanian"], ans: 1, exp: "Sekhar Rao assumed interim leadership following the expiration of the previous MD's term." },
+    { q: "Which platform must be used for all Indian government payments above ₹75 crore starting July 16, 2025?", opts: ["BharatPay", "e-Kuber", "DigiPay", "SBI Yono"], ans: 1, exp: "The RBI mandated the use of its core banking system, e-Kuber, for massive government transactions." },
+    { q: "Which bank reduced its one-year MCLR to 9% and removed minimum balance penalties starting July 7, 2025?", opts: ["State Bank of India", "Bank of Baroda", "Punjab National Bank", "Indian Bank"], ans: 2, exp: "Punjab National Bank implemented these changes to become more competitive in the retail segment." }
+];
+
+let currentQ = 0;
+
+function load() {
+    const q = bankingQuestions[currentQ];
+    document.getElementById('q-count').innerText = `Question ${currentQ + 1} / ${bankingQuestions.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    const container = document.getElementById('opt-container');
+    container.innerHTML = '';
+    
+    q.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => check(i, btn);
+        container.appendChild(btn);
+    });
+    
+    document.getElementById('exp-box').style.display = 'none';
+    document.getElementById('prev-btn').disabled = currentQ === 0;
+    document.getElementById('next-btn').disabled = currentQ === bankingQuestions.length - 1;
+}
+
+function check(idx, btn) {
+    const correct = bankingQuestions[currentQ].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if(idx === correct) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+    }
+    
+    document.getElementById('exp-box').innerHTML = `<strong>Financial Insight:</strong> ${bankingQuestions[currentQ].exp}`;
+    document.getElementById('exp-box').style.display = 'block';
+}
+
+function move(step) {
+    currentQ += step;
+    load();
+}
+
+load();
+</script>
+</body>
+</html>

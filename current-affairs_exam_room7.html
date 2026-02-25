@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Current Affairs Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e292b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit { background: var(--accent); color: white; display: block; width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 800; border-radius: 15px; cursor: pointer; border: none; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; text-align: center; text-decoration: none; padding: 20px; border-radius: 15px; font-weight: 800; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Excellent focus! You're keeping up with the 2026 global landscape.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Current Affairs Test 7</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 7</button>
+        <a href="test7.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+      const questions = [
+    { q: "Who has been appointed as the new CEO of Nayara Energy, effective September 2025?", options: ["Alessandro Des Dorides", "Teymur Abasguliyev", "Sergey Denisov", "Kesani Enterprises nominee"], ans: 1, logic: "Teymur Abasguliyev, a seasoned energy leader from SOCAR Türkiye, was appointed CEO to succeed Alessandro Des Dorides." },
+    { q: "Which company partnered with Engineers India Limited (EIL) to collaborate on onshore projects in Saudi Arabia?", options: ["NMDC Energy", "Saudi Aramco", "ADNOC Energy", "Reliance Industries"], ans: 0, logic: "EIL signed an MoU with UAE-based NMDC Energy at ADIPEC 2025 to focus on energy infrastructure in Saudi Arabia." },
+    { q: "Which company partnered with the Government of India to create 2.5 lakh job opportunities annually via the NCS portal?", options: ["Zomato", "Swiggy", "Ola", "Amazon"], ans: 0, logic: "Zomato signed an MoU with the Ministry of Labour & Employment in October 2025 to list gig work opportunities on the National Career Service portal." },
+    { q: "Which company will build the BvS10 Sindhu all-terrain armoured vehicles for the Indian Army?", options: ["L&T", "Tata Advanced Systems", "Bharat Forge", "Mahindra Defence"], ans: 0, logic: "Larsen & Toubro (L&T) partnered with BAE Systems to indigenously produce the BvS10 Sindhu at its Hazira facility." },
+    { q: "Which country participated alongside India in the 4th edition of Naval Exercise Bongosagar 2025?", options: ["Sri Lanka", "Myanmar", "Thailand", "Bangladesh"], ans: 3, logic: "The India-Bangladesh Naval Exercise Bongosagar 2025 was conducted in the Bay of Bengal in March 2025." },
+    { q: "Which senior IDAS officer took charge as the Financial Advisor (Defence Services) on November 1, 2025?", options: ["Sanjay Verma", "Raj Kumar Arora", "Deepak Mittal", "Anil Khanna"], ans: 1, logic: "Raj Kumar Arora, a 1990-batch IDAS officer, assumed the role of Financial Advisor (Defence Services)." },
+    { q: "With which country did India sign key defence agreements in October 2025 to enhance military cooperation?", options: ["Japan", "France", "United States", "Australia"], ans: 2, logic: "India and the US signed significant agreements to bolster the Major Defence Partnership and Indo-Pacific security." },
+    { q: "During which period is World Interfaith Harmony Week observed each year?", options: ["January 15th to 21st", "February 10th to 16th", "February 1st to 7th", "March 1st to 7th"], ans: 2, logic: "The UN observes World Interfaith Harmony Week annually from February 1 to 7." },
+    { q: "On which date is the International Day for Preventing the Exploitation of the Environment in War observed?", options: ["November 5", "November 7", "November 6", "November 8"], ans: 2, logic: "This UN-designated day is observed globally every year on November 6." },
+    { q: "On which date is Engineers Day 2025 celebrated in India to honour Sir M. Visvesvaraya?", options: ["August 29", "October 2", "January 15", "September 15"], ans: 3, logic: "National Engineers Day is celebrated in India every year on September 15." },
+    { q: "On which date will India observe National Epilepsy Day in 2025?", options: ["November 15", "November 19", "November 17", "November 21"], ans: 2, logic: "National Epilepsy Day is observed in India on November 17 to raise awareness about the condition." },
+    { q: "On which date will Ayurveda Day 2025 be celebrated (not tied to Dhanteras for the first time)?", options: ["October 29", "September 23", "November 2", "September 30"], ans: 1, logic: "The Ministry of Ayush announced that Ayurveda Day will now be observed on the fixed date of September 23." },
+    { q: "In which country did India achieve a kabaddi double at the 2025 Asian Youth Games?", options: ["Qatar", "UAE", "Bahrain", "Saudi Arabia"], ans: 0, logic: "India's U-18 teams won gold in both boys' and girls' categories at the games held in Doha, Qatar." },
+    { q: "Who won the Seychelles presidential election in October 2025?", options: ["Patrick Herminie", "Wavel Ramkalawan", "Danny Faure", "Vincent Meriton"], ans: 0, logic: "Opposition leader Patrick Herminie of the United Seychelles Party won with 52.7% of the vote." },
+    { q: "The MY Bharat Mobile App launched by Union Minister Dr. Mansukh Mandaviya is primarily for:", options: ["Rural Development", "Digital Inclusion", "Youth Empowerment", "Women Entrepreneurship"], ans: 2, logic: "The app acts as a one-stop digital platform for youth development and volunteerism." },
+    { q: "Where has India launched its first Integrative Oncology Research and Care Centre (IORCC)?", options: ["Kerala", "Goa", "Karnataka", "Maharashtra"], ans: 1, logic: "The IORCC, combining Ayurveda and modern cancer care, was inaugurated at AIIA in Dhargal, Goa." },
+    { q: "In which city was the 60th DGP–IGP Conference 2025 chaired by Prime Minister Narendra Modi?", options: ["Raipur", "Bhopal", "Lucknow", "Patna"], ans: 0, logic: "The 60th All India Conference of Director Generals and Inspector Generals of Police was held in Raipur, Chhattisgarh." },
+    { q: "Which state achieved a Guinness World Record by distributing 5,555 e-cycles to women in 24 hours?", options: ["Andhra Pradesh", "Telangana", "Karnataka", "Tamil Nadu"], ans: 0, logic: "Andhra Pradesh's Chittoor district set the record in January 2026 under the leadership of CM N. Chandrababu Naidu." },
+    { q: "Which Indian state hosted the India Energy Week (IEW) 2026?", options: ["Gujarat", "Goa", "Maharashtra", "Kerala"], ans: 1, logic: "Following the 2024 success, Goa once again hosted the premier global energy event, India Energy Week 2026." },
+    { q: "Which city is the first in India to implement a Real-Time Flood Forecasting and Spatial Decision Support System?", options: ["Mumbai", "Kolkata", "Bengaluru", "Chennai"], ans: 3, logic: "Chennai operationalized this advanced World Bank-funded system to manage extreme flood occurrences." }
+];
+    
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Key Fact:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>
