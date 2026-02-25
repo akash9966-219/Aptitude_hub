@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 11</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 11</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "(A) She sang / (B) very well / (C) isn't it? / (D) No error.", options: ["A", "B", "C", "D"], ans: 2, logic: "Question tag error. Since 'sang' is past tense and positive, the tag should be 'didn't she?'." },
+            { q: "(A) In spite of his / (B) being a Quiz Master / (C) show was / (D) a big flop. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 2, logic: "Article missing. It should be 'the show was'." },
+            { q: "(A) The patient recover / (B) so fast that / (C) the expert doctors / (D) also were surprised. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 0, logic: "Tense consistency. The doctors 'were' surprised (past), so the patient 'recovered' (past)." },
+            { q: "(A) He deserted the path of honour / (B) in order to / (C) satisfy his ambition / (D) and then went down his doom very quickly. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "Preposition error. The correct idiom is 'went down to his doom'." },
+            { q: "(A) Looking forward / (B) to seeing / (C) you / (D) soon. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 4, logic: "This is a common conversational phrase; in formal tests, it's often considered an acceptable elliptical sentence." },
+            { q: "Synonym: Being a member of this club, he has certain **rights**.", options: ["status", "truth", "virtues", "privileges"], ans: 3, logic: "'Privileges' are special rights or advantages available only to a particular person or group." },
+            { q: "Antonym: **NIGGARDLY**", options: ["Frugal", "Thrifty", "Stingy", "Generous"], ans: 3, logic: "Niggardly means stingy or ungenerous. Its opposite is 'Generous'." },
+            { q: "Antonym: Harish displays **enthusiasm** whenever he is posed with a problem.", options: ["eagerness", "weakness", "indifference", "softness"], ans: 2, logic: "Enthusiasm is intense enjoyment or interest; 'indifference' is a lack of interest or concern." },
+            { q: "Fill in the blank: West Bengal ...... plentiful rainfall and is consequently very green.", options: ["misses", "receives", "expects", "regrets"], ans: 1, logic: "'Receives' is the standard verb for rainfall in a geographical context." },
+            { q: "Fill in the blank: Brothers must live in harmony. They must never fall ...... ", options: ["off", "out", "apart", "away"], ans: 1, logic: "'Fall out' is a phrasal verb meaning to have an argument or disagreement." },
+            { q: "Fill in the blank: ...there must not only be sincerity on each side, but also ...... in the sincerity of the other.", options: ["faith", "belief", "substance", "certainty"], ans: 0, logic: "Having 'faith' in someone's sincerity is the standard idiomatic expression in this context." },
+            { q: "Sequence: This time (P) exactly what he had been told (Q) the young man did (R) beyond his dreams (S) and the plan succeeded.", options: ["QPRS", "QPSR", "PQSR", "QSRP"], ans: 1, logic: "The correct order is: This time the young man did (Q) exactly what he had been told (P) and the plan succeeded (S) beyond his dreams (R). QPSR." },
+            { q: "Sequence: It would (P) appear from his statement (Q) about the policy of management (R) in dealing with the strike (S) that he was quite in the dark.", options: ["RPSQ", "PSQR", "RQPS", "PRQS"], ans: 1, logic: "The correct order is: It would appear from his statement (P) that he was quite in the dark (S) about the policy of management (Q) in dealing with the strike (R). PSQR." },
+            { q: "Improvement: ...conversion from scale **have well-formulated**.", options: ["can be well-formulated", "are well-formulated", "well-formulated", "No improvement"], ans: 0, logic: "Passive voice 'can be well-formulated' is grammatically correct for the context of conversion scales." },
+            { q: "Stem: Despite his best efforts to conceal his anger ...", options: ["could detect he was happy", "failed to give agony impression", "succeeded in camouflaging", "succeeded in doing it easily", "people came to know he was annoyed"], ans: 4, logic: "'Despite' indicates a contrast. He tried to hide it, but people still realized he was annoyed." },
+            { q: "Sequence (Train window): S1, P, Q, R, S, S6", options: ["RSQP", "SQPR", "SQRP", "RSPQ"], ans: 2, logic: "Order: SQRP. S sets the scene (crowded), Q introduces the window issue, R describes the quarrel, and P details the opposing views." },
+            { q: "One Word: A person who tries to deceive people by claiming wonderful things", options: ["Trickster", "Imposter", "Magician", "Mountebank"], ans: 3, logic: "A 'Mountebank' specifically refers to someone who deceives others, historically by selling fake medicines with stunts." },
+            { q: "Idiom: He visits the doctor **off and on**.", options: ["everyday", "regularly", "never at all", "occasionally"], ans: 3, logic: "'Off and on' means now and then; occasionally." },
+            { q: "Idiom: The authorities **took him to task** for his negligence.", options: ["additional work", "suspended assignment", "reprimanded him", "forced him to resign"], ans: 2, logic: "To 'take someone to task' means to scold, criticize, or reprimand them for a mistake." },
+            { q: "Idiom: ...yet all his plans are **built upon sand**.", options: ["insecure foundations", "inexperience", "cheap material", "immature ideas"], ans: 0, logic: "Based on the biblical parable, 'built upon sand' means having a weak or insecure basis."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

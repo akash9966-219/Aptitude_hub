@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 1</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 1</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Error Detection: (A) You can get / (B) all the information that you want / (C) in this book. / (D) No error.", options: ["A", "B", "C", "D"], ans: 3, logic: "The sentence is grammatically correct. 'Information' is an uncountable noun and correctly used here." },
+            { q: "Error Detection: (A) They have been / (B) very close friends / (C) until they quarrelled. / (D) No error.", options: ["A", "B", "C", "D"], ans: 0, logic: "Since the quarrelling happened in the past, it should be 'They had been' (Past Perfect) instead of 'have been'." },
+            { q: "Error Detection: (A) It is true / (B) that God helps those / (C) who helps themselves. / (D) No error.", options: ["A", "B", "C", "D"], ans: 2, logic: "The subject 'those' is plural, so the relative clause verb should be 'help' (plural) not 'helps'." },
+            { q: "Error Detection: (A) Mr. Praful Patel / (B) is not attending his office / (C) for the last month. / (D) No error.", options: ["A", "B", "C", "D"], ans: 1, logic: "For a duration (for the last month), we use Present Perfect Continuous: 'has not been attending'." },
+            { q: "Error Detection: (A) In a report issued by Indian Statistical Institute, / (B) the Iron and Steel Industry is investing more than any other / (C) Indian industry in fighting pollution. / (D) No error.", options: ["A", "B", "C", "D"], ans: 3, logic: "The sentence is grammatically sound. The comparison 'more than any other' is correctly structured." },
+            { q: "Error Detection: (A) Pass on / (B) the salt / (C) please / (D) do you? / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "For imperative sentences (requests), the question tag should be 'will you?' or 'won't you?', not 'do you?'." },
+            { q: "Error Detection: (A) I am contacting you / (B) sometime in next week / (C) to explain to you / (D) my problem in detail. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 1, logic: "The phrase should be 'sometime next week'. The 'in' is redundant or incorrect in this specific context." },
+            { q: "Error Detection: (A) What is needed today is / (B) a new breed of managers / (C) with a new set of concepts / (D) and a flexible way about thinking. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "The correct prepositional phrase is 'way of thinking', not 'way about thinking'." },
+            { q: "Error Detection: (A) He tried as he could / (B) Naveen did not / (C) succeed in getting / (D) his car to start up. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 0, logic: "The idiomatic expression should be 'Try as he might' or 'Hard as he tried' to show contrast/effort." },
+            { q: "Synonym: DISTANT", options: ["Far", "Removed", "Reserved", "Separate"], ans: 0, logic: "'Distant' primarily means far away in space or time." },
+            { q: "Antonym: REMISS", options: ["Forgetful", "Watchful", "Dutiful", "Harmful"], ans: 2, logic: "'Remiss' means negligent or careless. 'Dutiful' means conscientious and fulfilling one's obligations." },
+            { q: "Fill in the blank: Affix a revenue stamp and put your signature ...... it.", options: ["on", "upon", "above", "over"], ans: 0, logic: "You put a signature 'on' a document or stamp." },
+            { q: "Find the correctly spelt word:", options: ["Survaillance", "Surveillance", "Survellance", "Surveilance"], ans: 1, logic: "The correct spelling is 'Surveillance' (double 'l', 'ei' after 'v')." },
+            { q: "Sentence Correction: Technology **must use to feed** the forces of change.", options: ["must be used to feed", "must have been using to feed", "must use having fed", "must be using to feed", "No correction required"], ans: 0, logic: "Passive voice is required: 'Technology must be used...' because technology is the object being used." },
+            { q: "Meaning: 'Anand stuck up a friendship with Mahesh in just 2 days' means:", options: ["Friendship ended", "Found other friends", "Fixed a deal", "Lasted 2 years", "Became friends in < 2 days"], ans: 4, logic: "To 'stick up a friendship' (usually 'strike up') means to start or establish a friendship." },
+            { q: "Sentence Rearrangement: Which sentence comes SECOND? (1) Office at 11, (2) Money to parents, (3) Hour at Post Office, (4) Went to bank, (5) Had no money.", options: ["1", "2", "3", "4", "5"], ans: 4, logic: "Sequence: 2 (Money to parents needed) -> 5 (Had no money) -> 4 (Went to bank) -> 3 (Spent hour at Post Office) -> 1 (Reached office)." },
+            { q: "Cloze Test (9): 'The notion [that teenagers inevitably rebel] has the potential for great family ......'", options: ["ruin", "harm", "defeat", "downfall"], ans: 1, logic: "In the context of family dynamics, 'harm' is the most appropriate word for damage to relationships." },
+            { q: "One Word Substitution: Be the embodiment or perfect example of", options: ["Characterise", "Idol", "Personify", "Signify"], ans: 2, logic: "To 'personify' means to be the perfect example or embodiment of a quality." },
+            { q: "One Word Substitution: A person interested in reading books and nothing else", options: ["Book-keeper", "Scholar", "Book-worm", "Student"], ans: 2, logic: "A 'book-worm' is an informal term for someone who spends a great deal of time reading." },
+            { q: "Idiom: Rohit has **bitten off more than he can chew**.", options: ["Is trying to do much", "Is very greedy", "Is always hungry", "Has little regard for others"], ans: 0, logic: "This idiom means to take on a task that is way too big or difficult for one to handle." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

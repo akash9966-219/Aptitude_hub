@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning - Vol 1 Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f8faff;
+            --card-bg: #ffffff;
+            --text: #34495e;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a252f 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 2.5rem; letter-spacing: 1px; }
+        header p { opacity: 0.8; margin-top: 10px; font-size: 1.1rem; }
+
+        .container {
+            max-width: 1200px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            margin: 40px 0 20px;
+            padding-left: 15px;
+            border-left: 4px solid var(--accent);
+            font-size: 1.4rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .topic-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #edf2f7;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+            border-color: var(--accent);
+        }
+
+        .topic-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .topic-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #718096;
+            line-height: 1.5;
+        }
+
+        .icon {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            font-size: 0.9rem;
+            color: #a0aec0;
+        }
+
+        @media (max-width: 600px) {
+            header { padding: 40px 20px; }
+            header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Home</a>
+    <h1>Verbal Reasoning - Vol 1</h1>
+    <p>Mastering logic, relationships, and analytical deductions</p>
+</header>
+
+<div class="container">
+    
+    <h2 class="section-title">Analytical & Verbal</h2>
+    <div class="grid">
+        <a href="logical-sequence.html" class="topic-card">
+            <div class="icon">📜</div>
+            <h3>Logical Sequence of Words</h3>
+            <p>Arrange words in a meaningful and chronological order.</p>
+        </a>
+        <a href="blood-relation.html" class="topic-card">
+            <div class="icon">🌳</div>
+            <h3>Blood Relation</h3>
+            <p>Decipher complex family ties and kinship diagrams.</p>
+        </a>
+        <a href="syllogism.html" class="topic-card">
+            <div class="icon">⭕</div>
+            <h3>Syllogism</h3>
+            <p>Use Venn diagrams to derive logical conclusions from premises.</p>
+        </a>
+        <a href="cause-effect1.html" class="topic-card">
+            <div class="icon">🔗</div>
+            <h3>Cause and Effect</h3>
+            <p>Identify the relationship between events and their outcomes.</p>
+        </a>
+        <a href="classification.html" class="topic-card">
+            <div class="icon">🏷️</div>
+            <h3>Classification</h3>
+            <p>Spot the odd element out based on shared characteristics.</p>
+        </a>
+        <a href="verification-truth.html" class="topic-card">
+            <div class="icon">✅</div>
+            <h3>Verification of Truth</h3>
+            <p>Identify the essential component without which a concept fails.</p>
+        </a>
+    </div>
+
+    <h2 class="section-title">Spatial & Numerical</h2>
+    <div class="grid">
+        <a href="series-completion.html" class="topic-card">
+            <div class="icon">📈</div>
+            <h3>Series Completion</h3>
+            <p>Identify patterns in number and letter sequences.</p>
+        </a>
+        <a href="cube-cuboid.html" class="topic-card">
+            <div class="icon">🧊</div>
+            <h3>Cube and Cuboid</h3>
+            <p>Solve spatial puzzles involving painted faces and cuts.</p>
+        </a>
+        <a href="seating-arrangement.html" class="topic-card">
+            <div class="icon">🪑</div>
+            <h3>Seating Arrangement</h3>
+            <p>Organize people or objects based on specific positioning rules.</p>
+        </a>
+        <a href="direction-sense.html" class="topic-card">
+            <div class="icon">🧭</div>
+            <h3>Direction Sense Test</h3>
+            <p>Navigate pathways and determine final orientations.</p>
+        </a>
+        <a href="data-sufficiency.html" class="topic-card">
+            <div class="icon">📊</div>
+            <h3>Data Sufficiency</h3>
+            <p>Determine if given data is enough to solve a problem.</p>
+        </a>
+        <a href="arithmetic-reasoning.html" class="topic-card">
+            <div class="icon">🧮</div>
+            <h3>Arithmetic Reasoning</h3>
+            <p>Solve mathematical word problems using logical steps.</p>
+        </a>
+    </div>
+
+</div>
+
+<footer>
+    &copy; 2026 Reasoning Prep Portal. No dollar signs included.
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 5</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 5</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Error Detection: (A) There is no question / (B) of my failing / (C) in the examination. / (D) No error.", options: ["A", "B", "C", "D"], ans: 3, logic: "The sentence is grammatically correct. Using the possessive 'my' before the gerund 'failing' is the formally correct construction." },
+            { q: "Error Detection: (A) Mr.Raman said that / (B) he had a difference / (C) with / (D) the chairman at his statement. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "The correct preposition should be 'over' or 'about' his statement, not 'at'." },
+            { q: "Error Detection: (A) I will put on / (B) a note in this regard / (C) for your consideration / (D) and necessary decision. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 0, logic: "To 'put on' means to wear clothes. The correct phrasal verb here is 'put up' (to present or propose a note)." },
+            { q: "Synonym: **outset**", options: ["end", "beginning", "middle", "entrance"], ans: 1, logic: "Outset means the start or beginning of something." },
+            { q: "Fill in the blank: I listened, but I had no idea what he was ...... about.", options: ["saying", "talking", "telling", "discussing"], ans: 1, logic: "We 'talk about' something. You would say 'what he was saying' (no about) or 'what he was talking about'." },
+            { q: "Fill in the blank: He lives near a lovely ...... of countryside.", options: ["length", "piece", "section", "stretch"], ans: 3, logic: "A 'stretch' is the standard term used for a continuous area of land or water." },
+            { q: "Fill in the blank: Owing to the power cut in the area, factories are being forced to ...... men", options: ["throw away", "send off", "put off", "lay off"], ans: 3, logic: "To 'lay off' means to discharge a worker temporarily or permanently because of a shortage of work." },
+            { q: "Correct Spelling:", options: ["Hindrance", "Hinderrance", "Hindrence", "Hinderence"], ans: 0, logic: "The correct spelling is 'Hindrance' (note there is no 'e' after the 'r')." },
+            { q: "Context/Spelling: He is a man of **amiable** (A) **disposition** (B) and **emenable** (C) to rule and **discipline** (D).", options: ["A", "B", "C", "D", "E"], ans: 2, logic: "Part C is misspelled. The correct spelling is 'amenable' (meaning open to suggestion or easily controlled)." },
+            { q: "Context/Spelling: **Stereotypes** (A) are **dysfunctional** (B) in **projecting** (C) an image of an **unbiased** (D) individual.", options: ["A", "B", "C", "D", "E"], ans: 4, logic: "All words are spelled correctly and used appropriately in the context." },
+            { q: "Sequence: P: have managed to catch, Q: the Eskimos and Red Indians, R: by a very difficulty method, S: a few specimens of this aquatic animal", options: ["QRPS", "SQPR", "SQRP", "QPSR"], ans: 3, logic: "Sequence: Q (The subject) -> P (The verb) -> S (The object) -> R (The method). QPSR." },
+            { q: "Sequence: P: along the railway line, Q: and had a right to, R: where other people not allowed to go, S: but daddy belonged to the railway", options: ["RPQS", "PRSQ", "RSQP", "PRQS"], ans: 3, logic: "Sequence: P (Where they went) -> R (Description of location) -> S (The reason) -> Q (The result). PRQS." },
+            { q: "Sequence: P: and stay for few days in Delhi, Q: when my father told me, R: very excited, S: that I could go with him", options: ["PQRS", "RQSP", "QRSP", "SPQR"], ans: 1, logic: "Sequence: R (State of mind) -> Q (The trigger) -> S (The news) -> P (The detail). RQSP." },
+            { q: "Sentence Correction: Ramesh is **as tall if not,** taller than Mahesh.", options: ["not as tall but", "not so tall but as", "as tall as, if not", "as if not", "No correction required"], ans: 2, logic: "The comparison 'as...as' must be complete. It should be 'as tall as, if not taller than'." },
+            { q: "Sentence Correction: 'Friends and comrades, the light has gone **away from** our lives...'", options: ["off", "out of", "out from", "out off", "No correction required"], ans: 1, logic: "The standard idiom for a light being extinguished or disappearing is to go 'out of' one's life." },
+            { q: "Stem Completion: Practically, very little work could be completed in the last week as it was ......", options: ["full of working days", "a very hectic week", "full of holidays", "a very busy week", "loaded with work"], ans: 2, logic: "The phrase 'very little work could be completed' implies that work was not possible, which logically points to it being 'full of holidays'." },
+            { q: "Sequence: S1: Ms. Parasuram started a Petrol Pump... P: 12 girls work. Q: Advertised for women. R: 2 shifts. S: Response good. S6: Thus she shown the way.", options: ["PQSR", "SQPR", "QSPR", "PQRS"], ans: 2, logic: "Sequence: Q (Action) -> S (Result) -> P (Current status) -> R (Working details). QSPR." },
+            { q: "Idiom: I **ran out of** money on my European tour.", options: ["exhausted my stock of", "did not have enough", "lost", "carried a lot"], ans: 0, logic: "To 'run out of' something means to finish the supply or exhaust the stock." },
+            { q: "Idiom: The robber **took to his heels** when the police arrived.", options: ["opened fire", "hid himself", "ran off", "surrendered"], ans: 2, logic: "'Took to his heels' is an idiom meaning to run away very fast." },
+            { q: "Analogy: GRAVITY : PULL", options: ["iron:metal", "north pole:directions", "magnetism:attraction", "dust:desert"], ans: 2, logic: "Gravity is the force that causes a pull; magnetism is the force that causes attraction. Both are physical properties and their effects." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

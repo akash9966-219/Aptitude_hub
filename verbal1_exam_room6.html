@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 180px; height: auto; margin: 10px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+        .main-img { max-width: 100%; height: auto; margin-bottom: 15px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 6</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 6</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "Which tree is just opposite to raspberry tree?",
+                direction: "8-trees: mango, guava, papaya, pomegranate, lemon, banana, raspberry, apple. Two rows of 4. Lemon is between mango and apple but opposite guava. Banana is at an end, right of guava. Raspberry is at an end, diagonally opposite mango.",
+                options: ["Papaya", "Pomegranate", "Papaya or Pomegranate", "Data inadequate"], ans: 2, 
+                logic: "Row 1: Mango - Lemon - Apple - (Pomegranate/Papaya). Row 2: Raspberry - Guava - Banana - (Papaya/Pomegranate). Raspberry is diagonally opposite Mango. Since the positions of Papaya and Pomegranate aren't fixed, Raspberry is opposite either of them." 
+            },
+            { 
+                q: "Statements: Some mangoes are yellow. Some tixo are mangoes. Conclusions: (1) Some mangoes are green. (2) Tixo is a yellow.",
+                options: ["Only (1)", "Only (2)", "Either (1) or (2)", "Neither (1) nor (2)", "Both (1) and (2)"], ans: 3, 
+                logic: "We cannot conclude (1) because the statements don't mention green. We cannot conclude (2) because being a mango doesn't guarantee being yellow." 
+            },
+            { 
+                q: "Statements: All cups are books. All books are shirts. Conclusions: (1) Some cups are not shirts. (2) Some shirts are cups.",
+                options: ["Only (1)", "Only (2)", "Either (1) or (2)", "Neither (1) nor (2)", "Both (1) and (2)"], ans: 1, 
+                logic: "Since all cups are books and all books are shirts, all cups are shirts. Therefore, some shirts must be cups (inverse property)." 
+            },
+            { 
+                q: "Statements: Some cars are scooters. No scooter is cycle. Conclusions: (1) No car is cycle. (2) No scooter is car. (3) Some cars are cycles. (4) Some scooters are cars.",
+                options: ["None", "All", "Only (1) and (4)", "Only (4)", "Only (2) and (4)"], ans: 3, 
+                logic: "Since some cars are scooters, those specific scooters are cars. (1) and (3) are uncertain without more data." 
+            },
+            { 
+                q: "Statements: All the books are pencils. No pencil is eraser. Conclusions: (1) All pencils are books. (2) Some erasers are books. (3) No book is eraser. (4) Some books are erasers.",
+                options: ["Only (3)", "Only (1) and (3)", "Only (1) and (2)", "Only (2) and (3)", "Only (3) and (4)"], ans: 0, 
+                logic: "If all books are inside the 'pencil' circle and 'pencil' doesn't touch 'eraser', then no book can touch eraser." 
+            },
+            { 
+                q: "Controversy always involves",
+                options: ["Dislike", "Injustice", "Disagreement", "Passion"], ans: 2, 
+                logic: "By definition, a controversy is a state of prolonged public dispute or intense disagreement." 
+            },
+            { 
+                q: "Which of the following diagrams indicates the best relation between Sweets, Rasagulla and Apple?",
+                options: [
+                    "A. Rasagulla inside Sweets; Apple separate. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c10.png' class='q-img'>",
+                    "B. All separate. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>",
+                    "C. All intersecting. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c3.png' class='q-img'>",
+                    "D. Two inside one. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c11.png' class='q-img'>"
+                ], ans: 0, 
+                logic: "Rasagulla is a type of sweet (subset), while an Apple is a fruit and entirely separate." 
+            },
+            { 
+                q: "Which one of the following represents the educated men but not urban?",
+                direction: "Rectangle=Men, Triangle=Educated, Circle=Urban, Square=Govt Employees",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-8-Dir-1.png",
+                options: ["9", "5", "4", "11"], ans: 3, 
+                logic: "Look for the intersection of the Rectangle and Triangle that stays outside the Circle. The number is 11." 
+            },
+            { 
+                q: "Which one of the following represents a woman who is urban as well as government employee?",
+                direction: "Rectangle=Men, Triangle=Educated, Circle=Urban, Square=Govt Employees",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-8-Dir-1.png",
+                options: ["7", "13", "10", "6"], ans: 2, 
+                logic: "Women are represented by the area outside the 'Men' rectangle. We need the intersection of Circle and Square outside the rectangle, which is 10." 
+            },
+            { 
+                q: "How many small cubes are there where one face is green and other one is either black or red?",
+                direction: "64 cubes ($4 \\times 4 \\times 4$). Opposite faces: Red, Black, Green.",
+                options: ["28", "8", "16", "24"], ans: 3, 
+                logic: "These are edge cubes excluding corners. Each edge has $n-2 = 2$ such cubes. There are 12 edges, but only 8 edges represent the intersection of Green with Red or Black. $8 \\times 2 + 8 \\text{ (half corner count)} = 24$." 
+            },
+            { 
+                q: "ABCD : WXYZ :: EFGH : ?",
+                options: ["STUV", "ZYXW", "VUTS", "WXZY"], ans: 2, 
+                logic: "Reverse alphabet pattern: A=Z, B=Y, C=X, D=W. However, the sequence WXYZ is the reverse end of the alphabet. Applying this to EFGH gives VUTS." 
+            },
+            { 
+                q: "CEDH : HDEC :: ? : PNRV",
+                options: ["VRNP", "RNPV", "NRVP", "VNRP"], ans: 3, 
+                logic: "The pattern is a simple reversal of the string: 1234 becomes 4321. Reversing PNRV gives VNRP." 
+            },
+            { 
+                q: "PSQR : CFED :: JMKL : ?",
+                options: ["UVXZ", "YVZX", "YXZW", "WZYX"], ans: 3, 
+                logic: "The pattern follows a shift and reverse logic in the alphabet sequence, leading to WZYX." 
+            },
+            { 
+                q: "KeaC : CaeK :: XgmF : ?",
+                options: ["GmcF", "FmgX", "EgmX", "EmgF"], ans: 1, 
+                logic: "First and last letters are swapped and casing is maintained for internal letters. XgmF becomes FmgX." 
+            },
+            { 
+                q: "Pick the pair that best illustrates: Stove : Kitchen",
+                options: ["Window : Bedroom", "Sink : Bathroom", "Pot : Pan", "Television : Living room"], ans: 1, 
+                logic: "A stove is a fixed, essential utility in a kitchen, just as a sink is a fixed utility in a bathroom." 
+            },
+            { 
+                q: "Which alternative is another member of the group: Clutch, Brake, Horn?",
+                options: ["Car", "Scooter", "Accident", "Steering"], ans: 3, 
+                logic: "Clutch, Brake, and Horn are manual controls/parts of a vehicle; Steering is the most appropriate addition." 
+            },
+            { 
+                q: "Which alternative is another member of the group: Lock, Shut, Fasten?",
+                options: ["Window", "Door", "Iron", "Block"], ans: 3, 
+                logic: "Lock, Shut, and Fasten are verbs meaning to secure or close. Block is a synonym in the context of preventing movement/closing." 
+            },
+            { 
+                q: "'Smoke' is related to 'Pollution' in the same way as 'War' is related to:",
+                options: ["Victory", "Treaty", "Defeat", "Destruction"], ans: 3, 
+                logic: "Smoke causes Pollution (Cause -> Effect). War causes Destruction." 
+            },
+            { 
+                q: "Which group of cars is to the right of Ambassador?",
+                direction: "7 cars (C, A, F, M, Mer, B, Far) facing East. Cadillac next to right of Fargo. Fargo 4th right of Fiat. Maruti between A and B. Fiat 3rd left of A.",
+                options: ["Cadillac, Fargo and Maruti", "Mercedes, Cadillac and Fargo", "Maruti, Bedford and Fiat", "Bedford, Cadillac and Fargo"], ans: 1, 
+                logic: "Order from North to South: Fiat - Mercedes - (Bedford/Maruti) - Ambassador - Fargo - Cadillac. Right of A = South = Fargo, Cadillac, and Mercedes." 
+            },
+            { 
+                q: "Arrange in meaningful sequence: 1. Nation, 2. Village, 3. City, 4. District, 5. State",
+                options: ["2, 3, 4, 5, 1", "2, 3, 4, 1, 5", "1, 3, 5, 4, 2", "1, 2, 3, 4, 5"], ans: 0, 
+                logic: "Sequence based on size (increasing): Village -> City -> District -> State -> Nation." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="main-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

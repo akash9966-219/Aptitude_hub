@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning - Logical Inferences</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f8f9fa;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .passage-section {
+            background: #f1f7fb;
+            border-left: 5px solid var(--secondary);
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .question-prompt {
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .options-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 18px;
+            border: 2px solid #eaeff2;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .opt-btn:hover { border-color: var(--secondary); background: #fdfdfe; }
+        .opt-btn.selected { border-color: var(--secondary); background: #ebf5fb; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--secondary); color: white; display: none; }
+
+        .progress-text { font-weight: bold; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Main Dashboard</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div id="passage" class="passage-section"></div>
+        <div class="question-prompt">Based on the passage above, which of the following must be true?</div>
+        <div id="options" class="options-list"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress-text"></span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="verify()">Submit Inference</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next Passage →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    {
+        p: "Vincent has a paper route. Each morning, he delivers 37 newspapers to customers in his neighborhood. It takes Vincent 50 minutes to deliver all the papers. If Vincent is sick or has other plans, his friend Thomas, who lives on the same street, will sometimes deliver the papers for him.",
+        opts: [
+            "Vincent and Thomas live in the same neighborhood.",
+            "It takes Thomas more than 50 minutes to deliver the papers.",
+            "It is dark outside when Vincent begins his deliveries.",
+            "Thomas would like to have his own paper route."
+        ],
+        ans: 0
+    },
+    {
+        p: "The Pacific yew is an evergreen tree that grows in the Pacific Northwest. The Pacific yew has a fleshy, poisonous fruit. Recently, taxol, a substance found in the bark of the Pacific yew, was discovered to be a promising new anticancer drug.",
+        opts: [
+            "Taxol is poisonous when taken by healthy people.",
+            "Taxol has cured people from various diseases.",
+            "People should not eat the fruit of the Pacific yew.",
+            "The Pacific yew was considered worthless until taxol was discovered."
+        ],
+        ans: 2
+    },
+    {
+        p: "Erin is twelve years old. For three years, she has been asking her parents for a dog. Her parents have told her that they believe a dog would not be happy in an apartment, but they have given her permission to have a bird. Erin has not yet decided what kind of bird she would like to have.",
+        opts: [
+            "Erin's parents like birds better than they like dogs.",
+            "Erin does not like birds.",
+            "Erin and her parents live in an apartment.",
+            "Erin and her parents would like to move."
+        ],
+        ans: 2
+    },
+    {
+        p: "Tim's commute never bothered him because there were always seats available on the train and he was able to spend his 40 minutes comfortably reading the newspaper or catching up on paperwork. Ever since the train schedule changed, the train has been extremely crowded, and by the time the doors open at his station, there isn't a seat to be found.",
+        opts: [
+            "Tim would be better off taking the bus to work.",
+            "Tim's commute is less comfortable since the train schedule changed.",
+            "Many commuters will complain about the new train schedule.",
+            "Tim will likely look for a new job closer to home."
+        ],
+        ans: 1
+    },
+    {
+        p: "When they heard news of the hurricane, Maya and Julian decided to change their vacation plans. Instead of traveling to the island beach resort, they booked a room at a fancy new spa in the mountains. Their plans were a bit more expensive, but they'd heard wonderful things about the spa and they were relieved to find availability on such short notice.",
+        opts: [
+            "Maya and Julian take beach vacations every year.",
+            "The spa is overpriced.",
+            "It is usually necessary to book at least six months in advance at the spa.",
+            "Maya and Julian decided to change their vacation plans because of the hurricane."
+        ],
+        ans: 3
+    },
+    {
+        p: "Ten new television shows appeared during the month of September. Five of the shows were sitcoms, three were hour-long dramas, and two were news-magazine shows. By January, only seven of these new shows were still on the air. Five of the shows that remained were sitcoms.",
+        opts: [
+            "Only one of the news-magazine shows remained on the air.",
+            "Only one of the hour-long dramas remained on the air.",
+            "At least one of the shows that was cancelled was an hour-long drama.",
+            "Television viewers prefer sitcoms over hour-long dramas."
+        ],
+        ans: 2
+    },
+    {
+        p: "On weekends, Mr. Sanchez spends many hours working in his vegetable and flower gardens. Mrs. Sanchez spends her free time reading and listening to classical music. Both Mr. Sanchez and Mrs. Sanchez like to cook.",
+        opts: [
+            "Mr. Sanchez enjoys planting and growing vegetables.",
+            "Mr. Sanchez does not like classical music.",
+            "Mrs. Sanchez cooks the vegetables that Mr. Sanchez grows.",
+            "Mrs. Sanchez enjoys reading nineteenth century novels."
+        ],
+        ans: 0
+    },
+    {
+        p: "Georgia is older than her cousin Marsha. Marsha's brother Bart is older than Georgia. When Marsha and Bart are visiting with Georgia, all three like to play a game of Monopoly. Marsha wins more often than Georgia does.",
+        opts: [
+            "When he plays Monopoly with Marsha and Georgia, Bart often loses.",
+            "Of the three, Georgia is the oldest.",
+            "Georgia hates to lose at Monopoly.",
+            "Of the three, Marsha is the youngest."
+        ],
+        ans: 3
+    },
+    {
+        p: "Sara lives in a large city on the East Coast. Her younger cousin Marlee lives in the Mid-west in a small town with fewer than 1,000 residents. Marlee has visited Sara several times during the past five years. In the same period of time, Sara has visited Marlee only once.",
+        opts: [
+            "Marlee likes Sara better than Sara likes Marlee.",
+            "Sara thinks small towns are boring.",
+            "Sara is older than Marlee.",
+            "Marlee wants to move to the East Coast."
+        ],
+        ans: 2
+    }
+];
+
+let currentIdx = 0;
+let selected = null;
+
+function render() {
+    const item = data[currentIdx];
+    document.getElementById('progress').innerText = `Passage ${currentIdx + 1} of ${data.length}`;
+    document.getElementById('passage').innerText = item.p;
+    
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    item.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        box.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function verify() {
+    if (selected === null) return alert("Please select a conclusion.");
+    const correct = data[currentIdx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((b, i) => {
+        if (i === correct) b.classList.add('correct');
+        if (i === selected && i !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    selected = null;
+    if (currentIdx < data.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        alert("Verbal Reasoning module complete!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

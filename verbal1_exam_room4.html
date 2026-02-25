@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 180px; height: auto; margin: 10px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+        .main-img { max-width: 100%; height: auto; margin-bottom: 15px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 4</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 4</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "One morning after sunrise, Vimal started to walk. He met Stephen who was coming from the opposite direction. Vimal saw that the shadow of Stephen was to the right of him (Vimal). To which direction was Vimal facing?",
+                options: ["East", "West", "South", "Data inadequate"], ans: 2, 
+                logic: "In the morning, the sun is in the East, so shadows fall West. For Stephen's shadow to be on Vimal's right, Vimal must be facing South." 
+            },
+            { 
+                q: "After walking 6 km, I turned right and walked 2 km. Then I turned left and walked 10 km. In the end, I was moving towards the North. From which direction did I start my journey?",
+                options: ["North", "South", "East", "West"], ans: 0, 
+                logic: "If the final movement is North, tracing the path backward shows the initial movement was also towards the North." 
+            },
+            { 
+                q: "Which one is in the North-East of the person who is to the left of Kumar?",
+                direction: "Kumar 40m right of Ankur. Dev 60m south of Kumar. Nilesh 25m west of Ankur. Pintu 90m North of Dev.",
+                options: ["Dev", "Nilesh", "Ankur", "Pintu"], ans: 3, 
+                logic: "The person to the left of Kumar is Ankur. Pintu is North-East of Ankur because Pintu is 30m North and 40m East of him." 
+            },
+            { 
+                q: "If the flats of P and T are interchanged, whose flat will be next to that of U?",
+                direction: "P, Q, R, S, T, U flats. Q is North facing. S and U are diagonal. R (South) is next to U. T is North facing.",
+                options: ["P", "Q", "R", "T"], ans: 2, 
+                logic: "Even if P and T swap, R remains next to U in the South-facing row (U-R-P sequence)." 
+            },
+            { 
+                q: "Which of the following shows that M is the maternal grandmother of T?",
+                direction: "+ (Father), - (Brother), % (Wife), x (Mother)",
+                options: ["M x N % S + T", "M x N - S % T", "M x S - N % T", "M x N x S % T"], ans: 3, 
+                logic: "M x N (M mother of N), N x S (N mother of S), S % T (S wife of T). M is the mother of T's wife's mother." 
+            },
+            { 
+                q: "Which of the following means I is the niece of J?",
+                direction: "+ (Daughter), - (Brother), % (Father), x (Sister)",
+                options: ["J - N % C x I", "I x C - N % J", "J + M x C % I", "I x C + N - J"], ans: 3, 
+                logic: "I x C (I sister of C), C + N (C daughter of N), N - J (N brother of J). I is the daughter of J's brother." 
+            },
+            { 
+                q: "Statements: Some poets are poems. No poem is song. Conclusions: (1) Some poems are not songs. (2) Some songs are poems.",
+                options: ["Only (1) follows", "Only (2) follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 0, 
+                logic: "Since 'No poem is song', it naturally follows that 'Some poems are not songs'." 
+            },
+            { 
+                q: "Which number face will be opposite to the face with number 3?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-2.png",
+                options: ["1", "2", "4", "5"], ans: 2, 
+                logic: "By comparing the positions of the dice, the number 4 is opposite 3." 
+            },
+            { 
+                q: "I. Many people suffer from Malaria. II. Private practitioners decided to close clinics for a few days.",
+                options: ["Statement I is cause, II effect", "Statement II is cause, I effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 3, 
+                logic: "An increase in disease (I) and closing clinics (II) are two independent occurrences or effects of unrelated causes." 
+            },
+            { 
+                q: "I. Govt reduced petrol prices by 5% after a 10% increase. II. Inflation dropped marginally last week.",
+                options: ["Statement I is cause, II effect", "Statement II is cause, I effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 0, 
+                logic: "Reducing fuel prices (I) leads to a decrease in the cost of goods, causing inflation to drop (II)." 
+            },
+            { 
+                q: "Which diagram indicates the best relation between Women, Mothers and Engineers?",
+                options: [
+                    "A. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c1.png' class='q-img'>",
+                    "B. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c2.png' class='q-img'>",
+                    "C. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c3.png' class='q-img'>",
+                    "D. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>"
+                ], ans: 0, 
+                logic: "All Mothers are Women. Some Mothers/Women are Engineers (Diagram A)." 
+            },
+            { 
+                q: "Which part of the diagram represents the girls who are players but not coach?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-2-5.png",
+                options: ["P", "Q", "R", "S"], ans: 1, 
+                logic: "Q is the intersection of Triangle (Girls) and Square (Players), excluding the Circle (Coach)." 
+            },
+            { 
+                q: "How many educated people are employed?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-8-Dir-1.png",
+                options: ["9", "18", "20", "15"], ans: 1, 
+                logic: "The sum of regions representing the intersection of 'Educated' and 'Employed' is 6 + 12 = 18." 
+            },
+            { 
+                q: "BLOCKED : YOLXPVW :: ? : OZFMXS",
+                options: ["DEBATE", "RESULT", "LABOR", "LAUNCH"], ans: 3, 
+                logic: "The pattern uses reverse alphabet positions (A=Z, B=Y). Applying this to OZFMXS gives LAUNCH." 
+            },
+            { 
+                q: "Which alternative is another member of the group: Root, Stem, Branch?",
+                options: ["Fertilizer", "Leaf", "Tree", "Wood"], ans: 1, 
+                logic: "Leaf is a primary part of a plant structure, similar to Root, Stem, and Branch." 
+            },
+            { 
+                q: "'Forest' is related to 'Vivarium' in the same way as 'sea' is related to:",
+                options: ["Port site", "Water", "Fishery", "Aquarium"], ans: 3, 
+                logic: "A vivarium is an artificial forest/habitat; an aquarium is an artificial sea habitat." 
+            },
+            { 
+                q: "How many girls are there out of these 7 students?",
+                passage: "7 students: A-G. Bench I, II, III. At least 1 girl per bench. C (girl) not with A, E, D. F (boy) only with B. G on III. E is brother of C.",
+                options: ["3", "3 or 4", "4", "Data inadequate"], ans: 1, 
+                logic: "Analysis of the constraints shows there are either 3 or 4 girls depending on G's gender." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-26.png",
+                options: ["25", "37", "41", "47"], ans: 2, 
+                logic: "The pattern involves squaring the numbers or cross-sums leading to 41." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-47.png",
+                options: ["25", "625", "125", "50"], ans: 1, 
+                logic: "The pattern follows powers of 5: 5, 25, 125, so the next is 625." 
+            },
+            { 
+                q: "Arrange in meaningful sequence: 1. Elephant, 2. Cat, 3. Mosquito, 4. Tiger, 5. Whale",
+                options: ["5, 3, 1, 2, 4", "3, 2, 4, 1, 5", "1, 3, 5, 4, 2", "2, 5, 1, 4, 3"], ans: 1, 
+                logic: "Sequence based on size (increasing): Mosquito -> Cat -> Tiger -> Elephant -> Whale." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="main-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

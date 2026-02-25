@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 9</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 9</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Error Detection: (A) The charges in this hospital / (B) are less than / (C) the hospital near my house. / (D) No error", options: ["A", "B", "C", "D"], ans: 2, logic: "Faulty comparison. You must compare charges to charges, not charges to a building. It should be 'than those of the hospital' or 'than the hospital's'." },
+            { q: "Error Detection: (A) Even though the shirt is rather expensive / (B) but I wish to / (C) purchase it with my own money. / (D) No error.", options: ["A", "B", "C", "D"], ans: 1, logic: "'Even though' and 'but' are redundant when used together. Remove 'but'." },
+            { q: "Error Detection: (A) His father promised to / (B) give him anything what he / (C) wants if he / (D) passes in the examination. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 1, logic: "The relative pronoun 'what' cannot be used after 'anything'. Use 'that' instead of 'what'." },
+            { q: "Error Detection: (A) After listening to / (B) his advice, I / (C) decided to not to / (D) go abroad for studies. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 2, logic: "Double usage of 'to' is incorrect. It should be 'decided not to'." },
+            { q: "Synonym: **MELD**", options: ["To soothe", "Merge", "Purchase", "Glisten"], ans: 1, logic: "'Meld' means to blend or combine; 'Merge' is the closest synonym." },
+            { q: "Synonym: The leader nodded his **approbation**.", options: ["understanding", "approval", "admiration", "appreciation"], ans: 1, logic: "'Approbation' is a formal word for approval or praise." },
+            { q: "Antonym: **EXPAND**", options: ["Convert", "Condense", "Congest", "Conclude"], ans: 1, logic: "'Expand' means to grow larger; 'Condense' means to make something more dense or smaller." },
+            { q: "Antonym: Like poverty, **affluence** can sometimes create its own problems.", options: ["indigence", "opulence", "sorrow", "exuberance"], ans: 0, logic: "'Affluence' means wealth. 'Indigence' means extreme poverty." },
+            { q: "Antonym: The actor is well known both for his **humility** and courage.", options: ["pride", "determination", "honesty", "gentleness"], ans: 0, logic: "'Humility' is the quality of being humble; 'Pride' (in the sense of arrogance) is its opposite." },
+            { q: "Fill in the blank: Government buildings are ...... on the Republic day.", options: ["enlightened", "lightened", "illuminated", "glowed"], ans: 2, logic: "'Illuminated' specifically refers to lighting up a building for celebration or display." },
+            { q: "Fill in the blank: Jawaharlal spent his childhood ...... Anand Bhawan.", options: ["at", "in", "on", "across"], ans: 0, logic: "We use 'at' for specific points or named locations like a specific house." },
+            { q: "Fill in the blank: We had to pay more taxi fare because the driver brought us by a ...... route.", options: ["circular", "circumscribed", "longest", "circuitous"], ans: 3, logic: "'Circuitous' means a route that is longer than the most direct way; roundabout." },
+            { q: "Correct Spelling:", options: ["Humorous", "Ganerous", "Pupolous", "Maretorious"], ans: 0, logic: "Humorous is correct. Others should be: Generous, Populous, Meritorious." },
+            { q: "Sequence: I read an advertisement that said (P) posh, air-conditioned (Q) gentleman of taste (R) are available for (S) fully furnished rooms.", options: ["PQRS", "PSRQ", "PSQR", "SRPQ"], ans: 1, logic: "The correct order is: advertisement that said (P) posh, air-conditioned (S) fully furnished rooms (R) are available for (Q) gentleman of taste. PSRQ." },
+            { q: "Sequence: With her body (P) dragging her unwilling feet (Q) weak and infirm (R) doubled with age (S) she persisted in her mission.", options: ["PQRS", "QPRS", "RQPS", "SRPQ"], ans: 2, logic: "Sequence: With her body (R) doubled with age, (Q) weak and infirm, (P) dragging her unwilling feet, (S) she persisted. RQPS." },
+            { q: "Sentence Improvement: We met him immediately after the session in which he **had been given** a nice speech.", options: ["would be giving", "has been given", "will have given", "had given", "No correction required"], ans: 3, logic: "The active voice is needed here. He performed the action of giving the speech: 'had given'." },
+            { q: "Sentence Improvement: Not long back, in Japan, a mysterious nerve gas **affected** a large number of people.", options: ["effected", "infected", "infested", "No improvement"], ans: 3, logic: "'Affect' (verb) means to produce a change or influence; 'Effect' is usually a noun." },
+            { q: "One Word: Be the embodiment or perfect example of", options: ["Characterise", "Idol", "Personify", "Signify"], ans: 2, logic: "To 'Personify' means to represent a quality or concept in physical or human form." },
+            { q: "Idiom: His friends advised him to be **fair and square** in his dealings.", options: ["Careful", "Considerate", "Polite", "Upright"], ans: 3, logic: "'Fair and square' means honest, direct, and upright." },
+            { q: "Idiom: We should **give a wide berth** to bad characters.", options: ["give publicity to", "publicly condemn", "keep away from", "not sympathise with"], ans: 2, logic: "To 'give a wide berth' means to stay a safe distance away from someone or something."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logical Reasoning - Theme Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #fdfdfd;
+            --card: #ffffff;
+            --accent: #e67e22;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Georgia', serif; /* Better for reading long passages */
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .passage-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .passage-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            background: #fff8f0;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid var(--accent);
+        }
+
+        .question-prompt {
+            font-weight: bold;
+            font-family: sans-serif;
+            margin-bottom: 20px;
+            color: #636e72;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid #f1f2f6;
+            padding: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.3s;
+            font-size: 1.05rem;
+            font-family: sans-serif;
+        }
+
+        .option-btn:hover { border-color: var(--accent); background: #fffaf5; }
+        .option-btn.selected { border-color: var(--accent); background: #fff5e6; }
+        .option-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .option-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border-radius: 50px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        #progress-bar {
+            height: 5px;
+            background: #eee;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: 0.5s;
+        }
+
+        @media (max-width: 600px) {
+            .passage-card { padding: 20px; }
+            .passage-text { font-size: 1.05rem; padding: 15px; }
+            .option-btn { font-size: 0.95rem; }
+            .controls { flex-direction: column; gap: 20px; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="logical-reasoning.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="score-display">Passage 1 / 18</span>
+</div>
+
+<div class="container">
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    
+    <div class="passage-card">
+        <div class="question-prompt">Analyze the Passage</div>
+        <div id="passage" class="passage-text"></div>
+        
+        <div class="question-prompt">Choose the supported statement</div>
+        <div class="options-list" id="options"></div>
+
+        <div class="controls">
+            <div id="feedback" style="font-weight:bold; font-family:sans-serif;"></div>
+            <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()">Evaluate Theme</button>
+            <button class="btn btn-next" id="nextBtn" onclick="loadNext()">Next Passage →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { p: "The attainment of individual and organisational goals is mutually interdependent and linked by a common denominator - employee work motivation. Organisational members are motivated to satisfy their personal goals, and they contribute their efforts to the attainment of organisational objectives as means of achieving these personal goals.", opts: ["encourages an individual to give priority to personal goals over organisational goals.", "is crucial for the survival of an individual and organisation.", "is the product of an individual's physical and mental energy.", "is the external force which induces an individual to contribute his efforts.", "makes organisation and society inseparable."], ans: 1 },
+    { p: "Due to enormous profits involved in smuggling, hundreds of persons have been attracted towards this anti-national activity. Some of them became millionaires overnight. India has a vast coastline... smugglers made huge profits even allowing for seizures.", opts: ["smuggling hampers the economic development of a nation.", "smuggling ought to be curbed.", "authorities are taking strict measures to curb smuggling.", "smuggling is fast increasing in our country owing to the quick profit it entails."], ans: 3 },
+    { p: "Though the waste of time or the expenditure on fashions is very large, yet fashions have come to stay. They will not go, come what may. However, what is now required is that strong efforts should be made to displace the excessive craze for fashion from the minds of these youngsters.", opts: ["fashion is the need of the day.", "the excessive craze for fashion is detrimental to one's personality.", "the hoard for fashion should be done away with so as not to let down the constructive development.", "work and other activities should be valued more than the outward appearance."], ans: 2 },
+    { p: "Technology imparts greater dignity and value to human labour. In industrialized society, productivity fixes the pay cheque and this fixes social status, making it a leveler of men regardless of caste or religion.", opts: ["technology decides individual's social status.", "castes and religions are man-made.", "human labour has dignity and value.", "all individuals, irrespective of caste and creed, are born equal.", "industrial society is a great leveller of men."], ans: 4 },
+    { p: "Educating women educates the whole nation. A country can never rise without the contribution of 50% of its population.", opts: ["India is striving hard for the emancipation of women.", "all women should be well educated.", "a nation can progress only when women are given equal rights and opportunities as men.", "women ought to be imparted full freedom to prove their worth and contribute to the progress of the nation."], ans: 3 },
+    { p: "The prevention of accidents makes it necessary not only that safety devices be used but also that mechanics be instructed in safety rules and lighting be adequate.", opts: ["are always avoidable;", "may be due to ignorance.", "cannot be entirely overcome.", "can be eliminated with the help of safety rules.", "usually result from inadequate machinery."], ans: 1 },
+    { p: "To forgive an injury is really a sign of strength. It takes a strong character to restrain natural passions of vengeance. The man who forgives proves himself superior.", opts: ["the sufferer alone knows the intensity of his sufferings.", "people tend to forgive the things happened in the past.", "natural passions are difficult to suppress.", "mercy is the noblest form of revenge.", "a person with calm and composed nature has depth of thought and vision."], ans: 3 },
+    { p: "Industrial exhibitions regularly held in Delhi enable us to measure our progress against mighty powers like U.K., U.S.A. and Russia.", opts: ["greatly tax the poor economies.", "are more useful for developed countries.", "are not of much use to backward countries.", "boost up production by analytical comparison with developed countries."], ans: 3 },
+    { p: "School has always been the means of transferring tradition. This is more true today as the family's role as bearer of tradition has weakened.", opts: ["there are means other than the school.", "several different sources must be tried.", "economic development plays a crucial role", "modern technology must be put to use.", "family, as ever, is the most potent means."], ans: 0 },
+    { p: "A poet's dream of yesterday becomes today an actual achievement. Inventors of the aeroplane could hardly have dreamt of outer space flight.", opts: ["seemingly impossible imaginations make one a good poet,", "all imaginations become a reality some day.", "what man imagined has never been impossible; he turned it to reality through conceptual hard labour.", "man has reached the climax of technological development."], ans: 2 },
+    { p: "A lesser number of agriculturists would mean more purchasing power. This releases surplus man-power for commodities with new demand.", opts: ["employment in production is more fruitful than agriculture.", "Indian economy is poor due to improper mobilisation.", "a shift of labour from agricultural sector to industrial sector would uplift standards.", "the industrial sector is labour-deficient while agriculture is over-manned."], ans: 2 },
+    { p: "Exports and trade balances are not an index of national prosperity. England is more prosperous today than before WW2 because the income of average workers has gone up.", opts: ["a country's economic standard can be best adjudged by per capital income.", "a country's balance of trade is the main criteria.", "a nation's economy strengthens with increase in exports.", "English trade has continually increased since the Second World War."], ans: 0 },
+    { p: "Satisfaction with work and pay goes with high performance among those with strong growth needs. Among those with weak growth needs, no such relationship is present.", opts: ["satisfaction is an inevitable organisational variable.", "job satisfaction and performance are directly related.", "relationship between job satisfaction and performance is moderated by growth need.", "every organisation has few employees having weak growth need.", "high performance is essential for effectiveness."], ans: 2 },
+    { p: "True education comes through child stimulation by social demands, leading them to act for the welfare of the group.", opts: ["will take place if children imbibe action and feeling.", "will take place if children are physically strong.", "is not provided in our schools today.", "comes through interaction with social situations.", "comes from self-centred approach."], ans: 3 },
+    { p: "The press has to be eternally vigilant to protect the rights of workers and suppressed sections and help form healthy public opinion.", opts: ["press has a great role to play in a democracy.", "the press is the only means to project policies.", "freedom of press is essential for democracy.", "press can be used by governments for upliftment."], ans: 0 },
+    { p: "Businessman has helped build cities, provided luxuries, and seeded the Industrial Revolution.", opts: ["is accountable to the society.", "lives luxurious and comfortable life.", "is the beneficiary of the Industrial Revolution.", "is capable of raising his standard of living.", "has contributed to the growth of civilisation."], ans: 4 },
+    { p: "Increase in service-sector requires managers to work more with people rather than objects from assembly lines.", opts: ["managers should have a balanced mind.", "assembly line will exist in service organisations.", "interpersonal skills will become more important in the future.", "manufacturing organisations ignore importance of people.", "service organisations will not deal with objects."], ans: 2 },
+    { p: "The virtue of art does not allow work to be ruled by anything other than itself. It insists it alone touch the work.", opts: ["art is governed by external rules.", "art is for the sake of art and life.", "art is for the sake of art alone.", "artist realises his dreams.", "artist should use art for society."], ans: 2 }
+];
+
+let currentIdx = 0;
+let selectedOpt = null;
+
+function renderQuestion() {
+    const q = data[currentIdx];
+    document.getElementById('score-display').innerText = `Passage ${currentIdx + 1} / ${data.length}`;
+    document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / data.length) * 100}%`;
+    document.getElementById('passage').innerText = q.p;
+    
+    const optionsHtml = q.opts.map((opt, i) => 
+        `<button class="option-btn" onclick="selectOpt(${i})">${String.fromCharCode(65 + i)}. ${opt}</button>`
+    ).join('');
+    
+    document.getElementById('options').innerHTML = optionsHtml;
+    document.getElementById('checkBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerText = "";
+    selectedOpt = null;
+}
+
+function selectOpt(idx) {
+    selectedOpt = idx;
+    document.querySelectorAll('.option-btn').forEach((btn, i) => {
+        btn.classList.toggle('selected', i === idx);
+    });
+}
+
+function checkAnswer() {
+    if (selectedOpt === null) return alert("Select the best supported theme!");
+    const correct = data[currentIdx].ans;
+    const btns = document.querySelectorAll('.option-btn');
+    
+    btns[correct].classList.add('correct');
+    if (selectedOpt !== correct) {
+        btns[selectedOpt].classList.add('wrong');
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--wrong)'>Incorrect Inference</span>";
+    } else {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--correct)'>Thematic Match!</span>";
+    }
+    
+    btns.forEach(b => b.disabled = true);
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function loadNext() {
+    if (currentIdx < data.length - 1) {
+        currentIdx++;
+        renderQuestion();
+        window.scrollTo(0,0);
+    } else {
+        alert("Mastery achieved! You have completed all Theme Detection passages.");
+    }
+}
+
+renderQuestion();
+</script>
+</body>
+</html>

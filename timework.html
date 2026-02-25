@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Time and Work Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Time and Work</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 30</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 30</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "A can do a work in 15 days and B in 20 days. If they work together for 4 days, then the fraction of the work left is:", options: ["1/4", "1/10", "7/15", "8/15"], correct: 3, explain: "A's 1 day = 1/15, B's 1 day = 1/20. Together 1 day = (1/15 + 1/20) = 7/60. In 4 days = 4 * 7/60 = 7/15. Work left = 1 - 7/15 = 8/15." },
+        { q: "A lays track in 16 days, B in 12 days. With C, they do it in 4 days. C alone takes:", options: ["9 1/5 days", "9 2/5 days", "9 3/5 days", "10 days"], correct: 2, explain: "1/C = 1/4 - (1/16 + 1/12) = 1/4 - 7/48 = 5/48. C alone = 48/5 = 9 3/5 days." },
+        { q: "A, B, C can do work in 20, 30, 60 days. In how many days can A do it if assisted by B and C every 3rd day?", options: ["12 days", "15 days", "16 days", "18 days"], correct: 1, explain: "A's 2 days work = 2/20 = 1/10. 3rd day (A+B+C) = 1/20 + 1/30 + 1/60 = 6/60 = 1/10. Total work in 3 days = 1/10 + 1/10 = 1/5. Total days for full work = 3 * 5 = 15 days." },
+        { q: "A is thrice as good as B and finishes a job in 60 days less than B. Working together, they take:", options: ["20 days", "22 1/2 days", "25 days", "30 days"], correct: 1, explain: "Efficiency A:B = 3:1. Time A:B = 1:3. Difference 2 parts = 60 days. 1 part = 30 days. A takes 30, B takes 90. Together = (30*90)/(30+90) = 22.5 days." },
+        { q: "A(6 days), B(8 days). Total pay Rs. 3200. With C, finished in 3 days. C's share?", options: ["Rs. 375", "Rs. 400", "Rs. 600", "Rs. 800"], correct: 1, explain: "A's work = 3/6 = 1/2. B's work = 3/8. C's work = 1 - (1/2 + 3/8) = 1/8. C's share = 1/8 * 3200 = 400." },
+        { q: "6M + 8B in 10 days. 26M + 48B in 2 days. Time for 15M + 20B?", options: ["4 days", "5 days", "6 days", "7 days"], correct: 0, explain: "60M + 80B = 52M + 96B => 8M = 16B => 1M = 2B. 6M+8B = 20B. 15M+20B = 50B. M1D1 = M2D2 => 20*10 = 50*x => x = 4 days." },
+        { q: "A(4h). B+C(3h). A+C(2h). B alone takes?", options: ["8 hours", "10 hours", "12 hours", "24 hours"], correct: 2, explain: "A = 1/4. C = 1/2 - 1/4 = 1/4. B = 1/3 - 1/4 = 1/12. So 12 hours." },
+        { q: "A = B+C. A+B in 10 days, C in 50 days. B alone takes:", options: ["15 days", "20 days", "25 days", "30 days"], correct: 2, explain: "A+B+C = 1/10 + 1/50 = 6/50 = 3/25. Since A=B+C, 2A = 3/25 => A = 3/50. B = 1/10 - 3/50 = 2/50 = 1/25. So 25 days." },
+        { q: "A does 80% work in 20 days. A+B finish remaining in 3 days. B alone takes:", options: ["23 days", "37 days", "37 1/2 days", "40 days"], correct: 2, explain: "A finishes 100% in 25 days. In 3 days A does 3/25. A+B 3 day work = 20% = 1/5. B's 3 day work = 1/5 - 3/25 = 2/25. B's 1 day = 2/75. B alone = 75/2 = 37.5 days." },
+        { q: "P(8h), Q(10h), R(12h). Start 9 AM, P closed 11 AM. Finish time?", options: ["11:30 AM", "12 noon", "12:30 PM", "1:00 PM"], correct: 3, explain: "In 2 hours (9-11) P,Q,R do 2*(1/8 + 1/10 + 1/12) = 37/60. Remaining 23/60 done by Q+R. (1/10+1/12) = 11/60. Time = (23/60)/(11/60) = 2.09 hours. Total time ≈ 1:00 PM." },
+        { q: "A(18), B(15). B worked 10 days and left. A alone finishes remaining in:", options: ["5 days", "5 1/2 days", "6 days", "8 days"], correct: 2, explain: "B's 10 day work = 10/15 = 2/3. Remaining = 1/3. A takes 1/3 * 18 = 6 days." },
+        { q: "4M + 6W in 8 days. 3M + 7W in 10 days. 10W take:", options: ["35 days", "40 days", "45 days", "50 days"], correct: 1, explain: "32M + 48W = 30M + 70W => 2M = 22W => 1M = 11W. 4M+6W = 50W. 50W in 8 days => 10W in 40 days." },
+        { q: "A+B in 30 days. Together for 20 days, then B left. A finished remaining in 20 days. A alone takes:", options: ["40", "50", "54", "60"], correct: 3, explain: "20 days work = 2/3. Remaining 1/3 done by A in 20 days. Full work by A = 60 days." },
+        { q: "P(12d, 8h/d), Q(8d, 10h/d). Together (8h/d) take:", options: ["5 5/11", "5 6/11", "6 5/11", "6 6/11"], correct: 1, explain: "P = 96h, Q = 80h. Together 1 hour = 1/96 + 1/80 = 11/480. Total hours = 480/11. Days (8h/d) = 60/11 = 5 5/11. *Wait, re-checking... (480/11)/8 = 60/11 = 5 5/11.*" },
+        { q: "10W(7d), 10C(14d). Time for 5W + 10C?", options: ["3", "5", "7", "None"], correct: 2, explain: "10W in 7d => 5W in 14d. 10C in 14d. (1/14 + 1/14) = 2/14 = 1/7. So 7 days." },
+        { q: "X(20), Y(12). X starts, after 4 days Y joins. Total duration?", options: ["6 days", "10 days", "15 days", "20 days"], correct: 1, explain: "X's 4 day work = 4/20 = 1/5. Remaining 4/5 by X+Y. Together 1 day = 1/20 + 1/12 = 8/60 = 2/15. Days for 4/5 = (4/5)/(2/15) = 6. Total = 4 + 6 = 10 days." },
+        { q: "A is 30% more efficient than B. A takes 23 days. Together take:", options: ["11 days", "13 days", "20 3/17 days", "None"], correct: 1, explain: "Ratio Efficiency A:B = 130:100 = 13:10. Total Work = 13 * 23. Together efficiency = 23. Time = (13*23)/23 = 13 days." },
+        { q: "Ravi (32pg/6h), Kumar (40pg/5h). Time for 110 pages?", options: ["7h 30m", "8h", "8h 15m", "8h 25m"], correct: 2, explain: "Ravi = 16/3 pg/h, Kumar = 8 pg/h. Together = 16/3 + 8 = 40/3 pg/h. Time = 110 / (40/3) = 33/4 = 8 hours 15 mins." },
+        { q: "A(24), B(6), C(12). Together take:", options: ["1/24", "7/24", "3 3/7", "4"], correct: 2, explain: "1/24 + 1/6 + 1/12 = 7/24. Time = 24/7 = 3 3/7 days." },
+        { q: "Sakshi(20). Tanya is 25% more efficient. Tanya takes:", options: ["15", "16", "18", "21"], correct: 1, explain: "Efficiency S:T = 100:125 = 4:5. Time S:T = 5:4. 5 parts = 20d, 1 part = 4d, 4 parts = 16 days." },
+        { q: "A=2B=3C time. Together 2 days. B alone takes:", options: ["4 days", "6 days", "8 days", "12 days"], correct: 1, explain: "Let A=6x, B=3x, C=2x. 1/6x + 1/3x + 1/2x = 1/2 => 6/6x = 1/2 => x=2. B = 3x = 6 days." },
+        { q: "A(15), B(10). Together 2 days, B leaves. Total duration?", options: ["8 days", "10 days", "12 days", "15 days"], correct: 2, explain: "A+B 2 day work = 2*(1/15+1/10) = 1/3. Remaining 2/3 by A. A takes 2/3 * 15 = 10 days. Total = 10 + 2 = 12 days." },
+        { q: "A+B(30), B+C(24), C+A(20). All 10 days, then B,C leave. A takes how many more days?", options: ["18", "24", "30", "36"], correct: 0, explain: "2(A+B+C) = 1/30 + 1/24 + 1/20 = 1/8 => A+B+C = 1/16. 10 day work = 10/16 = 5/8. Remaining = 3/8. A = 1/16 - 1/24 = 1/48. A takes (3/8)/(1/48) = 18 days." },
+        { q: "A twice fast as B. B in 12 days. Together finish in:", options: ["4 days", "6 days", "8 days", "18 days"], correct: 0, explain: "B=12d, A=6d. Together = (6*12)/18 = 4 days." },
+        { q: "20W(16d). 16M(15d). Ratio capacity M:W?", options: ["3:4", "4:3", "5:3", "None"], correct: 1, explain: "Total Work = 20*16 W = 16*15 M => 320W = 240M => 4W = 3M => M/W = 4/3." },
+        { q: "A+B(8), B+C(12), A+B+C(6). A+C take:", options: ["4", "6", "8", "12"], correct: 2, explain: "A = (A+B+C) - (B+C) = 1/6 - 1/12 = 1/12. C = (A+B+C) - (A+B) = 1/6 - 1/8 = 1/24. A+C = 1/12 + 1/24 = 3/24 = 1/8. So 8 days." },
+        { q: "A(24), B(9), C(12). B+C worked 3 days and left. A finishes rest in:", options: ["5", "6", "10", "10 1/8"], correct: 2, explain: "B+C 3 day work = 3*(1/9 + 1/12) = 3*(7/36) = 7/12. Remaining = 5/12. A takes 5/12 * 24 = 10 days." },
+        { q: "X(40). X works 8 days, Y finishes rest in 16 days. Together take:", options: ["13 1/3", "15", "20", "26"], correct: 0, explain: "X's 8 day work = 1/5. Remaining 4/5 by Y in 16 days. Y takes 20 days. Together = (40*20)/(60) = 40/3 = 13 1/3 days." },
+        { q: "A+B(7). A is 1.75x efficient as B. A alone takes:", options: ["9 1/3", "11", "12 1/4", "16 1/3"], correct: 1, explain: "Efficiency A:B = 7:4. Together = 11. Total work = 11 * 7. A alone = (11*7)/7 = 11 days." },
+        { q: "A+B(30). A works 16 days, B finishes rest in 44 days. B alone takes:", options: ["30", "40", "60", "70"], correct: 2, explain: "16A + 44B = 1. Since A+B=1/30 => A = 1/30 - B. 16(1/30 - B) + 44B = 1 => 16/30 + 28B = 1 => 28B = 14/30 => B = 1/60. So 60 days." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

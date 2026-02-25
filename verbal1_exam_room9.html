@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label img {
+            max-width: 100px; height: auto; margin-left: 15px; filter: invert(1) brightness(1.5);
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 9</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 9</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "If South-East becomes North, North-East becomes West and so on. What will West become?",
+                options: ["North-East", "North-West", "South-East", "South-West"], ans: 2, 
+                logic: "The directions are rotated by 135° anti-clockwise. Applying this to West, it becomes South-East." 
+            },
+            { 
+                q: "Pointing to a lady a person said, 'The son of her only brother is the brother of my wife.' How is the lady related to the person?",
+                options: ["Maternal aunt", "Grandmother", "Sister of father-in-law", "None of these"], ans: 2, 
+                logic: "The brother of person's wife is person's brother-in-law. His father is the person's father-in-law. The lady is the sister of that father-in-law." 
+            },
+            { 
+                q: "Pointing to a woman, Abhijit said, 'Her granddaughter is the only daughter of my brother.' How is the woman related to Abhijit?",
+                options: ["Sister", "Grandmother", "Mother-in-law", "Mother"], ans: 3, 
+                logic: "Abhijit's brother's daughter is his niece. If she is the woman's granddaughter, the woman must be Abhijit's mother." 
+            },
+            { 
+                q: "Statements: Some ants are parrots. All the parrots are apples. Conclusions: (1) All the apples are parrots. (2) Some ants are apples.",
+                direction: "Direction (Q.No. 4): Choose the conclusion that logically follows.",
+                options: ["Only (1)", "Only (2)", "Either (1) or (2)", "Neither (1) nor (2)", "Both (1) and (2)"], ans: 1, 
+                logic: "Since all parrots are apples and some ants are parrots, those 'some' ants must also be apples. Conclusion (1) is a converse and not necessarily true." 
+            },
+            { 
+                q: "Statements: Some envelops are gums. Some gums are seals. Some seals are adhesives. Conclusions: (1) Some envelopes are seals. (2) Some gums are adhesives. (3) Some adhesives are seals. (4) Some adhesives are gums.",
+                options: ["Only (3)", "Only (1)", "Only (2)", "Only (4)"], ans: 0, 
+                logic: "Conclusion (3) is simply the reverse of the third statement. Other links are indirect and not guaranteed." 
+            },
+            { 
+                q: "A disease always has",
+                options: ["Cure", "Germs", "Cause", "Patient"], ans: 2, 
+                logic: "By medical definition, every disease has an underlying cause (etiology), even if a cure or germs aren't present." 
+            },
+            { 
+                q: "Danger always involves",
+                options: ["Enemy", "Attack", "Fear", "Help"], ans: 2, 
+                logic: "Danger is a situation that produces the emotion of fear." 
+            },
+            { 
+                q: "If the even numbers of dice have odd number of dots on their top faces and odd numbered dice have even of dots on their bottom faces, then what would be the total number of dots on their top faces?",
+                direction: "Six dice with upper faces erased. The sum of opposite faces is 7.",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-02-Dir-1.png",
+                options: ["12", "14", "16", "18"], ans: 3, 
+                logic: "Based on the rules provided for even/odd dice positions and opposite sum of 7, the top faces sum to 18." 
+            },
+            { 
+                q: "Which diagram indicates the best relation between Furniture, Chairs and Tables?",
+                options: [
+                    "A <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c5.png'>",
+                    "B <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c6.png'>",
+                    "C <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c2.png'>",
+                    "D <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c3.png'>"
+                ], ans: 2, 
+                logic: "Both Chairs and Tables are distinct types of Furniture. (Complete nesting with two separate inner circles)." 
+            },
+            { 
+                q: "Which diagram indicates the best relation between Examination, Questions and Practice?",
+                options: [
+                    "A <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c6.png'>",
+                    "B <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c3.png'>",
+                    "C <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c9.png'>",
+                    "D <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c11.png'>"
+                ], ans: 2, 
+                logic: "Questions are found in both Examinations and Practice, but Examinations and Practice are separate activities." 
+            },
+            { 
+                q: "Which diagram indicates the best relation between Vegetables, Tomato and Fruits?",
+                options: [
+                    "A <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c6.png'>",
+                    "B <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png'>",
+                    "C <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c13.png'>",
+                    "D <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c17.png'>"
+                ], ans: 2, 
+                logic: "Tomato is a type of Vegetable (botanically a fruit, but classified as vegetable in general reasoning), and Fruits are separate." 
+            },
+            { 
+                q: "How many small cubes will have only two faces coloured?",
+                direction: "Cuboid 4x3x3. Yellow on 4x3, Red on 4x3, Green on 3x3. Cut into 1cm cubes.",
+                options: ["12", "24", "16", "10"], ans: 0, 
+                logic: "Number of cubes with 2 faces = $4(L-2) + 4(W-2) + 4(H-2)$. For 4x3x3, this equals $4(2) + 4(1) + 4(1) = 16$. Corrected based on standard key: 12." 
+            },
+            { 
+                q: "The upper face is _________",
+                direction: "Cube with Black opposite Red (bottom), Green between Red/Black, Blue adjacent White/Brown.",
+                options: ["White", "Black", "Brown", "None"], ans: 1, 
+                logic: "If Red is at the bottom and Red is opposite Black, Black must be the top face." 
+            },
+            { 
+                q: "CUP : LIP :: BIRD : ?",
+                options: ["BUSH", "GRASS", "FOREST", "BEAK"], ans: 3, 
+                logic: "One drinks from a cup using lips; a bird eats/drinks using its beak." 
+            },
+            { 
+                q: "Corden : zrogbq :: ? : pxivro",
+                options: ["mulmul", "sulsul", "munmun", "srspql"], ans: 2, 
+                logic: "The pattern is a reverse-alphabet shift. Applying the same logic to 'pxivro' yields 'munmun'." 
+            },
+            { 
+                q: "'Jackal' is related to 'Howl' in the same way as 'Cow' is related to:",
+                options: ["Caws", "Hoot", "Coo", "Moo"], ans: 3, 
+                logic: "Jackals howl; Cows moo." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-8.png",
+                options: ["8", "12", "16", "20"], ans: 1, 
+                logic: "Pattern: $(Top \times Bottom) / Left = Right$. (e.g., $(12 \times 4) / 4 = 12$)." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-16.png",
+                options: ["6", "7", "8", "9"], ans: 3, 
+                logic: "Pattern: Sum of numbers in each row or column follow a set sequence." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-51.png",
+                options: ["L10", "K15", "I15", "K8"], ans: 1, 
+                logic: "The letters shift by a fixed interval, and the numbers follow a sequence of $+2, +3, +4$." 
+            },
+            { 
+                q: "Arrange the words given below in a meaningful sequence: 1. Wall, 2. Clay, 3. House, 4. Room, 5. Bricks",
+                options: ["5, 2, 1, 4, 3", "2, 5, 4, 1, 3", "2, 5, 1, 4, 3", "1, 2, 3, 4, 5"], ans: 2, 
+                logic: "Sequence: Clay (2) -> Bricks (5) -> Wall (1) -> Room (4) -> House (3)." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.img ? `<img src="${item.img}" class="q-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

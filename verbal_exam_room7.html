@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 7</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 7</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Error Detection: (A) Scarcely had / (B) I arrived than / (C) the train left. / (D) No error.", options: ["A", "B", "C", "D"], ans: 1, logic: "The conjunction 'scarcely' is always followed by 'when', not 'than'. It should be 'I arrived when'." },
+            { q: "Error Detection: (A) No sooner did I open the door / (B) when the rain, heavy and stormy, rushed in / (C) making us shiver from head to foot / (D) No error.", options: ["A", "B", "C", "D"], ans: 1, logic: "The conjunction 'No sooner' must be paired with 'than'. Replace 'when' with 'than'." },
+            { q: "Error Detection: (A) A lot of travel delay is caused / (B) due to the inefficiency and lack of good management / (C) on behalf of the railways. / (D) No error.", options: ["A", "B", "C", "D"], ans: 2, logic: "The phrase 'on behalf of' means representing someone. Here, the correct phrase is 'on the part of', referring to the responsibility of the railways." },
+            { q: "Error Detection: (A) Kamala's fountain-pen / (B) is as expensive / (C) as Shyama. / (D) No error.", options: ["A", "B", "C", "D"], ans: 2, logic: "This is a faulty comparison. You must compare a pen to a pen, not a pen to a person. It should be 'as Shyama's' or 'as that of Shyama'." },
+            { q: "Error Detection: (A) Our system of assigning / (B) different jobs to different people / (C) should be based on / (D) their strengths and weaknesses. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 4, logic: "The sentence is grammatically correct and logically sound." },
+            { q: "Error Detection: (A) An anti-extortion cell is opened / (B) by the district police headquarter / (C) six months ago / (D) as a precautionary measure. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 0, logic: "Because the action happened 'six months ago', the verb should be in the simple past tense: 'was opened' instead of 'is opened'." },
+            { q: "Error Detection: (A) All renew licences / (B) may be collected from / (C) the cashier's counter after / (D) paying the fees. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 0, logic: "The adjective should be 'renewed' (past participle) to describe the licences. 'Renew' is a verb." },
+            { q: "Error Detection: (A) The job is much worse than I expected / (B) If I would have realised / (C) how awful it was going to be / (D) I would not have accepted it. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 1, logic: "In a Type 3 conditional (past unreal), the 'if' clause uses 'had + past participle'. It should be 'If I had realised'." },
+            { q: "Synonym: **IMPROVEMENT**", options: ["Advancement", "Betterment", "Promotion", "Preference"], ans: 1, logic: "'Betterment' is the direct synonym for making something improved or better." },
+            { q: "Synonym: **CANDID**", options: ["Apparent", "Explicit", "Frank", "Bright"], ans: 2, logic: "Candid means truthful and straightforward; 'frank' is the closest meaning." },
+            { q: "Antonym: **ENCOURAGE**", options: ["Dampen", "Disapprove", "Discourage", "Warn"], ans: 2, logic: "Discourage (to deprive of confidence or hope) is the direct opposite of encourage." },
+            { q: "Antonym: **ESSENTIAL**", options: ["Extra", "Noughts", "Minors", "Trivial"], ans: 3, logic: "Essential means absolutely necessary; 'trivial' means of little value or importance (non-essential)." },
+            { q: "Antonym: **massive**", options: ["meager", "heavy", "light", "short"], ans: 0, logic: "Massive refers to large quantity or scale; 'meager' means lacking in quantity or quality." },
+            { q: "Correct Spelling:", options: ["Friming", "Burnning", "Running", "Fryng"], ans: 2, logic: "Running is the only correctly spelled word. (Burning has one 'n', Frying has an 'i')." },
+            { q: "Wrong Spelling:", options: ["Boundary", "Exhibit", "Depresion", "Demonstration", "All correct"], ans: 2, logic: "The correct spelling is 'Depression' with a double 's'." },
+            { q: "Context/Spelling: His **decision** (A) was based on **adequate** (B) and **acurate** (C) **information** (D).", options: ["A", "B", "C", "D", "E"], ans: 2, logic: "Part C is misspelled. The correct spelling is 'accurate' (double 'c')." },
+            { q: "Sentence Correction: **The long or short of it** is that I do not want to deal with that new firm.", options: ["The long and short of it", "The long and short for it", "The long or short for it", "The shot and long for it", "No correction required"], ans: 0, logic: "The standard idiomatic expression is 'the long and short of it', meaning the substance or summary of a matter." },
+            { q: "Stem Completion: It is not easy to remain tranquil when those around you ......", options: ["behave socially", "exhibit mannerisms", "are losing their heads", "agree to you", "exhibit generosity"], ans: 2, logic: "'Tranquil' (calm) is contrasted with the idiom 'losing their heads' (becoming panicked or angry)." },
+            { q: "One Word: A remedy for all diseases", options: ["Stoic", "Marvel", "Panacea", "Recompense"], ans: 2, logic: "A 'panacea' is a solution or remedy for all difficulties or diseases." },
+            { q: "Analogy: HOPE : ASPIRES", options: ["love:elevates", "film:flam", "fib:lie", "fake:ordinary"], ans: 2, logic: "Hope and Aspire are near-synonyms (noun-verb relationship); Fib and Lie are synonyms. Option C is the strongest synonym pair."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Analogies - Verbal Ability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #34495e;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #fdfefe;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--accent);
+        }
+
+        .instruction {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .analogy-pair {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 35px;
+            letter-spacing: 2px;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            padding: 18px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover { background: #f8f9fa; border-color: var(--primary); }
+        .opt-btn.selected { border-color: var(--primary); background: #f1f3f5; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        .progress-circle {
+            font-weight: bold;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="verbal-ability.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Home Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <span class="instruction">Select the pair that best expresses a relationship similar to the original:</span>
+        <div id="q-pair" class="analogy-pair"></div>
+        <div id="options" class="options-list"></div>
+        
+        <div class="footer">
+            <span id="progress" class="progress-circle">1 / 18</span>
+            <div>
+                <button class="btn btn-check" id="checkBtn" onclick="validate()">Check</button>
+                <button class="btn btn-next" id="nextBtn" onclick="next()">Next →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    { q: "DIVA : OPERA", opts: ["producer : theatre", "director : drama", "conductor : bus", "thespian : play"], ans: 3 },
+    { q: "GRAIN : SALT", opts: ["shard : pottery", "shred : wood", "blades : grass", "chip : glass"], ans: 3 },
+    { q: "THRUST : SPEAR", opts: ["mangle : iron", "scabbard : sword", "bow : arrow", "fence : epee"], ans: 3 },
+    { q: "PAIN : SEDATIVE", opts: ["comfort : stimulant", "grief : consolation", "trance : narcotic", "ache : extraction"], ans: 1 },
+    { q: "LIGHT : BLIND", opts: ["speech : dumb", "language : deaf", "tongue : sound", "voice : vibration"], ans: 0 },
+    { q: "WAN : COLOUR", opts: ["corpulent : weight", "insipid : flavour", "pallid : complexion", "enigmatic : puzzle"], ans: 1 },
+    { q: "PORK : PIG", opts: ["rooster : chicken", "mutton : sheep", "steer : beef", "lobster : crustacean"], ans: 1 },
+    { q: "AFTER : BEFORE", opts: ["first : second", "present : past", "contemporary : historic", "successor : predecessor"], ans: 3 },
+    { q: "INDIGENT : WEALTHY", opts: ["angry : rich", "native : affluent", "gauche : graceful", "scholarly : erudite"], ans: 2 },
+    { q: "DISTANCE : MILE", opts: ["liquid : litre", "bushel : corn", "weight : scale", "fame : television"], ans: 0 },
+    { q: "TEN : DECIMAL", opts: ["seven : septet", "four : quartet", "two : binary", "five : quince"], ans: 2 },
+    { q: "MUNDANE : SPIRITUAL", opts: ["common : ghostly", "worldly : unworldly", "routine : novel", "secular : clerical"], ans: 1 },
+    { q: "ARMY : LOGISTICS", opts: ["business : strategy", "soldier : students", "war : logic", "team : individual"], ans: 0 },
+    { q: "GRAVITY : PULL", opts: ["iron : metal", "north pole : directions", "magnetism : attraction", "dust : desert"], ans: 2 },
+    { q: "FILTER : WATER", opts: ["curtail : activity", "expunge : book", "edit : text", "censor : play"], ans: 3 },
+    { q: "HOPE : ASPIRES", opts: ["love : elevates", "film : flam", "fib : lie", "fake : ordinary"], ans: 2 },
+    { q: "CORPOREAL : SPIRITUAL", opts: ["mesa : plateau", "moron : savant", "foreigner : immigrant", "pedagogue : teacher"], ans: 1 },
+    { q: "SYMPHONY : COMPOSER", opts: ["Leonardo : music", "Fresco : painter", "colours : pallet", "art : appreciation"], ans: 1 }
+];
+
+let idx = 0;
+let selected = null;
+
+function render() {
+    const item = data[idx];
+    document.getElementById('progress').innerText = `${idx + 1} / ${data.length}`;
+    document.getElementById('q-pair').innerText = item.q;
+    
+    const optBox = document.getElementById('options');
+    optBox.innerHTML = '';
+    item.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = o;
+        btn.onclick = () => {
+            selected = i;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        optBox.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function validate() {
+    if (selected === null) return alert("Select an option!");
+    const correct = data[idx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach((b, i) => {
+        if (i === correct) b.classList.add('correct');
+        if (i === selected && i !== correct) b.classList.add('wrong');
+        b.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function next() {
+    selected = null;
+    if (idx < data.length - 1) {
+        idx++;
+        render();
+    } else {
+        alert("Analogy Practice Completed!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

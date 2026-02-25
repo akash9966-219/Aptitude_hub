@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volume and Surface Area Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Volume and Surface Area</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "A right triangle (3, 4, 5 cm) is rotated along the 3 cm side to form a cone. Volume?", options: ["12π cm³", "15π cm³", "16π cm³", "20π cm³"], correct: 2, explain: "The 3cm side is the height ($h$), so the 4cm side becomes the radius ($r$). $V = \\frac{1}{3}\\pi r^2 h = \\frac{1}{3}\\pi(4^2)(3) = 16\\pi$ cm³." },
+        { q: "Rainfall of 5 cm on 1.5 hectares of ground. Volume in cu. m?", options: ["75", "750", "7500", "75000"], correct: 1, explain: "1.5 hectares = 15,000 m². Height = 5 cm = 0.05 m. $V = Area \\times Height = 15000 \\times 0.05 = 750$ m³." },
+        { q: "Hall 15m x 12m. Area(Floor + Ceiling) = Area(4 Walls). Volume?", options: ["720", "900", "1200", "1800"], correct: 2, explain: "Area(F+C) = $2(15 \\times 12) = 360$. Area(4 Walls) = $2h(15+12) = 54h$. $54h = 360 \\implies h = \\frac{20}{3}$. $V = 15 \\times 12 \\times \\frac{20}{3} = 1200$ m³." },
+        { q: "66 cm³ silver wire, 1mm diameter. Length in metres?", options: ["84", "90", "168", "336"], correct: 0, explain: "$r = 0.5$ mm = 0.05 cm. $\\pi r^2 h = 66$. $\\frac{22}{7} \\times (0.05)^2 \\times h = 66 \\implies h = 8400$ cm = 84 m." },
+        { q: "Hollow iron pipe 21cm long, ext. dia 8cm, thickness 1cm. Iron weighs 8g/cm³. Weight?", options: ["3.6 kg", "3.696 kg", "36 kg", "36.9 kg"], correct: 1, explain: "$R=4, r=3, h=21$. $V = \\pi(R^2 - r^2)h = \\frac{22}{7}(16-9)21 = 462$ cm³. Weight = $462 \\times 8 = 3696$ g = 3.696 kg." },
+        { q: "Boat (3m x 2m) sinks 1cm when a man gets on. Mass of man?", options: ["12 kg", "60 kg", "72 kg", "96 kg"], correct: 1, explain: "Volume of water displaced = $3 \\times 2 \\times 0.01 = 0.06$ m³. Mass = $V \\times Density_{water} = 0.06 \\times 1000 = 60$ kg." },
+        { q: "50 men dip in tank (40m x 20m). Avg displacement 4m³. Rise in water level?", options: ["20 cm", "25 cm", "35 cm", "50 cm"], correct: 1, explain: "Total displacement = $50 \\times 4 = 200$ m³. $Area \\times Rise = 200 \\implies 800 \\times h = 200 \\implies h = 0.25$ m = 25 cm." },
+        { q: "Slant height 10m, height 8m. Curved surface area of cone?", options: ["30π m²", "40π m²", "60π m²", "80π m²"], correct: 2, explain: "$r = \\sqrt{10^2 - 8^2} = 6$. $CSA = \\pi r l = \\pi(6)(10) = 60\\pi$ m²." },
+        { q: "Cistern 6m x 4m, water depth 1.25m. Total wet surface area?", options: ["49 m²", "50 m²", "53.5 m²", "55 m²"], correct: 0, explain: "Area = $Bottom + 4 Walls = (6 \\times 4) + 2(6+4) \\times 1.25 = 24 + 25 = 49$ m²." },
+        { q: "48m x 36m sheet. Cut 8m squares from corners to make box. Volume?", options: ["4830", "5120", "6420", "8960"], correct: 1, explain: "$L = 48-16=32, B = 36-16=20, H=8$. $V = 32 \\times 20 \\times 8 = 5120$ m³." },
+        { q: "CSA cylinder = 264, Vol = 924. Ratio of diameter to height?", options: ["3:7", "7:3", "6:7", "7:6"], correct: 1, explain: "$\\frac{\\pi r^2 h}{2\\pi r h} = \\frac{924}{264} \\implies \\frac{r}{2} = 3.5 \\implies r=7$. $2\\pi(7)h = 264 \\implies h=6$. $D:H = 14:6 = 7:3$." },
+        { q: "Capacity 8000L. Ext dims 3.3x2.6x1.1m. Walls 5cm thick. Bottom thickness?", options: ["90 cm", "1 dm", "1 m", "1.1 cm"], correct: 1, explain: "Int dims: $L=3.2, B=2.5$. $V = 3.2 \\times 2.5 \\times H_{int} = 8$ m³. $H_{int} = 1$ m. Bottom thickness = $1.1 - 1.0 = 0.1$ m = 1 dm." },
+        { q: "TSA of cone: height 14, radius 7?", options: ["344.35 cm²", "462 cm²", "498.35 cm²", "None"], correct: 2, explain: "$l = \\sqrt{14^2 + 7^2} = \\sqrt{245} \\approx 15.65$. $TSA = \\pi r(r+l) = \\frac{22}{7} \\times 7(7 + 15.65) = 498.3$ cm²." },
+        { q: "Melt cubes 3, 4, 5 cm to make one large cube. Ratio of TSA (small sum : large)?", options: ["2:1", "3:2", "25:18", "27:20"], correct: 2, explain: "$V_{total} = 27+64+125 = 216$. Side of large cube = 6. TSA small = $6(3^2+4^2+5^2) = 6(50) = 300$. TSA large = $6(6^2) = 216$. Ratio = $300:216 = 25:18$." },
+        { q: "How many bricks (25x11.25x6 cm) for wall (8m x 6m x 22.5cm)?", options: ["5600", "6000", "6400", "7200"], correct: 2, explain: "$n = \\frac{800 \\times 600 \\times 22.5}{25 \\times 11.25 \\times 6} = 32 \\times 100 \\times 2 = 6400$." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

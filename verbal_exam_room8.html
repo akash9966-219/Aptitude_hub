@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 8</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 8</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Antonym: **DEAR**", options: ["Priceless", "Free", "Worthless", "Cheap"], ans: 3, logic: "In this context, 'Dear' means expensive. Therefore, 'Cheap' is the direct opposite." },
+            { q: "Antonym: **MINOR**", options: ["Big", "Major", "Tall", "Heavy"], ans: 1, logic: "'Major' is the standard antonym for 'Minor' when referring to scale, importance, or rank." },
+            { q: "Fill in the blank: In high school many of us never realised the importance that grammar would ...... in later life.", options: ["figure", "portray", "play", "exercise"], ans: 2, logic: "The standard colocation is to 'play an importance' or 'play a role/part' in something." },
+            { q: "Fill in the blank: Physically we are now all neighbors, but psychologically, we are ...... to each other.", options: ["primitives", "complimentary", "strangers", "cowards"], ans: 2, logic: "The sentence uses 'but' to show contrast. While we are physically close (neighbors), we remain mentally distant (strangers)." },
+            { q: "Fill in the blank: The robbers were arrested and ...... prison yesterday.", options: ["brought into", "brought to", "taken into", "taken to"], ans: 3, logic: "The correct idiom for being moved to a place of confinement is 'taken to prison'." },
+            { q: "Fill in the blank: He is a person of sound character and ...... disposition.", options: ["beneficent", "morous", "amiable", "amicable"], ans: 2, logic: "'Amiable' refers to a friendly and pleasant manner/disposition in a person." },
+            { q: "Fill in the blank: This, partly, explains how the Mehta family has been able to ...... its lavish lifestyle in recent times, despite the fact that all its assets have been ......", options: ["keep, removed", "afford, attached", "develop, liquidated", "keep up, destroyed"], ans: 1, logic: "In legal/financial terms, assets are 'attached' (seized). Despite this, they 'afford' the lifestyle." },
+            { q: "Wrong Spelling:", options: ["Filled", "Fulfiled", "Expelled", "Skilled", "All correct"], ans: 1, logic: "The correct spelling is 'Fulfilled' with a double 'l' in the middle (and optionally at the end depending on US/UK English, but 'Fulfiled' is always wrong)." },
+            { q: "Sequence: It was to be (P) before their school examination (Q) which was due to start (R) the last expedition (S) in a month's time.", options: ["SRQP", "RQSP", "RPQS", "SPRQ"], ans: 2, logic: "The sequence is: It was to be (R) the last expedition (P) before their school examination (Q) which was due to start (S) in a month's time. RPQS." },
+            { q: "Sentence Improvement: I have got some tea, but I do not have **a** sugar.", options: ["some", "got", "more", "any", "No correction required"], ans: 3, logic: "Sugar is an uncountable noun. In negative sentences, we use 'any' (e.g., 'I do not have any sugar')." },
+            { q: "Sentence Improvement: Anand has the guts **to rise from** the occasion and come out successfully.", options: ["in rising from", "to raise with", "to rise to", "to rise against", "No correction required"], ans: 2, logic: "The correct idiom is 'to rise to the occasion', meaning to succeed in a difficult situation." },
+            { q: "Stem Completion: 'Anand stuck up a friendship with Mahesh in just 2 days' means ......", options: ["friendship ended", "found other friends", "fixed a deal", "lasted 2 years", "became a friend in less than 2 days"], ans: 4, logic: "'Stuck up a friendship' (or strike up) means to start a friendship." },
+            { q: "One Word: A prima facie case is such", options: ["As it seems at first sight", "As it is made to seem", "As it turns out at end", "As it seems after hearings"], ans: 0, logic: "Latin: 'Prima facie' literally means 'at first face' or 'at first sight'." },
+            { q: "One Word: One absorbed in his own thoughts and feelings rather than in things outside", options: ["Scholar", "Recluse", "Introvert", "Intellectual"], ans: 2, logic: "An 'Introvert' is someone whose focus is directed inward toward their own thoughts and feelings." },
+            { q: "One Word: The part of government which is concerned with making of rules", options: ["Court", "Tribunal", "Bar", "Legislature"], ans: 3, logic: "The 'Legislature' is the branch of government responsible for making/enacting laws." },
+            { q: "One Word: That which cannot be believed", options: ["Incredible", "Incredulous", "Implausible", "Unreliable"], ans: 0, logic: "'Incredible' means impossible to believe. (Note: Incredulous refers to the person who refuses to believe)." },
+            { q: "One Word: One who does not care for literature or art", options: ["Primitive", "Illiterate", "Philistine", "Barbarian"], ans: 2, logic: "A 'Philistine' is a person who is hostile or indifferent to culture and the arts." },
+            { q: "Idiom: He **struck several bad patches** before he made good.", options: ["bad soil", "Had a bad time", "many illness", "Had many professional difficulties"], ans: 3, logic: "To 'strike a bad patch' means to experience a period of difficulty or lack of success." },
+            { q: "Idiom: Do not imagine that Dharmendra is really sorry that his wife died. Those are only **crocodile tears**.", options: ["Pretended sorrow", "Tears a crocodile", "A weeping crocodile", "Mild regret"], ans: 0, logic: "'Crocodile tears' refers to a false or insincere display of grief." },
+            { q: "Idiom: The case was **held over** due to the great opposition to it.", options: ["stopped", "postponed", "dropped", "cancelled"], ans: 1, logic: "To 'hold over' something means to postpone or delay it until a later time."}
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

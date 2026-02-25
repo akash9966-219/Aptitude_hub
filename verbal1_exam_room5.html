@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 180px; height: auto; margin: 10px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+        .main-img { max-width: 100%; height: auto; margin-bottom: 15px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 5</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 5</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "Rohit walked 25 m towards south. Then he turned to his left and walked 20 m. He then turned to his left and walked 25 m. He again turned to his right and walked 15 m. At what distance is he from the starting point and in which direction?",
+                options: ["35 m East", "35 m North", "30 m West", "45 m East"], ans: 0, 
+                logic: "The two 25m North/South walks cancel out. He walked 20m East and then 15m East. Total = 35m East." 
+            },
+            { 
+                q: "Which of the following shows that P is the maternal uncle of Q?",
+                direction: "+ (Mother), - (Brother), % (Father), x (Sister)",
+                options: ["Q - N + M x P", "P + S x N - Q", "P - M + N x Q", "Q - S % P"], ans: 2, 
+                logic: "P - M (P is brother of M) and M + N (M is mother of N). This makes P the maternal uncle of N's circle." 
+            },
+            { 
+                q: "In A # B $ C * D, who is the father?",
+                direction: "$ (Brother), # (Mother), * (Daughter)",
+                options: ["D", "B", "C", "Data inadequate"], ans: 0, 
+                logic: "A is mother of B, B is brother of C, C is daughter of D. Since A is the mother, D must be the father." 
+            },
+            { 
+                q: "P % Q + R - T x K indicates which relation of P to K?",
+                direction: "x (Daughter), + (Father), % (Mother), - (Brother)",
+                options: ["Daughter-in-law", "Sister-in-law", "Aunt", "None of these"], ans: 0, 
+                logic: "P is mother of Q, Q is father of R, R is brother of T, T is daughter of K. This implies P is mother-in-law of K, and the relation flows to Daughter-in-law." 
+            },
+            { 
+                q: "Statements: Some tables are T.V. Some T.V. are radios.",
+                options: ["Only (2) and (4)", "Only (1) and (3)", "Only (4)", "Only (1) and (4)", "None of the four"], ans: 4, 
+                logic: "Two 'Some' statements do not allow for a definite connection between the first and third elements." 
+            },
+            { 
+                q: "Statements: All men are vertebrates. Some mammals are vertebrates.",
+                options: ["Only (4)", "Only (2)", "Only (3)", "Only (1)", "Only (1) and (3)"], ans: 2, 
+                logic: "If some mammals are vertebrates, then some vertebrates must be mammals." 
+            },
+            { 
+                q: "Statements: All the locks are keys. All the keys are bats. Some watches are bats.",
+                options: ["Only (1) and (2)", "Only (1)", "Only (2)", "Only (1) and (3)"], ans: 1, 
+                logic: "Since all locks are keys and all keys are bats, some bats are definitely locks." 
+            },
+            { 
+                q: "Statements: All the books are papers. Some papers are journals. Some journals are calendars.",
+                options: ["Only (1)", "Only (2)", "Only (3)", "Only (4)", "None of the four"], ans: 4, 
+                logic: "No definite conclusion follows as the intermediate links are 'Some' statements." 
+            },
+            { 
+                q: "A car always has",
+                options: ["Driver", "Wheels", "Bonnet", "Bumper"], ans: 1, 
+                logic: "A driver is only needed for operation, but wheels are an essential part of the car's physical existence." 
+            },
+            { 
+                q: "Which one of the following a 'Drama' must have?",
+                options: ["Actors", "Story", "Sets", "Director"], ans: 1, 
+                logic: "A story is the core requirement of any drama; without a narrative, there is no drama." 
+            },
+            { 
+                q: "How many points will be on the face opposite to the face which contains 2 points?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-13.png",
+                options: ["1", "5", "4", "6"], ans: 3, 
+                logic: "By eliminating adjacent faces (1, 3, 4, 5), the face opposite 2 must be 6." 
+            },
+            { 
+                q: "Which number is on the face opposite to 6?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-17.png",
+                options: ["4", "1", "2", "3"], ans: 1, 
+                logic: "Analyzing the common faces in the dice positions reveals that 1 is opposite 6." 
+            },
+            { 
+                q: "Which diagram indicates the best relation between Football, Player and Field?",
+                options: [
+                    "A. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c1.png' class='q-img'>",
+                    "B. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c2.png' class='q-img'>",
+                    "C. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c3.png' class='q-img'>",
+                    "D. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>"
+                ], ans: 3, 
+                logic: "Football, Player, and Field are three distinct entities with no shared class, represented by disjoint circles." 
+            },
+            { 
+                q: "Which diagram indicates the best relation between Factory, Product and Machinery?",
+                options: [
+                    "A. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>",
+                    "B. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c10.png' class='q-img'>",
+                    "C. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c3.png' class='q-img'>",
+                    "D. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c11.png' class='q-img'>"
+                ], ans: 3, 
+                logic: "Both Product and Machinery are separate items found within a Factory (Diagram D)." 
+            },
+            { 
+                q: "If hospital management requires only married trained nurses for operation theater, which part should be chosen?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-7-Dir-1.png",
+                options: ["7", "4", "5", "6"], ans: 2, 
+                logic: "The area representing the intersection of 'Married', 'Trained', and 'Nurses' is 5." 
+            },
+            { 
+                q: "How many small cubes will be formed having no face coloured?",
+                direction: "Cube painted blue, cut into 125 small cubes.",
+                options: ["27", "8", "16", "24"], ans: 0, 
+                logic: "For an $n \times n \times n$ cube, inner cubes = $(n-2)^3$. Here $125 = 5^3$, so $(5-2)^3 = 3^3 = 27$." 
+            },
+            { 
+                q: "What is the number of cubes with at least one green face each?",
+                options: ["36", "32", "38", "48"], ans: 2, 
+                logic: "Calculation of surfaces based on the red/green paint split on the two 32-cube segments leads to 38." 
+            },
+            { 
+                q: "Who among the following is seated between E and H?",
+                passage: "8 persons E-L square table. J between L and F. G between I and F. H (lady) 2nd left of J. F (male) opposite E (lady). Lady between F and I.",
+                options: ["F", "I", "K", "Cannot be determined"], ans: 2, 
+                logic: "Mapping the seating arrangement based on the gender constraints and adjacency shows K is between E and H." 
+            },
+            { 
+                q: "Which one is sitting just right to V?",
+                passage: "6 girls circle. T not between Q and S. P next left of V. R 4th right of P.",
+                options: ["P", "T", "R", "S/Q"], ans: 3, 
+                logic: "Placing P, V, and R first shows V's right must be occupied by either S or Q." 
+            },
+            { 
+                q: "Arrange in meaningful sequence: 1. Leaves, 2. Branch, 3. Flower, 4. Tree, 5. Fruit",
+                options: ["4, 3, 1, 2, 5", "4, 2, 5, 1, 3", "4, 3, 2, 1, 5", "4, 2, 1, 3, 5"], ans: 3, 
+                logic: "The growth/structural sequence is: Tree -> Branch -> Leaves -> Flower -> Fruit." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="main-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

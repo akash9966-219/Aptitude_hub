@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 8</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 8</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "Radha moves towards South-East a distance of 7 km, then she moves towards West and travels a distance of 14 km. From here she moves towards North-West a distance of 7 km and finally she moves a distance of 4 km towards east. How far is she now from the starting point?",
+                options: ["3 km", "4 km", "10 km", "11 km"], ans: 2, 
+                logic: "Radha's path forms a parallelogram. The distance between the starting and ending points on the horizontal line is $14 - 4 = 10$ km." 
+            },
+            { 
+                q: "From his house, Lokesh went 15 km to the North. Then he turned west and covered 10 km. Then he turned south and covered 5 km. Finally turning to the east, he covered 10 km. In which direction is he from his house?",
+                options: ["East", "West", "North", "South"], ans: 2, 
+                logic: "He moved 15 km North and 5 km South, resulting in 10 km North. The West and East movements (10 km each) cancel out." 
+            },
+            { 
+                q: "One morning Udai and Vishal were talking to each other face to face at a crossing. If Vishal's shadow was exactly to the left of Udai, which direction was Udai facing?",
+                options: ["East", "West", "North", "South"], ans: 2, 
+                logic: "In the morning, the sun is in the East, so shadows fall West. If the shadow is to Udai's left, Udai must be facing North." 
+            },
+            { 
+                q: "Pointing to a boy in the photograph Reena said, 'He is the only son of the only child of my grandfather.' How Reena is related to that boy?",
+                options: ["Mother", "Sister", "Aunt", "Cannot be determined"], ans: 1, 
+                logic: "The 'only child of grandfather' is Reena's father. The 'only son' of her father is her brother. Thus, Reena is his sister." 
+            },
+            { 
+                q: "Pointing to a photograph of a boy Suresh said, 'He is the son of the only son of my mother.' How is Suresh related to that boy?",
+                options: ["Brother", "Uncle", "Cousin", "Father"], ans: 3, 
+                logic: "The 'only son of my mother' is Suresh himself. The boy is Suresh's son, so Suresh is the Father." 
+            },
+            { 
+                q: "Introducing a man, a woman said, 'He is the only son of the mother of my mother.' How is the woman related to the man?",
+                options: ["Mother", "Sister", "Niece", "Maternal aunt"], ans: 2, 
+                logic: "The 'mother of my mother' is grandmother. Her 'only son' is the woman's maternal uncle. The woman is his Niece." 
+            },
+            { 
+                q: "Which one of the following is always found in 'Phrase'?",
+                options: ["Nomenclature", "Manifestation", "Pictorial effect", "Glossary"], ans: 1, 
+                logic: "A phrase is a manifestation of an idea or expression through words." 
+            },
+            { 
+                q: "If the dice (I), (II) and (III) have even number of dots on their bottom faces, then what would be the total number of dots on their top faces?",
+                direction: "Six dice with upper faces erased. The sum of the numbers of dots on the opposite face is 7.",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-02-Dir-1.png",
+                options: ["7", "11", "12", "14"], ans: 2, 
+                logic: "Opposite sum is 7. If bottom is even (2,4,6), top is odd (5,3,1). Calculating based on visible side faces for I, II, III gives a total of 12." 
+            },
+            { 
+                q: "Statements: I. Police had resorted to lathi-charge to disperse the unruly mob. II. The civic administration has recently hiked the property tax by 30%.",
+                options: ["A", "B", "C", "D", "E"], ans: 1, 
+                logic: "The hike in property tax (Cause II) led to the unruly mob and subsequent police action (Effect I)." 
+            },
+            { 
+                q: "Study the diagram and identify the people who can speak only one language.",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-2-1.png",
+                options: ["L + M + O", "K + J + I", "K", "I"], ans: 1, 
+                logic: "The letters K, J, and I are in non-overlapping sections, representing those who speak only one language." 
+            },
+            { 
+                q: "By which letter the ladies who doctor and surgeon both are represented?",
+                direction: "Square = doctors, triangle = ladies, circle = surgeon.",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-2-23.png",
+                options: ["U", "T", "S", "P"], ans: 1, 
+                logic: "The letter 'T' is located in the intersection of the square, triangle, and circle." 
+            },
+            { 
+                q: "How many artists are players?",
+                direction: "Study the Venn diagram of Artists, Players, and Doctors.",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-5-Dir-1.png",
+                options: ["5", "8", "25", "16"], ans: 2, 
+                logic: "Players who are artists = $22 + 3 = 25$." 
+            },
+            { 
+                q: "Tiger : Forest :: Otter : ?",
+                options: ["Cage", "Sky", "Nest", "Water"], ans: 3, 
+                logic: "A tiger's natural habitat is the forest; an otter's natural habitat is water." 
+            },
+            { 
+                q: "'Nun' is related to 'Convent' in the same way as 'Hen' is related to:",
+                options: ["Nest", "Shed", "Cell", "Cote"], ans: 3, 
+                logic: "A Nun lives in a Convent; a Hen is kept in a Cote." 
+            },
+            { 
+                q: "Which of the cars are on both the sides of cadillac car?",
+                direction: "Exhibition of 7 cars standing facing East: Cadillac is right of Fargo; Fargo is 4th right of Fiat; Maruti is between Ambassador and Bedford; Fiat is 3rd left of Ambassador.",
+                options: ["Ambassador and Maruti", "Maruti and Fiat", "Fargo and Mercedes", "Ambassador and Fargo"], ans: 2, 
+                logic: "Sequence from left: Fiat, Bedford, Maruti, Ambassador, Fargo, Cadillac, Mercedes. Neighbors of Cadillac are Fargo and Mercedes." 
+            },
+            { 
+                q: "Which one is sitting opposite to P?",
+                direction: "P, Q, R, S, T, U on hexagonal table. P is 2nd left of U. Q is neighbour of R and S. T is 2nd left of S.",
+                options: ["R", "Q", "T", "S"], ans: 3, 
+                logic: "The seating order is U, T, P, R, Q, S. Opposite P is S." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-23.png",
+                options: ["9", "6", "15", "14"], ans: 0, 
+                logic: "Pattern: $(Diagonal Sum) - (Other Diagonal Sum) = 9$." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-25.png",
+                options: ["30", "13", "70", "118"], ans: 2, 
+                logic: "The pattern involves squaring or multiplying outer numbers to get the central value 70." 
+            },
+            { 
+                q: "Arrange the words given below in a meaningful sequence: 1. Rainbow, 2. Rain, 3. Sun, 4. Happy, 5. Child",
+                options: ["4, 2, 3, 5, 1", "2, 3, 1, 5, 4", "4, 5, 1, 2, 3", "2, 1, 4, 5, 3"], ans: 1, 
+                logic: "Natural order: Rain (2) leads to Sun (3), creating a Rainbow (1), which a Child (5) sees and becomes Happy (4)." 
+            },
+            { 
+                q: "Arrange in meaningful sequence: 1. Police, 2. Punishment, 3. Crime, 4. Judge, 5. Judgement",
+                options: ["3, 1, 2, 4, 5", "1, 2, 4, 3, 5", "5, 4, 3, 2, 1", "3, 1, 4, 5, 2"], ans: 3, 
+                logic: "Legal process: Crime (3) -> Police (1) -> Judge (4) -> Judgement (5) -> Punishment (2)." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.img ? `<img src="${item.img}" class="q-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

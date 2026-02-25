@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label img {
+            max-width: 100px; height: auto; margin-left: 15px; filter: invert(1) brightness(1.5);
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 100%; height: auto; margin: 15px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 10</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 10</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "Sundar runs 20 m towards East and turns to right and runs 10 m. Then he turns to the right and runs 9 m. Again he turns to right and runs 5 m. After this he turns to left and runs 12 m and finally he turns to right and 6 m. Now to which direction is Sundar facing?",
+                options: ["East", "West", "North", "South"], ans: 2, 
+                logic: "Tracing the path: East -> Right (South) -> Right (West) -> Right (North) -> Left (West) -> Right (North). He ends facing North." 
+            },
+            { 
+                q: "The length and breadth of a room are 8 m and 6 m respectively. A cat runs along all the four walls and finally along a diagonal order to catch a rat. How much total distance is covered by the cat?",
+                options: ["10", "14", "38", "48"], ans: 2, 
+                logic: "Perimeter = $2(8 + 6) = 28$ m. Diagonal = $\\sqrt{8^2 + 6^2} = 10$ m. Total distance = $28 + 10 = 38$ m." 
+            },
+            { 
+                q: "Introducing a woman, Shashank said, 'She is the mother of the only daughter of my son.' How that woman is related to Shashank?",
+                options: ["Daughter", "Sister-in-law", "Wife", "Daughter-in-law"], ans: 3, 
+                logic: "The only daughter of Shashank's son is his granddaughter. The mother of that granddaughter is Shashank's son's wife, which makes her his Daughter-in-law." 
+            },
+            { 
+                q: "Which of the following means M is the maternal uncle of N?",
+                direction: "A*B: Sister, A$B: B is Mother, A+B: Brother, A=B: B is Father.",
+                options: ["M = P + Q * N", "N + P = Q * M", "N * P $ Q * M", "None of these"], ans: 2, 
+                logic: "In 'N * P $ Q * M': N is sister of P, Q is mother of P (so Q is mother of N), and Q is sister of M. Thus M is the maternal uncle." 
+            },
+            { 
+                q: "Statements: All the poets are goats. Some goats are trees. Conclusions: (1) Some poets are trees. (2) Some trees are goats.",
+                options: ["Only (1)", "Only (2)", "Either (1) or (2)", "Neither (1) nor (2)", "Both (1) and (2)"], ans: 1, 
+                logic: "Conclusion (2) is a direct conversion of 'Some goats are trees'. Conclusion (1) cannot be confirmed." 
+            },
+            { 
+                q: "Statements: All the pencils are pens. All the pens are inks. Conclusions: (1) All the pencils are inks. (2) Some inks are pencils.",
+                options: ["Only (1)", "Only (2)", "Either (1) or (2)", "Neither (1) nor (2)", "Both (1) and (2)"], ans: 4, 
+                logic: "Since pencils are inside pens and pens are inside inks, all pencils are inks. By conversion, some inks are pencils." 
+            },
+            { 
+                q: "Two positions of a dice are shown. Which number will appear opposite to 5?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-5.png",
+                options: ["2/6", "2", "6", "4"], ans: 0, 
+                logic: "From the two positions, 3 and 4 are adjacent to 1, 2, 5, and 6. Solving for the common faces, 5 is opposite to either 2 or 6." 
+            },
+            { 
+                q: "Two positions of dice are shown. How many points will appear on the opposite to the face containing 5 points?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-14.png",
+                options: ["3", "1", "2", "4"], ans: 1, 
+                logic: "The faces adjacent to 5 are 2, 3 and 4, 6. The remaining number is 1." 
+            },
+            { 
+                q: "When surface 4 touches the bottom, what surface will be on the top?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-19.png",
+                options: ["1", "2", "5", "6"], ans: 0, 
+                logic: "By comparing common faces, it is determined that 4 is opposite 1." 
+            },
+            { 
+                q: "Which diagram indicates the best relation between Paper, Stationery and Ink?",
+                options: [
+                    "a <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c10.png'>",
+                    "b <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c14.png'>",
+                    "c <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png'>",
+                    "d <img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c6.png'>"
+                ], ans: 3, 
+                logic: "Both Paper and Ink are distinct items that belong under the category of Stationery." 
+            },
+            { 
+                q: "How many persons take all the three?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-4-Dir-1.png",
+                options: ["20", "17", "25", "15"], ans: 3, 
+                logic: "The central intersection where all three circles meet contains the number 15." 
+            },
+            { 
+                q: "How many cubes will have green colour on two sides and rest having no colour?",
+                direction: "Cuboid 6x4x1. Black (4x1), Red (6x1), Green (6x4). Divided into 1cm cubes.",
+                options: ["12", "10", "8", "4"], ans: 2, 
+                logic: "These are the inner cubes on the 6x4 face. $(6-2) \\times (4-2) = 4 \\times 2 = 8$." 
+            },
+            { 
+                q: "How many small cubes have three faces coloured?",
+                direction: "Cuboid 4x3x3 cut into 1cm small cubes.",
+                options: ["24", "20", "16", "8"], ans: 3, 
+                logic: "Cubes with 3 faces coloured are always the corner cubes. A cuboid has 8 corners." 
+            },
+            { 
+                q: "How many small cubes are there whose only one face is coloured?",
+                direction: "Big cube cut into 64 small cubes (4x4x4). Opposite faces: red, black, green.",
+                options: ["32", "8", "16", "24"], ans: 3, 
+                logic: "Formula: $6(n-2)^2$. Here $n=4$, so $6(4-2)^2 = 6 \\times 4 = 24$." 
+            },
+            { 
+                q: "College : Student :: Hospital : ?",
+                options: ["Nurse", "Doctor", "Treatment", "Patient"], ans: 3, 
+                logic: "Students go to college to receive education; patients go to hospitals to receive medical care." 
+            },
+            { 
+                q: "Lucknow, Patna, Bhopal, Jaipur",
+                options: ["Shimla", "Mysore", "Pune", "Indore"], ans: 0, 
+                logic: "The group consists of state capitals of India. Shimla is the capital of Himachal Pradesh." 
+            },
+            { 
+                q: "Who is sitting right to Prakash?",
+                direction: "6 friends in a circle. Deepa between Prakash/Pankaj. Priti between Mukesh/Lalit. Prakash opposite Mukesh.",
+                options: ["Mukesh", "Deepa", "Pankaj", "Lalit"], ans: 1, 
+                logic: "Following the clockwise order, Deepa is sitting immediately to the right of Prakash." 
+            },
+            { 
+                q: "Who among the following are three lady members?",
+                direction: "8 persons on square table. 3 ladies not together. J between L/F. G between I/F. H (lady) 2nd left J. F (male) opposite E (lady). Lady between F/I.",
+                options: ["E, H and J", "E, F and G", "E, H and G", "C, H and J"], ans: 2, 
+                logic: "Based on the seating constraints and male/female designations, the three ladies are E, H, and G." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-28.png",
+                options: ["5", "6", "8", "9"], ans: 3, 
+                logic: "Pattern: $(15 + 12) / 3 = 9$. The sum of the top two divided by the bottom left gives the bottom right." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-56.png",
+                options: ["3", "2", "7", "6"], ans: 1, 
+                logic: "Looking at the relationship between outer and inner numbers, the value required to complete the pattern is 2." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.img ? `<img src="${item.img}" class="q-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

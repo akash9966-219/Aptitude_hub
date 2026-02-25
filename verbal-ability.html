@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability - Study Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --accent: #e74a3b;
+            --success: #1cc88a;
+            --dark: #2e3759;
+            --bg: #f8f9fc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: -30px auto 50px;
+        }
+
+        .nav-tools {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn-nav {
+            background: white;
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            background: #eee;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e3e6f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: var(--primary);
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #6c757d;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            margin-top: auto;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Color coding for different types */
+        .grammar::before { background: #4e73df; }
+        .vocab::before { background: #1cc88a; }
+        .logic::before { background: #f6c23e; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Verbal Ability Portal</h1>
+    <p>Comprehensive English Language & Grammar Preparation</p>
+</div>
+
+<div class="container">
+    <div class="nav-tools">
+        <a href="index.html" class="btn-nav">🏠 Home</a>
+        <a href="reasoning.html" class="btn-nav">🧠 Reasoning</a>
+    </div>
+
+    <div class="grid">
+        <a href="spotting-errors.html" class="card grammar">
+            <h3>Spotting Errors</h3>
+            <p>Identify grammatical and structural errors in sentences.</p>
+            <div class="badge">Grammar Focus</div>
+        </a>
+
+        <a href="synonyms.html" class="card vocab">
+            <h3>Synonyms</h3>
+            <p>Expand your vocabulary with words having similar meanings.</p>
+            <div class="badge">Vocabulary</div>
+        </a>
+
+        <a href="antonyms.html" class="card vocab">
+            <h3>Antonyms</h3>
+            <p>Practice identifying words with opposite meanings.</p>
+            <div class="badge">Vocabulary</div>
+        </a>
+
+        <a href="selecting-words.html" class="card vocab">
+            <h3>Selecting Words</h3>
+            <p>Choose the right word based on the context of the sentence.</p>
+            <div class="badge">Sentence Usage</div>
+        </a>
+
+        <a href="spellings.html" class="card vocab">
+            <h3>Spellings</h3>
+            <p>Test your accuracy in identifying correctly spelled words.</p>
+            <div class="badge">Accuracy</div>
+        </a>
+
+        <a href="Sentence-formation.html" class="card grammar">
+            <h3>Sentence Formation</h3>
+            <p>Practice constructing logically sound sentences.</p>
+            <div class="badge">Composition</div>
+        </a>
+
+        <a href="ordering-of-words.html" class="card logic">
+            <h3>Ordering of Words</h3>
+            <p>Rearrange jumbled words into a meaningful sentence.</p>
+            <div class="badge">Structure</div>
+        </a>
+
+        <a href="sentence-correction.html" class="card grammar">
+            <h3>Sentence Correction</h3>
+            <p>Practice replacing phrases to improve grammatical flow.</p>
+            <div class="badge">Grammar</div>
+        </a>
+
+        <a href="completing-statements.html" class="card logic">
+            <h3>Completing Statements</h3>
+            <p>Find the most logical ending for incomplete statements.</p>
+            <div class="badge">Reasoning</div>
+        </a>
+
+        <a href="paragraph-formation.html" class="card logic">
+            <h3>Paragraph Formation</h3>
+            <p>Arrange sentences to form a coherent paragraph.</p>
+            <div class="badge">Logical Flow</div>
+        </a>
+
+        <a href="cloze-test.html" class="card vocab">
+            <h3>Cloze Test</h3>
+            <p>Fill in multiple blanks within a passage contextually.</p>
+            <div class="badge">Contextual Ability</div>
+        </a>
+
+        <a href="comprehension.html" class="card logic">
+            <h3>Comprehension</h3>
+            <p>Read detailed passages and extract key information.</p>
+            <div class="badge">Reading Skill</div>
+        </a>
+
+        <a href="one-word-substitute.html" class="card vocab">
+            <h3>One Word Substitute</h3>
+            <p>Master concise language by replacing phrases with one word.</p>
+            <div class="badge">Vocabulary</div>
+        </a>
+
+        <a href="idioms-phrases.html" class="card vocab">
+            <h3>Idioms and Phrases</h3>
+            <p>Understand the figurative meanings of common expressions.</p>
+            <div class="badge">Figurative Language</div>
+        </a>
+
+        <a href="change-of-voice.html" class="card grammar">
+            <h3>Change of Voice</h3>
+            <p>Master Active and Passive voice transformations.</p>
+            <div class="badge">Grammar</div>
+        </a>
+
+        <a href="change-of-speech.html" class="card grammar">
+            <h3>Change of Speech</h3>
+            <p>Practice Direct and Indirect Narration rules.</p>
+            <div class="badge">Grammar</div>
+        </a>
+
+        <a href="verbal-analogies.html" class="card logic">
+            <h3>Verbal Analogies</h3>
+            <p>Identify and complete complex word relationships.</p>
+            <div class="badge">Verbal Logic</div>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

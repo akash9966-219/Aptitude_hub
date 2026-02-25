@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 3</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 3</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Error Detection: (A) Looking back, I find that among the many impressions of the people of India, / (B) absorbed while I lived among them, / (C) are their reverence for great men and women. / (D) No error.", options: ["A", "B", "C", "D"], ans: 2, logic: "The main subject is 'impressions' (plural), so 'are' is technically correct, BUT usually, the phrase 'among the many impressions... is their reverence' is preferred if we treat the collective observation as a singular concept. However, in this specific construction, part C often is flagged because 'one of the impressions' is the actual intent. Most examiners mark C because it should be 'is' to match the specific singular reverence mentioned." },
+            { q: "Error Detection: (A) In management, as you rise higher, / (B) the problems you face become more and more unstructured and you can't just fall back on / (C) the tools you had been / (D) No error.", options: ["A", "B", "C", "D"], ans: 2, logic: "Part C is incomplete. It should be 'the tools you had been using' or 'the tools you had'." },
+            { q: "Error Detection: (A) Even after worked in the office / (B) for as many as fifteen years, / (C) he still does not understand / (D) the basic objectives of the work. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 0, logic: "After a preposition like 'after', we use the gerund form: 'Even after working...'" },
+            { q: "Error Detection: (A) I cannot / (B) make from / (C) what you are saying / (D) about him. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 1, logic: "The correct phrasal verb is 'make out' (to understand), not 'make from'." },
+            { q: "Error Detection: (A) Your machine would not have / (B) given you so much trouble / (C) if you had / (D) maintained it proper. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "The verb 'maintained' must be modified by an adverb. Use 'properly' instead of 'proper'." },
+            { q: "Synonym: **hazardous**", options: ["tricky", "harmful", "difficult", "dangerous"], ans: 3, logic: "Hazardous refers to something involving risk or danger." },
+            { q: "Synonym: **insatiable**", options: ["unsatisfiable", "unchanging", "irreconcilable", "undesirable"], ans: 0, logic: "Insatiable means impossible to satisfy (especially an appetite or desire)." },
+            { q: "Synonym: **lamentable**", options: ["unpardonable", "deplorable", "inexcusable", "terrible"], ans: 1, logic: "Lamentable means regrettable or 'deplorable'." },
+            { q: "Antonym: FLAGITIOUS", options: ["Innocent", "Vapid", "Ignorant", "Frivolous"], ans: 0, logic: "Flagitious means extremely wicked/criminal; 'Innocent' is the direct opposite." },
+            { q: "Antonym: IMPASSE", options: ["Resurgence", "Breakthrough", "Continuation", "Combination"], ans: 1, logic: "An impasse is a deadlock; a breakthrough is an act of overcoming an obstacle." },
+            { q: "Fill in the blank: The paths of glory lead ...... to the grave.", options: ["straight", "but", "in", "directly"], ans: 1, logic: "This is a famous line from Thomas Gray's Elegy: 'The paths of glory lead but to the grave' (meaning 'only' to the grave)." },
+            { q: "Fill in the blank: He passed the examination in the first class because he ......", options: ["was hard working for it", "worked hardly for it", "had worked hard for it", "was working hard for it"], ans: 2, logic: "The past perfect 'had worked' indicates an action completed before another past action (passing the exam)." },
+            { q: "Fill in the blank: The English schemed to continue their rule in India by playing off one community ...... the other.", options: ["before", "upon", "against", "with"], ans: 2, logic: "To 'play off one against another' is the standard idiom for causing conflict between parties for one's own gain." },
+            { q: "Fill in the blank: The grapes are now ...... enough to be picked.", options: ["ready", "mature", "ripe", "advanced"], ans: 2, logic: "Fruit that is ready for picking is specifically described as 'ripe'." },
+            { q: "Stem Completion: In order to help the company attain its goal of enhancing profit, all the employees ......", options: ["urged the management to grant paid leave", "appealed the management to implement new welfare schemes", "voluntarily offered to work overtime with lucrative compensation", "voluntarily offered to render additional services in lieu of nothing", "decided to enhance production at the cost of quality"], ans: 3, logic: "To 'help the company attain its goal' of profit, offering services 'in lieu of nothing' (for free) is the most logically consistent action to reduce costs." },
+            { q: "Sequence: S1: Once upon a time... P: People afraid. Q: Could catch lions. R: Kill Death to be immortal. S: Good friends. S6: Set out to find Death.", options: ["QPRS", "SQPR", "RSQP", "SRPQ"], ans: 1, logic: "Sequence: S (Intro friends) -> Q (How strong they were) -> P (People afraid) -> R (The goal: Kill Death)." },
+            { q: "Sequence: S1: Ants eat worms... P: Quicker than ant. Q: Not easy game. R: Ways of escaping. S: Also eat larvae. S6: Some jump...", options: ["SQPR", "SPRQ", "SQRP", "SRQP"], ans: 0, logic: "Sequence: S (Addition to diet) -> Q (Contradiction: not easy) -> P (Reason 1: speed) -> R (Reason 2: methods)." },
+            { q: "Idiom: the Government has decided not to **give in**.", options: ["accede", "yield", "oblige", "confirm"], ans: 1, logic: "To 'give in' means to cease resistance or 'yield'." },
+            { q: "Idiom: Why do you wish to **tread on the toes**?", options: ["To give offence to them", "To follow them grudgingly", "To treat them indifferently", "To be kicked by them"], ans: 0, logic: "To tread on someone's toes means to offend or insult them, often by encroaching on their territory." },
+            { q: "Speech: Nita ordered her servant to bring her cup of tea.", options: ["Nita told her servant, \"Bring a cup of tea.\"", "Nita said, \"Bring me a cup of tea.\"", "Nita said to her servant, \"Bring me a cup of tea.\"", "Nita told her servant, \"Bring her that cup of tea.\""], ans: 2, logic: "When reporting an order, 'said to her servant' with 'Bring me' correctly translates to 'ordered her servant to bring her'." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

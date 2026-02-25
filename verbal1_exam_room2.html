@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 200px; height: auto; margin: 10px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+        .main-img { max-width: 100%; height: auto; margin-bottom: 15px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 2</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 2</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "Ravi left home and cycled 10 km towards South, then turned right and cycled 5 km and then again turned right and cycled 10 km. After this he turned left and cycled 10 km. How many kilometers will he have to cycle to reach his home straight?",
+                options: ["10 km", "15 km", "20 km", "25 km"], ans: 1, 
+                logic: "Initial moves create a rectangle (10S, 5W, 10N), placing him 5km West of home. One more move 10km West makes the total distance 15km West." 
+            },
+            { 
+                q: "Some boys are sitting in three rows all facing North such that A is in the middle row. P is just to the right of A. Q is just behind of P while R is in the North of A. In which direction of R is Q?",
+                options: ["South", "South-West", "North-East", "South-East"], ans: 3, 
+                logic: "Relative to R (top center), Q is further down (South) and to the right (East), resulting in South-East." 
+            },
+            { 
+                q: "Which of the following relations shows that I is the niece of K?",
+                direction: "P + Q = brother; P x Q = father; P - Q = sister.",
+                options: ["K + Y + Z - I", "K + Y x I - Z", "Z - I x Y + K", "K x Y + I - Z"], ans: 1, 
+                logic: "K + Y (K brother of Y), Y x I (Y father of I), I - Z (I sister of Z). I is the daughter of K's brother, making her the niece." 
+            },
+            { 
+                q: "Which of the following means that K is the mother-in-law of M?",
+                direction: "3=mother, 4=brother, 9=husband, 5=daughter",
+                options: ["M9N3K4J", "M9N5K3J", "K5J9M3N", "K3J9N4M"], ans: 1, 
+                logic: "M9N (M is husband of N) and N5K (N is daughter of K). If K is the mother (based on 3J), she is M's mother-in-law." 
+            },
+            { 
+                q: "Statements: All the harmoniums are instruments. All the instruments are flutes.",
+                options: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 1, 
+                logic: "All H are I + All I are F = All H are F. Conclusion 2 follows. 'All flutes are instruments' is a converse and not necessarily true." 
+            },
+            { 
+                q: "Statements: Some dogs are bats. Some bats are cats.",
+                options: ["Only (1) conclusion follows", "Only (2) conclusion follows", "Either (1) or (2) follows", "Neither (1) nor (2) follows", "Both (1) and (2) follow"], ans: 3, 
+                logic: "With two 'Some' statements, the middle term 'bats' is not distributed. No definite relationship can be formed between Dogs and Cats." 
+            },
+            { 
+                q: "A lotus flower always has",
+                options: ["Mud", "Petals", "Root", "Water"], ans: 1, 
+                logic: "Petals are an anatomical necessity for the flower structure itself." 
+            },
+            { 
+                q: "Which one of the following is always found in 'Bravery'?",
+                options: ["Experience", "Power", "Courage", "Knowledge"], ans: 2, 
+                logic: "Courage is the defining characteristic of bravery." 
+            },
+            { 
+                q: "Which symbol will be on the face opposite to the face with symbol * ?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-4.png",
+                options: ["@", "$", "8", "+"], ans: 2, 
+                logic: "By observing the positions, * is adjacent to @, -, +, and $. The opposite face must be 8." 
+            },
+            { 
+                q: "The employees of the biggest bank... strike call. II. Central Govt employees withdrawn demonstrations.",
+                options: ["Statement I is cause, II effect", "Statement II is cause, I effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 3, 
+                logic: "These are two separate labor-related events with different outcomes and origins." 
+            },
+            { 
+                q: "Which of the following diagrams indicates the best relation between Teacher, Writer and Musician?",
+                options: [
+                    "A. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c5.png' class='q-img'>",
+                    "B. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>",
+                    "C. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c2.png' class='q-img'>",
+                    "D. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c6.png' class='q-img'>"
+                ], ans: 0, 
+                logic: "A person can be all three simultaneously, requiring a diagram where all three circles intersect (Diagram A)." 
+            },
+            { 
+                q: "Which of the following diagrams indicates the best relation between Men, Rodents and Living beings?",
+                options: [
+                    "A. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c5.png' class='q-img'>",
+                    "B. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c17.png' class='q-img'>",
+                    "C. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c2.png' class='q-img'>",
+                    "D. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>"
+                ], ans: 2, 
+                logic: "Men and Rodents are separate (disjoint) but both are entirely contained within Living Beings (Diagram C)." 
+            },
+            { 
+                q: "Which of the following diagrams indicates the best relation between Lion, Dog and Snake?",
+                options: [
+                    "A. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>",
+                    "B. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c10.png' class='q-img'>",
+                    "C. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c3.png' class='q-img'>",
+                    "D. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c11.png' class='q-img'>"
+                ], ans: 0, 
+                logic: "Three completely different animals with no shared characteristics in this context (Diagram A)." 
+            },
+            { 
+                q: "By which letter, the people who live in joint family but are neither married nor teachers are represented?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-9-Dir-1.png",
+                options: ["T", "R", "Q", "S"], ans: 3, 
+                logic: "Region S is inside the Joint Family circle but outside the Teacher and Married shapes." 
+            },
+            { 
+                q: "A cube cut, colored, then cut into 32. How many have two red and one green face?",
+                options: ["0", "8", "16", "4"], ans: 1, 
+                logic: "Calculated based on the edge positions of the two resulting rectangular prisms after the initial cut." 
+            },
+            { 
+                q: "Sound : Muffled",
+                options: ["Moisture : Humid", "Colour : Faded", "Despair : Anger", "Odour : Pungent"], ans: 1, 
+                logic: "Muffled sound is sound that has lost intensity; Faded color is color that has lost intensity." 
+            },
+            { 
+                q: "Chalk : Blackboard",
+                options: ["Type : Point", "Table : Chair", "Door : Handle", "Ink : Paper"], ans: 3, 
+                logic: "Chalk is the tool used to mark the Blackboard; Ink is the tool used to mark Paper." 
+            },
+            { 
+                q: "Who is sitting immediate right to Reeta?",
+                passage: "Seema left of Rani, right of Bindu. Mary right of Rani. Reeta between Rani and Mary.",
+                options: ["Bindu", "Rani", "Mary", "Seema"], ans: 2, 
+                logic: "Order: Bindu -> Seema -> Rani -> Reeta -> Mary. Mary is to Reeta's immediate right." 
+            },
+            { 
+                q: "Which one of the following is the correct position of Mercedes?",
+                passage: "Order: Fiat (end), Maruti, Ambassador, Bedford, Mercedes, Fargo, Cadillac.",
+                options: ["Next to left of Cadillac", "Next to left of Bedford", "Between Bedford and Fargo", "4th right of Maruti"], ans: 2, 
+                logic: "Placement: Fiat - Maruti - Ambassador - Bedford - Mercedes - Fargo - Cadillac. Mercedes is between Bedford and Fargo." 
+            },
+            { 
+                q: "Second to the left of the person opposite to O?",
+                passage: "Facing South: C-D-B-A-E. Facing North: M-O-N-P-Q. Shifting: B to E, E to Q, Q to B.",
+                options: ["Q", "P", "E", "D"], ans: 0, 
+                logic: "Opposite O is D. Second left of D is E. Since Q moved to E's spot, the answer is Q." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="main-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

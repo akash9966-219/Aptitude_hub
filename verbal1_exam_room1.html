@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 1</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 1</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "K is 40 m South-West of L. If M is 40 m South-East of L, then M is in which direction of K?",
+                options: ["East", "West", "North-East", "South"], ans: 0, 
+                logic: "L is the center. K is down and left (SW), M is down and right (SE). Since distances are equal, M is directly to the right of K, which is East." 
+            },
+            { 
+                direction: "A + B = sister; A x B = wife; A % B = father; A - B = brother.",
+                q: "Which of the following means T is the daughter of P?",
+                options: ["P x Q % R + S - T", "P x Q % R - T + S", "P x Q % R + T - S", "P x Q % R + S + T"], ans: 1, 
+                logic: "In option 2: P is wife of Q, Q is father of R, R is brother of T, T is sister (+) of S. This makes T the daughter of P and Q." 
+            },
+            { 
+                direction: "Direction (Q.No. 3): Choose the conclusions which logically follow.",
+                passage: "Statements: Some envelops are gums. Some gums are seals. Some seals are adhesives.",
+                q: "Conclusions:\n1. Some envelopes are seals.\n2. Some gums are adhesives.\n3. Some adhesives are seals.\n4. Some adhesives are gums.",
+                options: ["Only (3)", "Only (1)", "Only (2)", "Only (4)"], ans: 0, 
+                logic: "By the law of conversion, 'Some seals are adhesives' implies 'Some adhesives are seals'. Other connections are uncertain." 
+            },
+            { 
+                direction: "Direction (Q.No. 4): Cause and Effect relationship.",
+                passage: "I. The staff of Airport Authorities called off the strike.\nII. The staff went on strike anticipating a threat to their jobs.",
+                q: "Which choice correctly depicts the relationship?",
+                options: ["Statement I is cause, II is effect", "Statement II is cause, I is effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 1, 
+                logic: "Going on strike (II) is the action/event that eventually leads to the resolution or calling it off (I)." 
+            },
+            { 
+                direction: "Direction (Q.No. 5): Square=English, Triangle=Marathi, Big Square=Telugu, Circle=Hindi.",
+                q: "How many persons can speak English and Hindi both the languages only?",
+                options: ["5", "8", "7", "18"], ans: 1, 
+                logic: "Find the region that is shared by the small square (English) and the circle (Hindi) but no other shapes. Based on the standard diagram for this question, this value is 8." 
+            },
+            { 
+                direction: "Direction (Q.No. 6): Rect=Men, Tri=Educated, Circ=Urban, Sq=Govt.",
+                q: "Which one of the following represents the educated men but not urban?",
+                options: ["9", "5", "4", "11"], ans: 3, 
+                logic: "Look for the intersection of the Rectangle and Triangle that remains outside the Circle. The number 11 satisfies this." 
+            },
+            { 
+                direction: "Direction (Q.No. 7): Cube cut into 64 small cubes. Faces: Red, Black, Green.",
+                q: "How many small cubes have one face green and the other either black or red?",
+                options: ["28", "8", "16", "24"], ans: 2, 
+                logic: "In a 4x4x4 cube, these are the edge cubes (excluding corners). Each green face shares edges with black and red faces. There are 16 such edge cubes." 
+            },
+            { 
+                q: "Eye : Myopia :: Teeth : ?",
+                options: ["Pyorrhoea", "Cataract", "Trachoma", "Eczema"], ans: 0, 
+                logic: "Myopia is a disease of the eyes; Pyorrhoea is a disease of the teeth." 
+            },
+            { 
+                q: "ZRYQ : KCJB :: PWOV : ?",
+                options: ["GBHA", "ISJT", "ELDK", "EOFP"], ans: 3, 
+                logic: "The pattern follows a reverse alphabetical mapping or a consistent shift. PWOV maps to EOFP based on the positional shift observed in the first pair." 
+            },
+            { 
+                q: "Glove : Hand",
+                options: ["Neck : Collar", "Tie : Shirt", "Socks : Feet", "Coat : Pocket"], ans: 2, 
+                logic: "A glove is worn on the hand; socks are worn on the feet." 
+            },
+            { 
+                direction: "Hexagonal table, facing centre. P is 2nd left of U. Q is neighbor of R and S. T is 2nd left of S.",
+                q: "Who is the fourth person to the left of Q?",
+                options: ["P", "U", "R", "Data inadequate"], ans: 0, 
+                logic: "By placing them: U, _, P, S, Q, R. The fourth to the left of Q (clockwise) is P." 
+            },
+            { 
+                direction: "Square table, 2 per side. 3 ladies (not adjacent). J between L & F. G between I & F. H (lady) is 2nd left of J. F (male) opposite E (lady).",
+                q: "Who among the following is seated between E and H?",
+                options: ["F", "I", "K", "Cannot be determined"], ans: 2, 
+                logic: "Following the constraints, K must fill the remaining spot between the lady members E and H." 
+            },
+            { 
+                q: "Choose the word which is different from the rest.",
+                options: ["Taxi", "Phaeton", "Cart", "Rickshaw", "Tonga"], ans: 0, 
+                logic: "Taxi is a motorized vehicle; the others are horse-drawn or manually pulled carriages." 
+            },
+            { 
+                q: "Choose the word which is different from the rest.",
+                options: ["Larva", "Pupa", "Caterpillar", "Nymph"], ans: 3, 
+                logic: "Larva, Pupa, and Caterpillar are stages of complete metamorphosis; Nymph is a stage of incomplete metamorphosis." 
+            },
+            { 
+                q: "Choose the word which is different from the rest.",
+                options: ["Panaji", "Bhopal", "Pune", "Shillong"], ans: 2, 
+                logic: "Panaji, Bhopal, and Shillong are state capitals. Pune is a major city but not a capital." 
+            },
+            { 
+                q: "Choose the odd one out.",
+                options: ["ABDG", "IJLO", "MNPS", "RSUY", "PQSV"], ans: 4, 
+                logic: "In others, the gaps between letters follow +1, +1, +2 (A-B, B-D, D-G). PQSV does not follow this pattern." 
+            },
+            { 
+                direction: "Data Sufficiency: (A) I only, (B) II only, (C) Either, (D) Neither, (E) Both.",
+                q: "How many New Year's greeting cards were sold this year in your shop?",
+                passage: "I. Last year 2935 cards were sold. II. This year was 1.2 times last year.",
+                options: ["I alone", "II alone", "Either", "Neither", "Both"], ans: 4, 
+                logic: "You need the base figure from I and the multiplier from II to calculate the answer." 
+            },
+            { 
+                q: "Who is to the immediate right of P among P, Q, R, S, T facing North?",
+                passage: "I. R is 3rd left of Q and P is 2nd right of R. II. Q is immediate left of T who is 2nd right of P.",
+                options: ["I alone", "II alone", "Either", "Neither", "Both"], ans: 2, 
+                logic: "Both statements independently allow you to arrange the sequence R, _, P, Q, T. In both cases, Q is to the immediate right of P." 
+            },
+            { 
+                q: "240, ?, 120, 40, 10, 2",
+                options: ["180", "240", "420", "480"], ans: 1, 
+                logic: "The series divides by decreasing integers: 240/1=240, 240/2=120, 120/3=40, 40/4=10, 10/5=2." 
+            },
+            { 
+                q: "cccbb _ aa _ cc _ bbbaa _ c",
+                options: ["aebe", "baca", "baba", "acba"], ans: 1, 
+                logic: "The pattern is ccc bbb aaa / ccc bbb aaa / c. Filling in 'baca' completes the triplets." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

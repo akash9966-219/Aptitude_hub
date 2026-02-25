@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Ability Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none;
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent);
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border-left: 5px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .q-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .option-label:hover { background: rgba(255,255,255,0.08); }
+        
+        .is-correct { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border-color: var(--correct) !important; 
+            color: var(--correct); font-weight: 700;
+        }
+        .is-wrong { 
+            background: rgba(239, 68, 68, 0.15) !important; 
+            border-color: var(--wrong) !important; 
+            color: var(--wrong);
+        }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(168, 85, 247, 0.05);
+            border-radius: 10px; display: none; border-left: 4px solid var(--accent);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-submit:hover { background: #9333ea; transform: translateY(-2px); }
+
+        .btn-dashboard { 
+            display: none; background: #334155; color: white; 
+            text-decoration: none; margin-top: 15px; 
+        }
+        .btn-dashboard:hover { background: #475569; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+        input[type="radio"] { margin-right: 15px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Test Analysis Complete</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review each question below to see detailed logic.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Ability Test 2</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 2</button>
+        <a href="test2.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Error Detection: (A) Do you know / (B) to play / (C) the guitar? / (D) No error.", options: ["A", "B", "C", "D"], ans: 1, logic: "When 'know' is used to refer to a skill, it is followed by 'how' + infinitive. Correct: 'Do you know how to play...'" },
+            { q: "Error Detection: (A) After leaving his office / (B) he went directly / (C) to a restaurant. / (D) No error.", options: ["A", "B", "C", "D"], ans: 3, logic: "The sentence is grammatically correct. 'Directly' is an adverb used correctly here." },
+            { q: "Error Detection: (A) Ramesh did not like / (B) leaving his old parents alone in the house / (C) but he had no alternative / (D) as he has to go out to work. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "Tense consistency error. Since the first part is in past tense ('did not like', 'had'), 'has' should be 'had'." },
+            { q: "Error Detection: (A) The observers felt that / (B) the stronger team had to face / (C) defeat because the players / (D) didn't play whole hearted. / (E) No error.", options: ["A", "B", "C", "D", "E"], ans: 3, logic: "We need an adverb to describe 'play'. The correct adverb is 'whole-heartedly'." },
+            { q: "Synonym: RESCUE", options: ["Command", "Help", "Defence", "Safety"], ans: 1, logic: "Rescue means to save or assist someone from a dangerous situation; 'Help' is the closest meaning." },
+            { q: "Synonym: AWAKENED", options: ["Enlightened", "Realised", "Shook", "Waken"], ans: 3, logic: "'Waken' is the direct synonym for 'Awakened'." },
+            { q: "Synonym: INSOLVENT", options: ["Poor", "Bankrupt", "Penniless", "Broke"], ans: 1, logic: "Insolvent specifically refers to the legal state of being unable to pay debts; 'Bankrupt' is the most accurate synonym." },
+            { q: "Synonym: RECKLESS", options: ["Courageous", "Rash", "Bold", "Daring"], ans: 1, logic: "Reckless implies a lack of care for consequences, similar to being 'Rash'." },
+            { q: "Swift is known in the world of letters for his **misogynism**.", options: ["hate for mankind", "hate for womankind", "love for the reasonable", "love for the womankind"], ans: 1, logic: "Misogynism is derived from 'miso' (hatred) and 'gyne' (woman)." },
+            { q: "Antonym: LEND", options: ["Borrow", "Cheat", "Pawn", "Hire"], ans: 0, logic: "To lend is to give; to borrow is to take with the intent to return." },
+            { q: "Antonym: FRUGAL", options: ["Copious", "Extravagant", "Generous", "Ostentatious"], ans: 1, logic: "Frugal means being economical/sparing; 'Extravagant' means spending excessively." },
+            { q: "Antonym: EXTRAVAGANCE", options: ["Luxury", "Poverty", "Economical", "Cheapness"], ans: 2, logic: "The noun form 'Economical' (though 'Economy' would be better) is the intended opposite of wastefulness." },
+            { q: "Antonym: **Adversity** teaches man to be humble and self-reliant.", options: ["sincerity", "animosity", "curiosity", "prosperity"], ans: 3, logic: "Adversity refers to hardship; prosperity refers to success and good fortune." },
+            { q: "Antonym: Unsettled conditions in the land led to **exodus** of hundreds of its citizens.", options: ["invasion", "entry", "immigration", "expulsion"], ans: 2, logic: "Exodus is a mass departure; immigration is the act of coming to live permanently in a foreign country." },
+            { q: "Fill in the blank: The river overflowed its ...... and flooded the area.", options: ["edges", "fronts", "limits", "banks"], ans: 3, logic: "The sides of a river are specifically called 'banks'." },
+            { q: "Find the word that is inappropriate or wrongly spelt: People in our country are **distressed**(A) by the **spate**(B) of strikes, an almost **perpetual**(C) go slow and **increadibily**(D) low productivity.", options: ["A", "B", "C", "D", "E (All correct)"], ans: 3, logic: "The word is misspelled. Correct spelling: 'incredibly'." },
+            { q: "Sentence Correction: They **failed in their attempt to repair** the demolished portion of that building.", options: ["for their attempt to repair", "in their attempting to repair", "with their attempt to repair", "in their attempt for repairs", "No correction required"], ans: 4, logic: "The original sentence is grammatically correct." },
+            { q: "Sequence: S1: Facing financial crisis. P: Cost benefit yardstick... Q: State of affairs cannot continue. R: Universities not commercial. S: Development must be ensured. S6: Gov realize.", options: ["QRPS", "QSPR", "QRSP", "QPRS"], ans: 0, logic: "The sequence QRPS logically flows from the crisis to the solution and philosophy." },
+            { q: "Relationship: TEN:DECIMAL", options: ["seven:septet", "four:quartet", "two:binary", "five:quince"], ans: 2, logic: "Decimal is a number system based on ten; Binary is a number system based on two." },
+            { q: "Relationship: DIVA:OPERA", options: ["producer:theatre", "director:drama", "conductor:bus", "thespian:play"], ans: 3, logic: "A Diva is a principal performer in an Opera; a Thespian is a performer in a Play." }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                <div class="q-text"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Answer: ${item.options[item.ans]}</strong><br>
+                    <div style="margin-top: 8px; color: #cbd5e1;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+
+                const correctLabel = document.getElementById(`L-${index}-${item.ans}`);
+                const expBox = document.getElementById(`E-${index}`);
+                const qBlock = document.getElementById(`block-${index}`);
+
+                if(correctLabel) correctLabel.classList.add('is-correct');
+                if(expBox) expBox.style.display = 'block';
+
+                if (selectedVal !== -1) {
+                    if (selectedVal === item.ans) {
+                        score++;
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--correct)";
+                    } else {
+                        const wrongLabel = document.getElementById(`L-${index}-${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('is-wrong');
+                        if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                    }
+                } else {
+                    if(qBlock) qBlock.style.borderLeftColor = "var(--wrong)";
+                }
+            });
+
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>

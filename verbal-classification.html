@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Classification - Logical Reasoning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #27ae60;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --bg: #f9fbf9;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            border: 1px solid #eef2ee;
+        }
+
+        .prompt {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            padding: 16px;
+            border: 2px solid #edf2f0;
+            background: #fff;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--primary);
+        }
+
+        .opt-btn:hover { border-color: var(--accent); background: #f0f9f4; }
+        .opt-btn.selected { border-color: var(--accent); background: #e8f5ed; }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--accent); color: white; display: none; }
+
+        .progress-pill {
+            background: #e8f5ed;
+            color: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="logical-reasoning.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">← Back to Menu</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="progress-pill" id="counter">Question 1 of 35</div>
+        <p class="prompt">Which word does <strong>NOT</strong> belong with the others?</p>
+        
+        <div id="options" class="options-list"></div>
+        
+        <div class="footer">
+            <button class="btn btn-check" id="checkBtn" onclick="verify()">Check Answer</button>
+            <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next Question →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const data = [
+    // SET 1
+    { opts: ["parsley", "basil", "dill", "mayonnaise"], ans: "mayonnaise" },
+    { opts: ["inch", "ounce", "centimeter", "yard"], ans: "ounce" },
+    { opts: ["tyre", "steering wheel", "engine", "car"], ans: "car" },
+    { opts: ["tulip", "rose", "bud", "daisy"], ans: "bud" },
+    { opts: ["rye", "sourdough", "pumpernickel", "loaf"], ans: "loaf" },
+    { opts: ["guitar", "flute", "violin", "cello"], ans: "flute" },
+    { opts: ["dodge", "flee", "duck", "avoid"], ans: "flee" },
+    { opts: ["branch", "dirt", "leaf", "root"], ans: "dirt" },
+    { opts: ["street", "freeway", "interstate", "expressway"], ans: "street" },
+    { opts: ["heading", "body", "letter", "closing"], ans: "letter" },
+    { opts: ["tape", "twine", "cord", "yarn"], ans: "tape" },
+    { opts: ["leopard", "cougar", "elephant", "lion"], ans: "elephant" },
+    { opts: ["couch", "rug", "table", "chair"], ans: "rug" },
+    { opts: ["cornea", "retina", "pupil", "vision"], ans: "vision" },
+    { opts: ["noun", "preposition", "punctuation", "adverb"], ans: "punctuation" },
+    { opts: ["book", "index", "glossary", "chapter"], ans: "book" },
+    { opts: ["unimportant", "trivial", "insignificant", "familiar"], ans: "familiar" },
+    // SET 2
+    { opts: ["wing", "fin", "beak", "rudder"], ans: "beak" },
+    { opts: ["core", "seeds", "pulp", "slice"], ans: "slice" },
+    { opts: ["peninsula", "island", "bay", "cape"], ans: "bay" },
+    { opts: ["fair", "just", "equitable", "favorable"], ans: "favorable" },
+    { opts: ["unique", "beautiful", "rare", "exceptional"], ans: "beautiful" },
+    { opts: ["acute", "right", "obtuse", "parallel"], ans: "parallel" },
+    { opts: ["triangle", "circle", "oval", "sphere"], ans: "sphere" },
+    { opts: ["scythe", "knife", "pliers", "saw"], ans: "pliers" },
+    { opts: ["biology", "chemistry", "theology", "zoology"], ans: "theology" },
+    { opts: ["evaluate", "assess", "appraise", "instruct"], ans: "instruct" },
+    { opts: ["defendant", "prosecutor", "trial", "judge"], ans: "trial" },
+    { opts: ["aorta", "heart", "liver", "stomach"], ans: "aorta" },
+    { opts: ["mayor", "lawyer", "governor", "senator"], ans: "lawyer" },
+    { opts: ["excite", "flourish", "prosper", "thrive"], ans: "excite" },
+    { opts: ["seat", "rung", "cushion", "leg"], ans: "cushion" },
+    { opts: ["area", "variable", "circumference", "quadrilateral"], ans: "variable" },
+    { opts: ["eel", "lobster", "crab", "shrimp"], ans: "eel" },
+    { opts: ["two", "three", "six", "eight"], ans: "three" }
+];
+
+let currentIdx = 0;
+let selectedVal = null;
+
+function render() {
+    const item = data[currentIdx];
+    document.getElementById('counter').innerText = `Question ${currentIdx + 1} of ${data.length}`;
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    
+    item.opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+            selectedVal = opt;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        box.appendChild(btn);
+    });
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+}
+
+function verify() {
+    if (!selectedVal) return alert("Pick an outlier!");
+    const correct = data[currentIdx].ans;
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    btns.forEach(btn => {
+        if (btn.innerText === correct) btn.classList.add('correct');
+        if (btn.innerText === selectedVal && selectedVal !== correct) btn.classList.add('wrong');
+        btn.disabled = true;
+    });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    selectedVal = null;
+    if (currentIdx < data.length - 1) {
+        currentIdx++;
+        render();
+    } else {
+        alert("Classification practice complete!");
+    }
+}
+
+render();
+</script>
+</body>
+</html>

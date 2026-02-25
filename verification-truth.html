@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reasoning - Verification of Truth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #fdfefe;
+            --card: #ffffff;
+            --accent: #e67e22;
+            --correct: #27ae60;
+            --wrong: #c0392b;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f4f9;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--primary);
+        }
+
+        .options-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 2px solid #eaeeef;
+            padding: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.05rem;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--accent);
+            background: #fff8f2;
+        }
+
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .sidebar {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            height: fit-content;
+            border-top: 5px solid var(--accent);
+        }
+
+        .logic-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff5eb;
+            border-left: 4px solid var(--accent);
+            display: none;
+        }
+
+        .btn-next {
+            background: var(--accent);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 25px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="verbal-reasoning1.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Back to Menu</a>
+    <span id="progress">0 / 0</span>
+</div>
+
+<div class="container">
+    <div class="quiz-card">
+        <div id="question" class="question-text"></div>
+        <div id="options" class="options-list"></div>
+        <button class="btn-next" id="nextBtn" onclick="nextQ()">Next Question</button>
+    </div>
+
+    <div class="sidebar">
+        <h3 style="margin-top:0">Truth Logic</h3>
+        <p style="font-size: 0.9rem;">This module tests for <b>essential</b> parts. For example, a car can exist without a driver, but it cannot exist without wheels.</p>
+        <div id="logicBox" class="logic-box">
+            <strong>Logic:</strong><br>
+            <span id="logicText"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { q: "A train always has", opts: ["Rails", "Driver", "Guard", "Engine"], ans: 3, hint: "A train cannot move or exist as a powered transport unit without an engine. While it runs on rails, the rails are part of the track, not the train itself." },
+        { q: "Which one of the following is always found in 'Bravery'?", opts: ["Experience", "Power", "Courage", "Knowledge"], ans: 2, hint: "Courage is the fundamental synonym and requirement for bravery." },
+        { q: "A song always has", opts: ["Word", "Chorus", "Musician", "Tymbal"], ans: 0, logic: "A song, by definition, involves vocal music which requires words (lyrics)." },
+        { q: "Yesterday I saw an ice cube which had already melted due to heat of a nearby furnace.", opts: ["Always", "Never", "Often", "Sometimes"], ans: 0, logic: "This is a factual possibility; ice always melts when exposed to heat." },
+        { q: "What is found necessarily in milk?", opts: ["Cream", "Curd", "Water", "Whiteness"], ans: 2, logic: "Milk is biologically composed primarily of water, regardless of its color or processing." },
+        { q: "Which one of the following is always with 'Bargain'?", opts: ["Exchange", "Sumptuousness", "Triviality", "Eloquence"], ans: 0, logic: "A bargain involves a negotiation for the exchange of goods or services for money." },
+        { q: "Which one of the following a 'Drama' must have?", opts: ["Actors", "Story", "Sets", "Director"], ans: 1, logic: "Without a story or plot, there is no drama to perform." },
+        { q: "A boy sitting at the back seat of a car experiences a backward force when the driver suddenly starts moving forward?", opts: ["Always", "Never", "Often", "Sometimes"], ans: 0, logic: "According to the Law of Inertia, an object at rest stays at rest, causing a relative backward pull when the vehicle accelerates forward." },
+        { q: "Which one of the following is always found in 'Wonder'?", opts: ["Crowd", "Lumber", "Astonishment", "Rustic"], ans: 2, logic: "Wonder is a feeling of great surprise and admiration, which is astonishment." },
+        { q: "Disclosure always involves", opts: ["Agents", "Display", "Exposition", "Secrets"], ans: 3, logic: "You can only 'disclose' something that was previously hidden or a secret." },
+        { q: "A bulb always has", opts: ["Glass", "Current", "Filament", "Light"], ans: 2, logic: "A traditional incandescent bulb requires a filament to produce light. Note: Modern LEDs differ, but in classical logic, Filament is the core." },
+        { q: "A mirror always", opts: ["Retracts", "Distorts", "Refracts", "Reflects"], ans: 3, logic: "The fundamental property of a mirror is the reflection of light." },
+        { q: "A lotus flower always has", opts: ["Mud", "Petals", "Root", "Water"], ans: 1, logic: "While it grows in mud/water, the object 'flower' must have petals to be a flower." },
+        { q: "In India a widow can marry her brother-in-law although a man cannot marry the sister of his dead wife:", opts: ["Always", "Never", "Often", "Sometimes"], ans: 3, logic: "This depends on personal laws and customs, so it happens 'sometimes'." },
+        { q: "Which one of the following is always found in 'Remedy of fault'?", opts: ["Punishment", "Remedy", "Fault", "Scolding"], ans: 2, logic: "To have a remedy of a fault, a fault must first exist." },
+        { q: "A car always has", opts: ["Driver", "Wheels", "Bonnet", "Bumper"], ans: 1, logic: "A car is a wheeled motor vehicle. It cannot be a car without wheels." },
+        { q: "Danger always involves", opts: ["Enemy", "Attack", "Fear", "Help"], ans: 2, logic: "Danger is the possibility of harm, which naturally triggers the emotion of fear." },
+        { q: "A disease always has", opts: ["Cure", "Germs", "Cause", "Patient"], ans: 2, logic: "Every physiological or mental condition has an underlying cause (biological, genetic, or environmental)." },
+        { q: "Management always involves", opts: ["Regulation", "Counsel", "Exhortation", "Coercion"], ans: 0, logic: "Management is the process of dealing with or controlling things/people via regulation." },
+        { q: "Which one of the following is always found in 'Phrase'?", opts: ["Nomenclature", "Manifestation", "Pictorial effect", "Glossary"], ans: 1, logic: "A phrase is a manifestation of thought or language." },
+        { q: "If we are going early in the morning towards the south, the sun will be visible at our left:", opts: ["Always", "Never", "Often", "Sometimes"], ans: 0, logic: "Sun rises in the East. If you face South, East is to your left." },
+        { q: "My ten years old niece is taller than my twelve years old son:", opts: ["Always", "Never", "Often", "Sometimes"], ans: 3, logic: "Height varies by individual; it is possible but not guaranteed." },
+        { q: "What is always in worry?", opts: ["Difficulty", "Unrest", "Non-Cooperation", "Poignancy"], ans: 1, logic: "Worry creates a state of mental unrest." },
+        { q: "Which one of the following is always associated with 'tree'?", opts: ["Flowers", "Leaves", "Fruits", "Roots"], ans: 3, logic: "Some trees don't have flowers/fruits/leaves (in winter), but all trees must have roots to live." },
+        { q: "Which one of the following is always associated with 'justice'?", opts: ["Hypocrisy", "Legitimate", "Magnanimity", "Diminutiveness"], ans: 1, logic: "Justice must be legitimate (conforming to laws/rules)." },
+        { q: "A camera always has", opts: ["Reels", "Flash", "Stand", "Lens"], ans: 3, logic: "A camera cannot capture an image without a lens to focus light." },
+        { q: "What is found necessarily in a race?", opts: ["Judge", "Spectators", "Competitor", "Prize"], ans: 2, logic: "You cannot have a race without people (competitors) to compete." },
+        { q: "What is found necessarily in game?", opts: ["Players", "Spectators", "Referee", "Victory"], ans: 0, logic: "A game requires participants or players to be played." },
+        { q: "Which one of the following is always found in factories?", opts: ["Chimney", "Workers", "Electricity", "Sellers"], ans: 1, logic: "A factory is a place where goods are manufactured by workers (or machine operators)." },
+        { q: "A hill always has", opts: ["Trees", "Height", "Animals", "Water"], ans: 1, logic: "A hill is defined as a naturally raised area of land, which requires height." },
+        { q: "Which one of the following is always in 'Sentiment'?", opts: ["Cruelty", "Insight", "Neutrality", "Emotion"], ans: 3, logic: "Sentiment is a view or attitude based on emotion." },
+        { q: "Controversy always involves", opts: ["Dislike", "Injustice", "Disagreement", "Passion"], ans: 2, logic: "Controversy is defined by a state of prolonged public disagreement." },
+        { q: "What is found necessarily in newspaper?", opts: ["Date", "Advertisement", "News", "Editor"], ans: 2, logic: "A newspaper's primary function and content is news." }
+    ];
+
+    let current = 0;
+
+    function render() {
+        const q = data[current];
+        document.getElementById('progress').innerText = `Question ${current + 1} / ${data.length}`;
+        document.getElementById('question').innerText = q.q;
+        document.getElementById('logicBox').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        
+        const optCont = document.getElementById('options');
+        optCont.innerHTML = '';
+        q.opts.forEach((o, i) => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = o;
+            b.onclick = () => check(i, q.ans, b);
+            optCont.appendChild(b);
+        });
+    }
+
+    function check(idx, correct, btn) {
+        const btns = document.querySelectorAll('.opt-btn');
+        btns.forEach(b => b.disabled = true);
+        if(idx === correct) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            btns[correct].classList.add('correct');
+        }
+        document.getElementById('logicText').innerText = data[current].logic || data[current].hint;
+        document.getElementById('logicBox').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function nextQ() {
+        if(current < data.length - 1) {
+            current++;
+            render();
+        } else {
+            alert("Verification of Truth module complete!");
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>

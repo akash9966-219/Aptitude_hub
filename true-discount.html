@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>True Discount Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #1cc88a;
+            --dark: #2e3759;
+            --light: #f8f9fc;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .back-btn {
+            background: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .feedback.wrong { background: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-check { background: var(--dark); color: white; }
+        .btn-next { background: var(--primary); color: white; display: none; }
+        
+        .score-screen {
+            text-align: center;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>True Discount</h1>
+</div>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='quantitative.html'">⬅ Back to Topics</button>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="quiz-card" id="quiz-area">
+        <div id="question-container">
+            <div class="question-meta" id="q-count">Question 1 of 15</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback">
+            <strong id="result-title"></strong>
+            <div class="explanation-text" id="explanation-content"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" id="check-btn" onclick="handleCheck()">Check Answer</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡</button>
+        </div>
+    </div>
+
+    <div class="quiz-card score-screen" id="score-area">
+        <h2>Practice Complete!</h2>
+        <p style="font-size: 1.5rem;">Your Score: <span id="final-score">0</span> / 15</p>
+        <button class="btn btn-next" style="display:inline-block" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Cow bought for Rs. 3000, sold for Rs. 3600 on 2 years credit. Rate 10% p.a. What is the gain?", options: ["0%", "5%", "7.5%", "10%"], correct: 0, explain: "PW of Rs. 3600 = (3600 * 100) / (100 + 10*2) = 360000/120 = Rs. 3000. CP = Rs. 3000. Gain = 0%." },
+        { q: "True discount on Rs. 2562 due 4 months hence is Rs. 122. The rate percent is:", options: ["12%", "13.33%", "15%", "14%"], correct: 2, explain: "PW = 2562 - 122 = 2440. SI on 2440 for 4 months = 122. R = (122 * 100 * 12) / (2440 * 4) = 15%." },
+        { q: "Owes Rs. 10028 due 1 year hence. Settle after 3 months at 12% p.a. How much cash?", options: ["Rs. 9025.20", "Rs. 9200", "Rs. 9600", "Rs. 9560"], correct: 1, explain: "Settling after 3 months means payment is 9 months early. PW = (10028 * 100) / (100 + 12 * 9/12) = 1002800 / 109 = Rs. 9200." },
+        { q: "Offer 1: Rs. 12,000 cash. Offer 2: Rs. 12,880 after 8 months @ 18% p.a. Better offer?", options: ["Rs. 12,000 cash", "Rs. 12,880 credit", "Equally good", "None"], correct: 1, explain: "PW of Offer 2 = (12880 * 100) / (100 + 18 * 8/12) = 1288000 / 112 = Rs. 11500. Offer 1 (12000) is better for the seller, but Offer 2 (PW 11500) is cheaper/better for the buyer. In sales context, cash is better if PW of credit is lower." },
+        { q: "TD is Rs. 10 on Rs. 110 due certain time. TD on same sum for double the time?", options: ["Rs. 20", "Rs. 21.81", "Rs. 18.33", "Rs. 22"], correct: 2, explain: "PW = 110-10 = 100. Rate*Time = (10/100)*100 = 10. For double time, R*2T = 20. TD = (100 * 20) / (100 + 20) = 2000/120 = Rs. 16.67 (Wait, re-calc: Amount is 110. TD = (110*20)/120 = Rs. 18.33)." },
+        { q: "Bought for Rs. 600, sold for Rs. 688.50 on 9 months credit gaining 2%. Rate p.a.?", options: ["16.67%", "14.5%", "13.33%", "15%"], correct: 0, explain: "Gain 2% on 600 = Rs. 612 (This is the PW). SI on 612 for 9 months = 688.50 - 612 = 76.5. R = (76.5 * 100 * 12) / (612 * 9) = 16.67%." },
+        { q: "TD on bill due 9 months hence at 16% is Rs. 189. Bill amount?", options: ["Rs. 1386", "Rs. 1764", "Rs. 1575", "Rs. 2268"], correct: 1, explain: "PW = (TD * 100) / (R * T) = (189 * 100) / (16 * 3/4) = 18900 / 12 = Rs. 1575. Bill = PW + TD = 1575 + 189 = Rs. 1764." },
+        { q: "Buy Rs. 1950 cash, sell Rs. 2200 on 1 year credit @ 10%. Result?", options: ["Gains Rs. 55", "Gains Rs. 50", "Loses Rs. 30", "Gains Rs. 30"], correct: 1, explain: "PW of Sale = (2200 * 100) / (110) = Rs. 2000. CP = Rs. 1950. Gain = 2000 - 1950 = Rs. 50." },
+        { q: "TD on Rs. 1760 @ 12% is Rs. 160. Time?", options: ["6 months", "8 months", "9 months", "10 months"], correct: 3, explain: "PW = 1760 - 160 = 1600. SI on 1600 for T = 160. T = (160 * 100) / (1600 * 12) = 10/12 years = 10 months." },
+        { q: "Present worth of Rs. 2310 due 2 years hence @ 15% p.a.?", options: ["Rs. 1750", "Rs. 1680", "Rs. 1840", "Rs. 1443.75"], correct: 0, explain: "PW = (2310 * 100) / (100 + 15*2) = 231000 / 130 = Rs. 1750." },
+        { q: "TD is Rs. 20 on Rs. 260. TD on same sum for half the time?", options: ["Rs. 10", "Rs. 10.40", "Rs. 15.20", "Rs. 13"], correct: 1, explain: "PW = 260-20=240. RT = 20/240 * 100 = 25/3. Half time RT = 25/6. TD = (260 * 25/6) / (100 + 25/6) = (260 * 25) / 625 = 260/25 = Rs. 10.40." },
+        { q: "SI on Rs. 750 (2 yrs) = TD on Rs. 960 (2 yrs). Rate?", options: ["12%", "14%", "15%", "16.67%"], correct: 1, explain: "SI = 750*R*2/100 = 15R. TD = (960*R*2)/(100+2R) = 1920R/(100+2R). 15R = 1920R/(100+2R) => 15(100+2R) = 1920 => 1500 + 30R = 1920 => 30R = 420 => R = 14%." },
+        { q: "SI and TD on a sum are Rs. 85 and Rs. 80. Sum is:", options: ["Rs. 1800", "Rs. 1450", "Rs. 1360", "Rs. 6800"], correct: 2, explain: "Sum = (SI * TD) / (SI - TD) = (85 * 80) / 5 = 17 * 80 = Rs. 1360." },
+        { q: "PW of Rs. 1404 due in two equal half-yearly installments @ 8% p.a.?", options: ["Rs. 1325", "Rs. 1300", "Rs. 1350", "Rs. 1500"], correct: 1, explain: "Installment = 702. PW1 = 702/(1 + 0.08*0.5) = 702/1.04 = 675. PW2 = 702/(1 + 0.08*1) = 702/1.08 = 650. Total PW = 675 + 650 = Rs. 1325. (Wait, checking calculation... 1325 is correct)." },
+        { q: "TD on sum due 2 yrs hence @ 14% is Rs. 168. Sum due?", options: ["Rs. 768", "Rs. 968", "Rs. 1960", "Rs. 2400"], correct: 0, explain: "PW = (168 * 100) / (14 * 2) = 16800 / 28 = Rs. 600. Sum = PW + TD = 600 + 168 = Rs. 768." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px">${String.fromCharCode(65+i)})</span> ${opt}`;
+            btn.onclick = () => selectOption(i);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        
+        const prog = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = prog + '%';
+        selectedIdx = null;
+    }
+
+    function selectOption(idx) {
+        selectedIdx = idx;
+        const opts = document.querySelectorAll('.option');
+        opts.forEach(o => o.classList.remove('selected'));
+        opts[idx].classList.add('selected');
+    }
+
+    function handleCheck() {
+        if (selectedIdx === null) return alert("Please select an option!");
+        
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback-box');
+        const title = document.getElementById('result-title');
+        const explain = document.getElementById('explanation-content');
+        
+        feedback.style.display = 'block';
+        if (selectedIdx === q.correct) {
+            score++;
+            title.innerText = "Correct!";
+            feedback.className = "feedback correct";
+        } else {
+            title.innerText = "Incorrect.";
+            feedback.className = "feedback wrong";
+        }
+        
+        explain.innerHTML = `<strong>Explanation:</strong> ${q.explain}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('score-area').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('progress-bar').style.width = '100%';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

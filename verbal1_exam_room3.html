@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verbal Reasoning Test 3 - Elite Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #a855f7; 
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a; color: white; padding-bottom: 60px;
+        }
+
+        .timer-header {
+            position: fixed; top: 0; width: 100%;
+            background: #1e293b; border-bottom: 2px solid var(--accent);
+            padding: 15px 0; text-align: center; font-size: 1.5rem;
+            font-weight: 800; color: var(--accent); z-index: 1000;
+        }
+
+        .test-container {
+            max-width: 850px; margin: 100px auto 40px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #summary-score {
+            display: none; background: rgba(168, 85, 247, 0.2);
+            border: 2px solid var(--accent); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 30px; animation: fadeIn 0.5s ease;
+        }
+
+        .direction-box {
+            background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; border-left: 4px solid #3b82f6; font-size: 0.9rem; color: #94a3b8;
+        }
+
+        .passage-box {
+            background: rgba(168, 85, 247, 0.1); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border-left: 4px solid var(--accent);
+            font-style: italic; color: #e2e8f0; line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .question-block { 
+            margin-bottom: 40px; padding: 25px; 
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px; border: 1px solid transparent; 
+        }
+
+        .option-label {
+            display: flex; align-items: center; padding: 14px 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: 0.2s;
+        }
+
+        .is-correct { background: rgba(34, 197, 94, 0.15) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 700; }
+        .is-wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; color: var(--wrong); }
+
+        .explanation {
+            margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; display: none; border: 1px solid var(--glass-border);
+        }
+
+        .btn-submit, .btn-dashboard {
+            display: block; width: 100%; padding: 20px;
+            font-size: 1.2rem; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: none; text-align: center; text-decoration: none;
+        }
+
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-dashboard { background: #334155; color: white; margin-top: 15px; display: none; }
+
+        .q-img { max-width: 180px; height: auto; margin: 10px 0; border-radius: 8px; filter: invert(1) brightness(1.5); }
+        .main-img { max-width: 100%; height: auto; margin-bottom: 15px; filter: invert(1) brightness(1.5); }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="timer-header" id="timer-display">Time Remaining: 30:00</div>
+
+    <div class="test-container">
+        <div id="summary-score">
+            <h2 style="margin:0">Performance Report</h2>
+            <div style="font-size: 3rem; font-weight: 800; margin: 10px 0;" id="final-score-val">0 / 20</div>
+            <p>Review the logic patterns below to improve your score.</p>
+        </div>
+
+        <h1 style="color: var(--accent); margin-bottom: 40px;">Verbal Reasoning Test 3</h1>
+        
+        <div id="questions-wrapper"></div>
+        
+        <button type="button" class="btn-submit" id="submit-btn" onclick="processResults()">Submit Test 3</button>
+        <a href="test4.html" class="btn-dashboard" id="dash-btn">Go to Dashboard</a>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                q: "P started from his house towards west. After walking 25 m, he turned right and walked 10 m. He then turned right again and walked 15 m. After this, he turns right at 135° and covers 30 m. In which direction should he go?",
+                options: ["West", "South", "South-West", "South-East"], ans: 2, 
+                logic: "After the second turn, he is facing East. Turning 135° right from East puts him in the South-West direction." 
+            },
+            { 
+                q: "One day at 2 P.M. Manisha and Madhuri were talking face to face. If Manisha's shadow was exactly to the left of Madhuri, which direction was Manisha facing?",
+                options: ["North", "South", "East", "None of these"], ans: 0, 
+                logic: "At 2 PM, the sun is in the West, so shadows fall East. For the shadow to be on Madhuri's left, Madhuri must face South. Since they are face-to-face, Manisha faces North." 
+            },
+            { 
+                q: "A's son B is married to C whose sister D is married to E, the brother of B. How is D related to A?",
+                options: ["Sister", "Daughter-in-law", "Sister-in-law", "Cousin"], ans: 1, 
+                logic: "E is A's son. D is E's wife. Therefore, D is A's daughter-in-law." 
+            },
+            { 
+                q: "Veena is the sister-in-law of Ashok and daughter-in-law of Kalyani. Dheeraj is the father of Sudeep, the only brother of Ashok. How is Kalyani related to Ashok?",
+                options: ["Mother-in-law", "Aunt", "Wife", "None of these"], ans: 3, 
+                logic: "Kalyani is the mother of Ashok (since she is the mother of Ashok's only brother Sudeep). 'Mother' is not in the options." 
+            },
+            { 
+                q: "A boy is sitting at the back seat of a car. When the driver suddenly starts moving the car forward, the boy experiences a backward force?",
+                options: ["Always", "Never", "Often", "Sometimes"], ans: 0, 
+                logic: "Due to Newton's First Law (Inertia), the body tends to remain at rest while the car moves forward, creating a backward force relative to the car." 
+            },
+            { 
+                q: "The figure on the left is folded to form a box. Choose the boxes that are similar to the box formed.",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-3-2.png",
+                options: ["1, 2 and 4 only", "3 and 4 only", "1 and 2 only", "1, 2 and 3 only"], ans: 0, 
+                logic: "Based on opposite faces in the unfolded net, configurations 1, 2, and 4 are physically possible." 
+            },
+            { 
+                q: "Statements: I. Rural areas suffer load-shedding. II. If power crisis isn't solved, load-shedding will extend to urban areas.",
+                options: ["Statement I is cause, II effect", "Statement II is cause, I effect", "Independent causes", "Effects of independent causes", "Effects of common cause"], ans: 0, 
+                logic: "The current crisis (I) is the reason/cause for the potential future extension of load-shedding (II)." 
+            },
+            { 
+                q: "Which of the following diagrams indicates the best relation between Hockey, Football and Cricket?",
+                options: [
+                    "A. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c10.png' class='q-img'>",
+                    "B. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c14.png' class='q-img'>",
+                    "C. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c4.png' class='q-img'>",
+                    "D. <br><img src='https://www.indiabix.com/_files/images/verbal-reasoning/venn-diagram/4-19-1-c9.png' class='q-img'>"
+                ], ans: 2, 
+                logic: "Hockey, Football, and Cricket are entirely different games; therefore, they are represented by three disjoint circles (Diagram C)." 
+            },
+            { 
+                q: "Ice : Coldness :: Earth : ?",
+                options: ["Weight", "Jungle", "Gravitation", "Sea"], ans: 2, 
+                logic: "Ice is characterized by coldness; Earth is characterized by gravitation." 
+            },
+            { 
+                q: "Safe : Secure :: Protect : ?",
+                options: ["Lock", "Sure", "Guard", "Conserve"], ans: 2, 
+                logic: "Safe and Secure are synonyms. Protect and Guard are synonyms." 
+            },
+            { 
+                q: "Computer : fqprxvht :: Language : ?",
+                options: ["oxpixdig", "ocqicyig", "ocqixcjg", "ocqixcig"], ans: 3, 
+                logic: "The pattern involves shifting letters forward: C+3=f, O+2=q, M+3=p, etc. Applying this to Language gives ocqixcig." 
+            },
+            { 
+                q: "? : QEHMDF :: WIDELY : HVCDXK",
+                options: ["FRINGE", "STRING", "FRANCE", "DEMAND"], ans: 0, 
+                logic: "The pattern in WIDELY to HVCDXK is -1 shift for each letter. Reversing this for QEHMDF gives FRINGE." 
+            },
+            { 
+                q: "68 : 130 :: ? : 350",
+                options: ["220", "224", "222", "226"], ans: 2, 
+                logic: "The pattern is (n^3 + n). 4^3+4=68; 5^3+5=130; 6^3+6=222; 7^3+7=350." 
+            },
+            { 
+                q: "Numismatist : Coins",
+                options: ["Jeweller : Jewels", "Cartographer : Maps", "Philatelist : Stamps", "Geneticist : Chromosomes"], ans: 2, 
+                logic: "A Numismatist collects/studies coins; a Philatelist collects/studies stamps." 
+            },
+            { 
+                q: "If O and P, A and E, and B and Q interchange positions, who is second right of the person opposite to the person second right of P?",
+                passage: "A,B,C,D,E face South. M,N,O,P,Q face North. B next to D, opposite Q. C,N diagonal. E opposite O. P left of Q, opposite D. M at end.",
+                options: ["D", "A", "E", "O"], ans: 1, 
+                logic: "Following the seating shifts and relative positions, the logic leads to person A." 
+            },
+            { 
+                q: "If P and R interchange positions, which pair will sit together?",
+                passage: "6 girls in a circle. T not between Q and S. P left of V. R is 4th right of P.",
+                options: ["RT", "PV", "VT", "QV"], ans: 2, 
+                logic: "Interchanging P and R places R next to V, but also results in V and T being adjacent based on the circular arrangement." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-7.png",
+                options: ["60", "46", "86", "75"], ans: 1, 
+                logic: "The pattern involves specific arithmetic operations on the surrounding numbers to reach the center value 46." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-44.png",
+                options: ["262", "622", "631", "824"], ans: 1, 
+                logic: "Subtracting the digits of the lower numbers from the upper numbers results in 622." 
+            },
+            { 
+                q: "Which one will replace the question mark?",
+                img: "https://www.indiabix.com/_files/images/verbal-reasoning/character-puzzles/4-20-1-55.png",
+                options: ["45", "29", "39", "37"], ans: 3, 
+                logic: "The logic follows (Outer top * Outer bottom) - (Left * Right) or similar grid-based calculation to reach 37." 
+            },
+            { 
+                q: "Arrange the words in a meaningful sequence: 1. Key, 2. Door, 3. Lock, 4. Room, 5. Switch on",
+                options: ["5, 1, 2, 4, 3", "4, 2, 1, 5, 3", "1, 3, 2, 4, 5", "1, 2, 3, 5, 4"], ans: 2, 
+                logic: "The logical sequence is: Key -> Lock -> Door -> Room -> Switch on." 
+            }
+        ];
+
+        const wrapper = document.getElementById('questions-wrapper');
+        questions.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${index}`;
+            block.innerHTML = `
+                ${item.direction ? `<div class="direction-box">${item.direction}</div>` : ''}
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Question ${index + 1}</div>
+                ${item.passage ? `<div class="passage-box">${item.passage}</div>` : ''}
+                ${item.img ? `<img src="${item.img}" class="main-img">` : ''}
+                <div class="q-text" style="margin-bottom:15px; font-weight:600;">${item.q}</div>
+                <div class="options-list">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="L-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> 
+                            <span style="margin-left:10px;">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="E-${index}">
+                    <strong style="color:var(--correct)">✔ Correct Logic:</strong>
+                    <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.95rem;">${item.logic}</div>
+                </div>
+            `;
+            wrapper.appendChild(block);
+        });
+
+        function processResults() {
+            let score = 0;
+            questions.forEach((item, index) => {
+                const radios = document.getElementsByName(`q${index}`);
+                let selectedVal = -1;
+                for(let i=0; i < radios.length; i++) {
+                    if(radios[i].checked) selectedVal = parseInt(radios[i].value);
+                    radios[i].disabled = true;
+                }
+                document.getElementById(`L-${index}-${item.ans}`).classList.add('is-correct');
+                document.getElementById(`E-${index}`).style.display = 'block';
+                if (selectedVal === item.ans) score++;
+                else if (selectedVal !== -1) document.getElementById(`L-${index}-${selectedVal}`).classList.add('is-wrong');
+            });
+            document.getElementById('summary-score').style.display = 'block';
+            document.getElementById('final-score-val').innerText = `${score} / 20`;
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('dash-btn').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        let timeLeft = 30 * 60;
+        const timerInt = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInt); processResults(); }
+            timeLeft--;
+        }, 1000);
+    </script>
+</body>
+</html>
